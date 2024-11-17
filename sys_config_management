@@ -120,7 +120,16 @@ Descripción del Diagrama
 3. Configuration Files (Archivos de Configuración)
 
 
+git add config/SecurityConfig.php config/FirewallManager.php config/AccessControl.php
 
+git commit -m "feat: Build security configuration system
+
+- Add SecurityConfig with SSL setup
+- Create FirewallManager with rule handling
+- Implement AccessControl with RBAC
+- Set up comprehensive security policies
+
+Relates to: #SEC-111 #FIRE-222"
 
     Apache Config (Configuración de Apache):
         Descripción: Archivos que configuran el servidor web Apache.
@@ -186,6 +195,8 @@ Ventajas de Esta Arquitectura de CI/CD
         Builds Reproducibles: Garantiza que cada build sea consistente y reproducible, lo que facilita la identificación de problemas y la garantía de calidad.
 
 Próximos Pasos
+
+
 
     Implementación de Git Flow:
         Configurar Git Flow en el Repositorio Git: Establecer las ramas principales (develop, feature, release, hotfix) y definir políticas de branching para el equipo de desarrollo.
