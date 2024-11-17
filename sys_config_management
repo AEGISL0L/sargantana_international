@@ -282,6 +282,10 @@ Relates to: #TEST-333 #QA-444"
         Integrar Herramientas de Monitorización: Implementar sistemas de monitorización como Prometheus y Grafana para supervisar el rendimiento y la salud de la aplicación en producción.
         Establecer Retroalimentación Continua: Utilizar la información de monitorización para realizar mejoras continuas en el pipeline y en la aplicación misma.
 
+
+git add jenkins/JenkinsConfig.php jenkins/PipelineManager.php jenkins/BuildManager.php
+
+
     Capacitación del Equipo:
         Entrenar a los Desarrolladores: Asegurar que todo el equipo de desarrollo esté familiarizado con Git Flow, Jenkins y las mejores prácticas de CI/CD.
         Documentar el Pipeline: Crear documentación detallada sobre el funcionamiento del pipeline, incluyendo cómo añadir nuevas etapas, manejar fallos y realizar despliegues manuales si es necesario.
