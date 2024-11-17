@@ -119,6 +119,9 @@ Descripción del Diagrama
 
 3. Configuration Files (Archivos de Configuración)
 
+
+
+
     Apache Config (Configuración de Apache):
         Descripción: Archivos que configuran el servidor web Apache.
         Función: Define parámetros como puertos, módulos cargados, y reglas de enrutamiento, asegurando que el servidor web funcione correctamente.
