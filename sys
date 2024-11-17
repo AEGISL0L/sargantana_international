@@ -2540,6 +2540,15 @@ Diagramas de Seguridad: Vitales para diseñar y gestionar las medidas de segurid
     Descripción: Representa las medidas de seguridad implementadas en el sistema.
     Componentes Incluidos: Firewalls, WAF, Sistemas de Autenticación, Encriptación, Gestión de Accesos.
 
+git commit -m "feat: Implement authentication and session management
+
+- Add AuthService with secure credential validation
+- Create SessionManager with token handling
+- Implement RoleManager for access control
+- Set up permission management system
+
+Relates to: #AUTH-808 #SESSION-909"
+
 graph TD
     subgraph "Perimeter Security"
         FW[Edge Firewall]
@@ -2587,6 +2596,10 @@ graph TD
 
     Descripción: Muestra cómo se gestionan y controlan los accesos a diferentes partes del sistema.
     Componentes Incluidos: Roles de Usuario, Permisos, Recursos Protegidos.
+
+
+
+
 
 graph TD
     subgraph "User Roles"
