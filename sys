@@ -2152,6 +2152,14 @@ Diagramas de Componentes y Despliegue: Ayudan a planificar cómo se distribuirá
     Descripción: Muestra cómo los diferentes componentes de software se organizan y se relacionan entre sí.
     Componentes Incluidos: Módulos PHP, Frameworks, Servicios Web, Librerías de Validación.
 
+git commit -m "feat: Implement service layer components
+
+- Add APIService for request handling
+- Create ValidationService with rule checking
+- Implement SecurityService with role-based access
+- Set up service layer logging
+
+Relates to: #SERVICE-789 #SECURITY-101"
 
 graph TD
     subgraph "Frontend Components"
