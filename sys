@@ -4142,6 +4142,8 @@ graph TD
     Descripción: Representa las técnicas y estrategias utilizadas para optimizar el sitio web para dispositivos móviles.
     Componentes Incluidos: Diseño Responsive, Lazy Loading, Minimización de Recursos.
 
+git add integration/HomeIntegration.php integration/LoginIntegration.php integration/RegisterIntegration.php
+
  graph TD
     subgraph "Responsive Design"
         Grid[Responsive Grid]
