@@ -2209,6 +2209,17 @@ graph TD
     Descripción: Representa la distribución física de los componentes de software en el hardware.
     Componentes Incluidos: Servidores Web, Máquinas Virtuales, Bases de Datos, Balanceadores de Carga.
 
+git commit -m "feat: Add monitoring and logging infrastructure
+
+- Implement MonitoringServer for metrics collection
+- Create LogServer for centralized logging
+- Add MetricsCollector for resource tracking
+- Set up performance monitoring
+
+Relates to: #MONITOR-456 #LOGGING-789"
+
+
+
 graph TD
     subgraph "Production Environment"
         LB[Load Balancer]
