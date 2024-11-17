@@ -7,3 +7,11 @@ class MetricsService {
         return $metrics;
     }
 }
+class MetricsService {
+    private $alertManager;
+    
+    public function trackMetrics(): void {
+        $metrics = $this->gatherSystemMetrics();
+        $this->evaluateThresholds($metrics);
+    }
+}
