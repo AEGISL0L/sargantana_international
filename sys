@@ -2878,7 +2878,16 @@ Diagramas de Monitorización y Alertas: Permiten visualizar cómo se supervisa e
     Descripción: Muestra cómo se monitorean los componentes del sistema.
     Componentes Incluidos: Herramientas de Monitorización (Prometheus, Grafana), Métricas Monitorizadas, Alertas Configuradas.
 
+git add monitoring/LoggingService.php monitoring/MetricsService.php monitoring/AlertService.php
 
+git commit -m "feat: Implement monitoring service components
+
+- Add LoggingService with pattern analysis
+- Create MetricsService with threshold evaluation
+- Implement AlertService with notification system
+- Set up real-time dashboard updates
+
+Relates to: #MONITOR-111 #ALERT-222"
 
 graph TD
     subgraph "System Components"
@@ -2916,6 +2925,9 @@ Diagramas de Flujo de Trabajo y Operaciones: Ayudan a definir y optimizar los fl
 
     Descripción: Representa los flujos de trabajo internos y procesos operativos del sistema.
     Escenarios Incluidos: Gestión de Usuarios, Asignación de Roles, Actualización de Contenidos.
+
+
+
 
 graph TD
     subgraph "User Management"
