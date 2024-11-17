@@ -169,9 +169,16 @@ Relates to: #PIPE-555 #BUILD-666"
         Descripción: Archivos que no cambian frecuentemente, como imágenes, hojas de estilo CSS y scripts JavaScript.
         Función: Almacenan y entregan recursos estáticos desde la CDN, asegurando una entrega rápida y eficiente.
 
+git add cache/CacheMonitor.php cache/MetricsCollector.php cache/AlertHandler.php
 
+git commit -m "feat: Build cache monitoring system
 
+- Add CacheMonitor with anomaly detection
+- Create MetricsCollector with performance tracking
+- Implement AlertHandler with notifications
+- Set up comprehensive monitoring
 
+Relates to: #MONITOR-777 #ALERT-888"
     Image Cache (Cache de Imágenes):
         Descripción: Almacena versiones optimizadas de imágenes en la CDN para acelerar su entrega.
         Función: Reduce el tiempo de carga de las imágenes y mejora la experiencia visual del usuario al servir imágenes desde ubicaciones geográficas cercanas.
