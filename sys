@@ -2488,6 +2488,16 @@ graph TD
     Componentes Incluidos: APIs, Servicios de Autenticación, Servicios de Base de Datos, Servicios de Monitorización.
 
 
+git commit -m "feat: Implement web services and content delivery
+
+- Add StaticContent with caching system
+- Create WebService with request handling
+- Implement ServiceOrchestrator for coordination
+- Set up performance optimization
+
+Relates to: #SERVICE-606 #CONTENT-707"
+
+
 graph TD
     subgraph "Frontend Services"
         EivissaWeb[Eivissa Web Service]
