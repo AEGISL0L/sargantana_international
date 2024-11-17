@@ -89,14 +89,39 @@ graph TD
 
 
 Descripción del Diagrama
+
 1. Browser Caching (Caching en Navegadores)
+
+git add cache/ServerCacheManager.php cache/PageCacheHandler.php cache/FragmentOptimizer.php
+
+git commit -m "feat: Build server caching system
+
+- Add ServerCacheManager with efficiency monitoring
+- Create PageCacheHandler with integrity checks
+- Implement FragmentOptimizer with performance metrics
+- Set up comprehensive page caching
+
+Relates to: #CACHE-777 #PERF-888"
 
     Browser Cache (Cache del Navegador):
         Descripción: Almacena recursos estáticos como HTML, CSS, JavaScript e imágenes directamente en el navegador del usuario.
         Función: Reduce el tiempo de carga al evitar la descarga repetida de recursos que no han cambiado, mejorando la velocidad de la página y la experiencia del usuario.
+
+git add cache/ApplicationCache.php cache/RedisManager.php cache/MemcachedOptimizer.php        
+git commit -m "feat: Build application cache system
+
+- Add ApplicationCache with distribution logic
+- Create RedisManager with data structures
+- Implement MemcachedOptimizer with load balancing
+- Set up distributed caching infrastructure
+
+Relates to: #CACHE-999 #REDIS-000"
+
     Local Storage (Almacenamiento Local):
         Descripción: Espacio de almacenamiento en el navegador para almacenar datos persistentes del lado del cliente.
         Función: Guarda datos que necesitan ser accesibles incluso después de cerrar el navegador, como preferencias del usuario o información de sesión.
+
+
     Session Storage (Almacenamiento de Sesión):
         Descripción: Almacena datos temporales de la sesión del usuario en el navegador.
         Función: Mantiene datos mientras el navegador está abierto, permitiendo la gestión de sesiones y estados temporales sin afectar el rendimiento general.
