@@ -3197,6 +3197,8 @@ Diagramas de Internacionalización y Localización: Importantes si el sistema ne
     Componentes Incluidos: Soporte Multilingüe, Traducción de Contenidos, Adaptación a Normas Locales.
 
 
+
+
 graph TD
     subgraph "Language Management"
         LangDetect[Language Detection]
