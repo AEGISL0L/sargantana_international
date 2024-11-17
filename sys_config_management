@@ -267,6 +267,17 @@ Relates to: #DEPLOY-111 #AUTO-222".
         Automatizar Despliegues: Configurar scripts de despliegue que automaticen el proceso de transferencia de artefactos desde el Build Server a los diferentes entornos.
         Implementar Validaciones en Staging: Asegurar que todas las validaciones y pruebas en el entorno de staging sean exhaustivas antes de proceder al despliegue en producción.
 
+git add testing/TestManager.php testing/UnitTestRunner.php testing/IntegrationTestRunner.php
+
+git commit -m "feat: Build automated testing system
+
+- Add TestManager with report generation
+- Create UnitTestRunner with test suite handling
+- Implement IntegrationTestRunner with analysis
+- Set up comprehensive test infrastructure
+
+Relates to: #TEST-333 #QA-444"
+
     Monitorización y Feedback:
         Integrar Herramientas de Monitorización: Implementar sistemas de monitorización como Prometheus y Grafana para supervisar el rendimiento y la salud de la aplicación en producción.
         Establecer Retroalimentación Continua: Utilizar la información de monitorización para realizar mejoras continuas en el pipeline y en la aplicación misma.
