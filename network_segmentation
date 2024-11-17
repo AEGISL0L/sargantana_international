@@ -1,0 +1,243 @@
+
+2.2. Diagrama de Segmentación de Red (Network Segmentation Diagram)
+
+    Descripción: Muestra cómo se divide la red en diferentes segmentos o VLANs para mejorar la seguridad y el rendimiento.
+    Componentes Incluidos: Redes Públicas, DMZ, Redes Internas, VLANs específicas para servidores web y bases de datos.
+
+
+graph TD
+    subgraph "Public Network - VLAN 10"
+        Internet((Internet))
+        Router[Edge Router]
+    end
+
+    subgraph "DMZ - VLAN 20"
+        FW[Firewall]
+        LB[Load Balancer]
+        WAF[Web Application Firewall]
+    end
+
+    subgraph "Web Servers - VLAN 30"
+        Apache1[Apache Server - Eivissa]
+        Apache2[Apache Server - Formentera]
+    end
+
+    subgraph "Application - VLAN 40"
+        EivissaVM[Eivissa VMs]
+        FormenteraVM[Formentera VMs]
+    end
+
+    subgraph "Database - VLAN 50"
+        MariaDB[MariaDB Servers]
+        Backup[Backup Storage]
+    end
+
+    subgraph "Management - VLAN 60"
+        Monitor[Monitoring Systems]
+        Logs[Log Servers]
+    end
+
+    Internet --> Router
+    Router --> FW
+    FW --> LB
+    LB --> WAF
+    WAF --> Apache1 & Apache2
+    Apache1 & Apache2 --> EivissaVM & FormenteraVM
+    EivissaVM & FormenteraVM --> MariaDB
+    MariaDB --> Backup
+    FW --> Monitor
+    Apache1 & Apache2 & EivissaVM & FormenteraVM --> Logs
+
+
+
++-----------------------------+
+| Public Network - VLAN 10    |
++-----------------------------+
+|  +---------+                |
+|  | Internet|                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Edge    |                |
+|  | Router  |                |
+|  +---------+                |
++-----------------------------+
+        |
+        v
++-----------------------------+
+| DMZ - VLAN 20               |
++-----------------------------+
+|  +---------+                |
+|  | Firewall|                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Load    |                |
+|  | Balancer|                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | WAF     |                |
+|  | Web App |                |
+|  | Firewall|                |
+|  +---------+                |
++-----------------------------+
+        |
+        v
++-----------------------------+
+| Web Servers - VLAN 30       |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | Apache   |  | Apache   | |
+|  | Server   |  | Server   | |
+|  | Eivissa  |  | Formentera| |
+|  +---------+  +---------+   |
++-----------------------------+
+        |          |
+        v          v
++-----------------------------+
+| Application - VLAN 40       |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | Eivissa  |  | Formentera| |
+|  | VMs      |  | VMs      | |
+|  +---------+  +---------+   |
++-----------------------------+
+        |          |
+        v          v
++-----------------------------+
+| Database - VLAN 50          |
++-----------------------------+
+|  +---------+                |
+|  | MariaDB |                |
+|  | Servers |                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Backup  |                |
+|  | Storage |                |
+|  +---------+                |
++-----------------------------+
+        |
+        v
++-----------------------------+
+| Management - VLAN 60        |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | Monitor  |  | Log     |  |
+|  | Systems  |  | Servers |  |
+|  +---------+  +---------+   |
++-----------------------------+
+
+
+
+Descripción de la Topología de Red
+1. Public Network - VLAN 10
+
+    Internet:
+        Descripción: Punto de entrada para el tráfico externo.
+        Función: Recibe solicitudes de usuarios de Eivissa y Formentera y las envía al enrutador de borde.
+
+    Edge Router (Enrutador de Borde):
+        Descripción: Enrutador que conecta la red interna con Internet.
+        Función: Filtra el tráfico y lo dirige a la DMZ para mayor seguridad.
+
+2. DMZ - VLAN 20
+
+    Firewall (Cortafuegos):
+        Descripción: Primera línea de defensa para proteger los recursos internos.
+        Función: Filtra el tráfico y aplica reglas de seguridad.
+
+    Load Balancer (Balanceador de Carga):
+        Descripción: Distribuye el tráfico entrante entre los servidores web.
+        Función: Mejora la disponibilidad y el rendimiento al distribuir las solicitudes.
+
+    Web Application Firewall (WAF):
+        Descripción: Protege la aplicación web contra ataques comunes.
+        Función: Filtra el tráfico HTTP/HTTPS, protegiendo contra inyecciones SQL, XSS, y otros ataques.
+
+3. Web Servers - VLAN 30
+
+    Apache Server - Eivissa y Formentera:
+        Descripción: Servidores web que manejan solicitudes HTTP/S para cada región.
+        Función: Procesan las solicitudes y se comunican con las máquinas virtuales para obtener datos.
+
+4. Application - VLAN 40
+
+    Eivissa VMs y Formentera VMs:
+        Descripción: Máquinas virtuales que ejecutan la lógica de la aplicación.
+        Función: Procesan la lógica del negocio y gestionan datos específicos para cada región.
+
+5. Database - VLAN 50
+
+    MariaDB Servers:
+        Descripción: Clúster de servidores MariaDB que almacenan datos de usuarios y transacciones.
+        Función: Proporciona almacenamiento persistente y acceso a datos.
+
+    Backup Storage (Almacenamiento de Respaldo):
+        Descripción: Almacenamiento dedicado para respaldos de la base de datos.
+        Función: Permite la recuperación de datos en caso de fallos.
+
+6. Management - VLAN 60
+
+    Monitoring Systems (Sistemas de Monitorización):
+        Descripción: Supervisan el rendimiento de los servidores y la red.
+        Función: Proporcionan alertas en tiempo real sobre el estado del sistema.
+
+    Log Servers (Servidores de Logs):
+        Descripción: Almacenan registros de actividades y errores.
+        Función: Proporcionan trazabilidad y facilitan la auditoría del sistema.
+
+Flujo de Datos e Interacción entre Componentes
+
+    Solicitud de Usuario:
+        Los usuarios de Eivissa y Formentera acceden a la aplicación a través de Internet, y sus solicitudes pasan por el enrutador de borde.
+
+    Filtrado y Balanceo:
+        El tráfico es filtrado por el cortafuegos y balanceado entre los servidores web mediante el balanceador de carga.
+
+    Protección de Aplicaciones:
+        El WAF protege la aplicación web de ataques antes de que las solicitudes lleguen a los servidores Apache.
+
+    Procesamiento de Solicitudes:
+        Los servidores Apache procesan las solicitudes y se comunican con las máquinas virtuales para ejecutar la lógica de la aplicación.
+
+    Acceso a Datos:
+        Las máquinas virtuales acceden a la base de datos MariaDB para recuperar o almacenar datos, utilizando conexiones seguras.
+
+    Monitorización y Auditoría:
+        Los sistemas de monitorización supervisan el rendimiento, y los logs se almacenan para análisis y auditoría.
+
+Ventajas de Esta Topología de Red
+
+    Seguridad Multicapa:
+        La combinación de cortafuegos, WAF y segmentación VLAN proporciona varias capas de seguridad para proteger los recursos internos.
+
+    Alta Disponibilidad:
+        El uso de balanceadores de carga y almacenamiento de respaldos garantiza la continuidad del servicio incluso en caso de fallos.
+
+    Rendimiento Optimizado:
+        La segmentación de la red en VLANs permite una mejor gestión del tráfico y reduce la congestión.
+
+    Escalabilidad:
+        La topología permite añadir más servidores web, máquinas virtuales o nodos de base de datos según crezcan las necesidades del negocio.
+
+Próximos Pasos para la Implementación
+
+    Configurar el Enrutador y el Cortafuegos:
+        Definir reglas de enrutamiento y filtrado para permitir solo el tráfico autorizado.
+
+    Implementar el Balanceador de Carga y el WAF:
+        Configurar el balanceador de carga para distribuir el tráfico y el WAF para proteger contra ataques comunes.
+
+    Desplegar los Servidores Apache y Máquinas Virtuales:
+        Configurar los servidores web y las máquinas virtuales para manejar solicitudes y procesar la lógica de la aplicación.
+
+    Configurar el Clúster de Bases de Datos:
+        Establecer replicación y respaldos para asegurar la disponibilidad de datos.
+
+    Implementar Sistemas de Monitorización y Logs:
+        Configurar herramientas como Prometheus y ELK Stack para supervisar y registrar actividades.
+
+Si necesitas más detalles sobre la implementación o ajustes en el diagrama, estaré encantado de ayudarte.
+

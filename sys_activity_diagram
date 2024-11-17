@@ -1,0 +1,236 @@
+5.2. Diagrama de Actividades (Activity Diagram)
+
+    Descripción: Representa el flujo de actividades o procesos dentro del sistema.
+    Escenarios Incluidos: Flujo de registro de usuario, validación de formularios, gestión de roles.
+
+
+graph TD
+    Start((Start)) --> FormInput[User Fills Registration Form]
+    
+    FormInput --> JSValidation{JavaScript Validation}
+    JSValidation -->|Invalid| ShowErrors[Show Form Errors]
+    ShowErrors --> FormInput
+    
+    JSValidation -->|Valid| SubmitForm[Submit Form to Server]
+    
+    SubmitForm --> PHPValidation{PHP Validation}
+    PHPValidation -->|Invalid| ReturnErrors[Return Validation Errors]
+    ReturnErrors --> FormInput
+    
+    PHPValidation -->|Valid| CheckIP{Check IP Location}
+    CheckIP -->|Not Allowed| BlockAccess[Block Registration]
+    
+    CheckIP -->|Allowed| CheckRole{Assign Role}
+    CheckRole -->|Basic User| CreateUser[Create User Account]
+    CheckRole -->|Admin| RequireApproval[Require Admin Approval]
+    
+    CreateUser --> SaveDB[Save to Database]
+    RequireApproval --> NotifyAdmin[Notify Administrator]
+    
+    SaveDB --> SendEmail[Send Confirmation Email]
+    SendEmail --> CreateSession[Create User Session]
+    
+    CreateSession --> End((End))
+    BlockAccess --> End
+    NotifyAdmin --> End
+
++---------------------------+
+|          Start            |
++---------------------------+
+            |
+            v
++---------------------------+
+| User Fills Registration   |
+| Form                      |
++---------------------------+
+            |
+            v
++---------------------------+
+| JavaScript Validation     |
++---------------------------+
+   |          |             
+   | Invalid  | Valid       
+   v          v             
++---------------------------+
+| Show Form Errors          |
++---------------------------+
+   |                        
+   v                        
++---------------------------+
+| Submit Form to Server     |
++---------------------------+
+            |
+            v
++---------------------------+
+| PHP Validation            |
++---------------------------+
+   |          |             
+   | Invalid  | Valid       
+   v          v             
++---------------------------+
+| Return Validation Errors  |
++---------------------------+
+   |                        
+   v                        
++---------------------------+
+| Check IP Location         |
++---------------------------+
+   |          |             
+   | Not      | Allowed     
+   | Allowed  |             
+   v          v             
++---------------------------+
+| Block Registration        |
++---------------------------+
+   |                        
+   v                        
++---------------------------+
+| Assign Role               |
++---------------------------+
+   |          |             
+   | Basic    | Admin       
+   | User     | Approval    
+   v          v             
++---------------------------+
+| Create User Account       |
++---------------------------+
+            |
+            v
++---------------------------+
+| Save to Database          |
++---------------------------+
+            |
+            v
++---------------------------+
+| Send Confirmation Email   |
++---------------------------+
+            |
+            v
++---------------------------+
+| Create User Session       |
++---------------------------+
+            |
+            v
++---------------------------+
+|           End             |
++---------------------------+
+
+
+
+
+Descripción del Diagrama de Flujo
+1. Start (Inicio)
+
+    Descripción: El proceso comienza cuando el usuario inicia el registro, rellenando el formulario de registro en la interfaz de usuario.
+
+2. JavaScript Validation (Validación con JavaScript)
+
+    Descripción: Validación inicial del formulario en el lado del cliente utilizando JavaScript.
+    Función: Verifica los campos del formulario para asegurar que cumplen con los requisitos básicos (formato de email, contraseñas, etc.).
+    Flujo:
+        Valid: Si los datos son correctos, se procede a enviar el formulario al servidor.
+        Invalid: Si los datos son incorrectos, se muestran errores al usuario para que pueda corregirlos.
+
+3. Submit Form to Server (Enviar Formulario al Servidor)
+
+    Descripción: Los datos del formulario se envían al backend para su procesamiento.
+
+4. PHP Validation (Validación con PHP)
+
+    Descripción: Validación adicional del formulario en el servidor utilizando PHP.
+    Función: Realiza validaciones más exhaustivas, como comprobaciones contra la base de datos para evitar duplicados.
+    Flujo:
+        Valid: Los datos son correctos y se continúa con el siguiente paso.
+        Invalid: Se devuelven errores al usuario, y se le solicita que corrija el formulario.
+
+5. Check IP Location (Comprobar Ubicación IP)
+
+    Descripción: Verifica la ubicación geográfica del usuario basado en su dirección IP.
+    Función: Limita el registro solo a usuarios de ubicaciones permitidas (Eivissa y Formentera).
+    Flujo:
+        Not Allowed: Si la IP no está permitida, se bloquea el registro.
+        Allowed: Si la IP es permitida, se procede con la asignación de roles.
+
+6. Assign Role (Asignar Rol)
+
+    Descripción: Asigna un rol al usuario basado en sus características y requisitos.
+    Flujo:
+        Basic User: Se crea una cuenta de usuario básica.
+        Admin: Si el usuario requiere aprobación administrativa, se notifica al administrador.
+
+7. Create User Account (Crear Cuenta de Usuario)
+
+    Descripción: Crea la cuenta del usuario en el sistema.
+
+8. Save to Database (Guardar en la Base de Datos)
+
+    Descripción: Almacena los datos del usuario en la base de datos.
+    Función: Persiste la información del usuario para su uso futuro.
+
+9. Send Confirmation Email (Enviar Email de Confirmación)
+
+    Descripción: Envía un correo electrónico de confirmación al usuario para verificar su registro.
+    Función: Informa al usuario de que su cuenta ha sido creada con éxito y proporciona instrucciones adicionales si es necesario.
+
+10. Create User Session (Crear Sesión de Usuario)
+
+    Descripción: Crea una sesión para el usuario recién registrado.
+    Función: Inicia la sesión del usuario automáticamente, permitiéndole acceder al sistema.
+
+11. End (Fin)
+
+    Descripción: El proceso de registro ha finalizado.
+
+Integración en la Topología General del Sistema
+
+    Validación de Datos y Seguridad:
+        La validación inicial con JavaScript mejora la experiencia del usuario al proporcionar retroalimentación inmediata.
+        La validación en PHP asegura que los datos sean correctos y seguros antes de almacenarlos en la base de datos.
+
+    Control de Acceso Basado en Ubicación:
+        La verificación de la IP refuerza la seguridad al restringir el registro solo a ubicaciones autorizadas (Eivissa y Formentera), previniendo accesos no deseados.
+
+    Asignación Dinámica de Roles:
+        El sistema permite la asignación automática de roles para usuarios básicos y una revisión administrativa para roles avanzados, mejorando la gestión de permisos.
+
+    Integración con la Base de Datos:
+        La información del usuario se almacena en la base de datos MariaDB, garantizando persistencia y disponibilidad para futuras operaciones.
+
+    Automatización de Notificaciones:
+        El envío automático de correos electrónicos de confirmación asegura que el usuario esté informado sobre el estado de su registro.
+
+    Creación Automática de Sesiones:
+        La creación automática de sesiones mejora la experiencia del usuario al permitirle acceder directamente al sistema después del registro.
+
+Ventajas del Proceso de Registro Propuesto
+
+    Mejora de la Experiencia del Usuario:
+        La validación en el cliente proporciona retroalimentación inmediata, reduciendo errores y facilitando el proceso de registro.
+
+    Seguridad Robusta:
+        La validación en el servidor y la verificación de IP aseguran que solo usuarios autorizados puedan registrarse, reduciendo el riesgo de accesos no deseados.
+
+    Gestión Eficiente de Roles:
+        La asignación dinámica de roles permite una administración flexible y escalable, ajustando los permisos según las características del usuario.
+
+    Automatización del Flujo:
+        El envío automático de correos y la creación de sesiones agilizan el proceso y mejoran la satisfacción del usuario.
+
+Próximos Pasos para la Implementación
+
+    Desarrollar Validaciones de Formularios:
+        Implementar las validaciones en JavaScript y PHP para cubrir todos los casos posibles de datos inválidos.
+
+    Configurar el Control de IP:
+        Definir y aplicar reglas para permitir solo registros desde ubicaciones autorizadas.
+
+    Desarrollar el Módulo de Asignación de Roles:
+        Crear la lógica para asignar roles automáticamente y gestionar la aprobación administrativa.
+
+    Integrar el Envío de Correos:
+        Configurar el envío de correos electrónicos utilizando un servicio como SMTP o una API de correo.
+
+    Probar el Flujo de Registro:
+        Realizar pruebas exhaustivas para asegurar que el flujo funcione correctamente y manejar todos los posibles escenarios de error.
+
+Si necesitas más detalles sobre la implementación o ajustes en el diagrama, estaré encantado de ayudarte.

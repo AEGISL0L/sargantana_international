@@ -1,0 +1,552 @@
+33. Diagramas de Gestión de Errores y Excepciones
+33.1. Diagrama de Manejo de Excepciones (Exception Handling Diagram)
+
+    Descripción: Representa cómo el sistema maneja errores y excepciones de manera estructurada.
+    Componentes Incluidos: Bloques Try-Catch, Páginas de Error Personalizadas, Registro de Errores.
+
+
+graph TD
+    subgraph "Exception Detection"
+        Try[Try Block]
+        Catch[Catch Block]
+        Finally[Finally Block]
+    end
+
+    subgraph "Error Classification"
+        Client[Client Errors]
+        Server[Server Errors]
+        DB[Database Errors]
+    end
+
+    subgraph "Error Handling"
+        Log[Error Logging]
+        Custom[Custom Error Pages]
+        Notify[Admin Notification]
+    end
+
+    subgraph "Recovery Actions"
+        Retry[Retry Operation]
+        Fallback[Fallback Logic]
+        Restore[System Restore]
+    end
+
+    Try --> Catch --> Finally
+    Catch --> Client & Server & DB
+    Client & Server & DB --> Log
+    Log --> Custom & Notify
+    Notify --> Retry & Fallback & Restore
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|   Exception Detection     |       |     Error Classification  |       |       Error Handling      |       |      Recovery Actions     |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |  Try    | | Catch   |   |       | | Client | | Server |   |       | | Log     | | Custom  |   |       | | Retry   | | Fallback|   |
+| | Block   | | Block   |   |       | | Errors | | Errors |   |       | | Logging | | Error   |   |       | | Operation| | Logic   |   |
+| |         | |         |   |       | |         | |         |   |       | |         | | Pages   |   |       | |         | |         |   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| +---------+               |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| | Finally |               |       | | DB      | |         |   |       | | Notify  | |         |   |       | | Restore | |         |   |
+| | Block   |               |       | | Errors | |         |   |       | | Admin   | |         |   |       | | System  | |         |   |
+| +---------+               |       | +---------+ +---------+   |       | | Notify  | |         |   |       | | Restore | |         |   |
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+                |                                |                                 |                                 |
+                |                                |                                 |                                 |
+                v                                v                                 v                                 v
+        +---------------+                +--------------+                  +--------------+                  +--------------+
+        | Try Block     |                | Client Errors|                  | Log Logging  |                  | Retry Operation|
+        +---------------+                +--------------+                  +--------------+                  +--------------+
+                |                                |                                 |                                 |
+                |                                |                                 |                                 |
+                v                                v                                 v                                 v
+        +---------------+                +--------------+                  +--------------+                  +--------------+
+        | Catch Block   |                | Server Errors|                  | Custom Error  |                  | Fallback Logic|
+        +---------------+                +--------------+                  | Pages         |                  +--------------+
+                |                                |                                 |                                 |
+                +--------------+-----------------+                                 |                                 |
+                               |                                               +-----+------+                          |
+                               v                                               | Admin       |                          |
+        +-------------------------------+                                  | Notification|                          |
+        |     Database Errors           |                                  +-----+------+                          |
+        +-------------------------------+                                        |                                 |
+                               |                                                v                                 |
+                               |                                   +---------------------+                       |
+                               +---------------------------------->| Incident Reports    |                       |
+                                                                   +---------------------+                       |
+                                                                                                              |
+                                                                                                              v
+                                                                                                   +---------------------+
+                                                                                                   |  System Restore     |
+                                                                                                   +---------------------+
+
+
+
+
+Descripción del Diagrama
+1. Exception Detection (Detección de Excepciones)
+
+    Try Block (Bloque Try):
+        Descripción: Sección del código donde se ejecutan operaciones que pueden generar excepciones.
+        Función: Intenta ejecutar el código protegido y detectar posibles errores o excepciones.
+
+    Catch Block (Bloque Catch):
+        Descripción: Sección del código que captura y maneja las excepciones lanzadas en el bloque Try.
+        Función: Clasifica el tipo de error (Cliente, Servidor, Base de Datos) y redirige al manejo adecuado.
+
+    Finally Block (Bloque Finally):
+        Descripción: Sección del código que se ejecuta independientemente de si se produjo una excepción o no.
+        Función: Limpieza de recursos, cierre de conexiones o cualquier acción necesaria después de la ejecución del bloque Try/Catch.
+
+2. Error Classification (Clasificación de Errores)
+
+    Client Errors (Errores del Cliente):
+        Descripción: Errores originados por las acciones del usuario o el cliente, como entradas inválidas.
+        Función: Identificar y categorizar errores que provienen de solicitudes incorrectas o malformadas.
+
+    Server Errors (Errores del Servidor):
+        Descripción: Errores internos del servidor, como fallos en el procesamiento de solicitudes.
+        Función: Identificar y categorizar errores que provienen de problemas internos del servidor.
+
+    DB Errors (Errores de la Base de Datos):
+        Descripción: Errores relacionados con las operaciones de la base de datos, como consultas fallidas.
+        Función: Identificar y categorizar errores que provienen de la interacción con la base de datos.
+
+3. Error Handling (Manejo de Errores)
+
+    Error Logging (Registro de Errores):
+        Descripción: Registro detallado de los errores y excepciones para análisis posterior.
+        Función: Facilitar la identificación y solución de problemas mediante el almacenamiento de logs.
+
+    Custom Error Pages (Páginas de Error Personalizadas):
+        Descripción: Páginas diseñadas para mostrar mensajes amigables al usuario cuando ocurre un error.
+        Función: Mejorar la experiencia del usuario al proporcionar información clara y útil sobre los errores.
+
+    Admin Notification (Notificación al Administrador):
+        Descripción: Sistema que notifica a los administradores sobre errores críticos o recurrentes.
+        Función: Asegurar que el equipo de soporte esté al tanto de los problemas para una rápida resolución.
+
+4. Recovery Actions (Acciones de Recuperación)
+
+    Retry Operation (Reintentar Operación):
+        Descripción: Intentar nuevamente la operación que falló, especialmente útil para errores transitorios.
+        Función: Mejorar la resiliencia del sistema reintentando operaciones fallidas automáticamente.
+
+    Fallback Logic (Lógica de Respaldo):
+        Descripción: Alternativas predefinidas que se ejecutan cuando una operación falla repetidamente.
+        Función: Proveer funcionalidad limitada o alternativas para mantener la operatividad del sistema.
+
+    System Restore (Restauración del Sistema):
+        Descripción: Restaurar el sistema a un estado anterior en caso de fallos críticos.
+        Función: Garantizar la disponibilidad y consistencia del sistema mediante la recuperación de respaldos.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Gestión de Errores y Excepciones se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con el Servidor Apache y las Máquinas Virtuales (Eivissa VM y Formentera VM):
+        Gestión de Excepciones: Los bloques Try/Catch dentro de las aplicaciones web alojadas en las VMs manejan las excepciones que pueden ocurrir durante la ejecución de las solicitudes.
+        Registro y Manejo de Errores: Los errores clasificados se registran en el Sistema de Logs y Monitorización para su análisis y seguimiento.
+
+    Sistema de Monitorización y Alertas:
+        Error Logging: Los registros de errores son recopilados y analizados por herramientas como Prometheus, Grafana y ELK Stack para detectar patrones y anomalías.
+        Alertas: Basándose en los logs y métricas, se generan alertas que notifican al equipo de administración sobre incidentes críticos.
+
+    Pipeline CI/CD:
+        Pruebas y Calidad: Durante las fases de Test Stage, se ejecutan pruebas unitarias y de integración que pueden detectar excepciones y errores antes de que el código se despliegue.
+        Despliegue Controlado: En caso de detectar errores durante el despliegue, se puede activar el Rollback Plan para revertir a una versión estable anterior.
+
+    Base de Datos MariaDB:
+        Errores de Base de Datos: Las excepciones relacionadas con la base de datos (DB Errors) son manejadas y registradas, asegurando que las operaciones de la base de datos sean robustas y confiables.
+
+    Panel de Administración:
+        Notificaciones y Auditoría: Los administradores reciben notificaciones sobre errores críticos y pueden revisar los Audit Reports para analizar incidentes y mejorar la gestión de errores.
+
+Ventajas de Este Enfoque de Gestión de Errores y Excepciones
+
+    Detección y Manejo Proactivo:
+        La estructura de bloques Try/Catch/Finnally permite manejar excepciones de manera eficiente, evitando que errores inesperados causen fallos mayores en el sistema.
+
+    Clasificación Precisa de Errores:
+        Clasificar los errores en Client, Server y DB permite una respuesta más dirigida y efectiva, facilitando la resolución rápida de problemas específicos.
+
+    Registro y Monitorización Eficiente:
+        El registro detallado de errores y la integración con sistemas de monitorización aseguran que los incidentes sean detectados y analizados oportunamente.
+
+    Recuperación Rápida y Resiliencia:
+        Las acciones de recuperación como Retry, Fallback y Restore garantizan que el sistema pueda recuperarse de fallos sin afectar significativamente la experiencia del usuario.
+
+    Mejora Continua:
+        Los Incident Reports y las auditorías de acceso proporcionan información valiosa para mejorar la infraestructura y las prácticas de manejo de errores, contribuyendo a la estabilidad y seguridad del sistema.
+
+Representación Visual Completa Integrada
+
+Para proporcionar una visión completa, a continuación se muestra cómo se integra el Diagrama de Gestión de Errores y Excepciones con la topología general del sistema previamente descrita:
+
+graph TD
+    %% Subgráficos existentes
+    subgraph "Clientes"
+        User1[Usuario en Eivissa]
+        User2[Usuario en Formentera]
+        User3[Usuario Externo]
+    end
+
+    subgraph "Internet"
+        Internet[Internet]
+    end
+
+    subgraph "Firewall Perimetral"
+        Firewall[Firewall Perimetral]
+    end
+
+    subgraph "Balanceador de Carga"
+        LoadBalancer[Balanceador de Carga]
+    end
+
+    subgraph "Servidor Apache"
+        Apache[Servidor Apache]
+    end
+
+    subgraph "Virtual Hosts"
+        Eivissa[VirtualHost: nom-llinatge-eivissa.local]
+        Formentera[VirtualHost: nom-llinatge-formentera.local]
+    end
+
+    subgraph "Máquinas Virtuales"
+        EivissaVM[Eivissa VM]
+        FormenteraVM[Formentera VM]
+    end
+
+    subgraph "Base de Datos"
+        MariaDB[MariaDB]
+    end
+
+    subgraph "Sistema de Logs y Monitorización"
+        Logs[Logs y Monitorización]
+    end
+
+    subgraph "Servicios de Respaldo y Recuperación"
+        Backup[Backup y Recuperación]
+    end
+
+    %% Nueva subgráfica de Monitorización y Gestión de Alertas
+    subgraph "Monitoring and Alerting"
+        subgraph "System Metrics"
+            Server[Server Metrics]
+            App[Application Metrics]
+            DB[Database Metrics]
+            Net[Network Metrics]
+        end
+
+        subgraph "Monitoring Tools"
+            Prometheus[Prometheus]
+            Grafana[Grafana Dashboards]
+            ELK[ELK Stack]
+        end
+
+        subgraph "Alert Management"
+            Rules[Alert Rules]
+            Notify[Notifications]
+            Escalate[Escalation]
+        end
+
+        subgraph "Response Actions"
+            Auto[Automated Response]
+            Manual[Manual Intervention]
+            Report[Incident Reports]
+        end
+
+        Server & App & DB & Net --> Prometheus
+        Prometheus --> Grafana
+        Grafana --> Rules
+        Rules --> Notify --> Escalate
+        Escalate --> Auto & Manual
+        Manual --> Report
+    end
+
+    %% Integración del Pipeline CI/CD
+    subgraph "Pipeline CI/CD"
+        subgraph "Source Control"
+            Code[Code Repository]
+            Branch[Branch Management]
+            Merge[Code Merge]
+        end
+
+        subgraph "Build Stage"
+            Build[Build Process]
+            Deps[Dependencies]
+            Artifact[Build Artifacts]
+        end
+
+        subgraph "Test Stage"
+            Unit[Unit Tests]
+            Int[Integration Tests]
+            Sec[Security Scans]
+        end
+
+        subgraph "Deploy Stage"
+            Stage[Staging Deploy]
+            Prod[Production Deploy]
+            Roll[Rollback Plan]
+        end
+
+        subgraph "Monitor & Feedback"
+            MetricsCD[Performance Metrics]
+            LogsPipeline[System Logs]
+            AlertPipeline[Alerts]
+        end
+
+        Code --> Branch --> Merge
+        Merge --> Build --> Deps --> Artifact
+        Artifact --> Unit --> Int --> Sec
+        Sec --> Stage --> Prod
+        Prod --> Roll
+        Prod --> MetricsCD --> LogsPipeline --> AlertPipeline
+
+        %% Conexiones del Pipeline CI/CD con la Topología General
+        Prod --> Apache
+        Stage --> Apache
+        Artifact --> EivissaVM
+        Artifact --> FormenteraVM
+
+        %% Conexión del Sistema de Monitorización
+        MetricsCD --> Server
+        LogsPipeline --> Logs
+        AlertPipeline --> Rules
+    end
+
+    %% Conexiones del Sistema de Monitorización con la Topología General
+    Apache --> Server
+    EivissaVM --> App
+    FormenteraVM --> App
+    MariaDB --> DB
+    Firewall --> Net
+    Network Metrics --> Net
+    Server --> Logs
+    App --> Logs
+    DB --> Logs
+    Net --> Logs
+    Prometheus --> Grafana
+    ELK --> Logs
+    Prometheus --> ELK
+    Backup --> Server & App & DB & Net
+
+    %% Nueva subgráfica de Gestión de Idiomas
+    subgraph "Language Management"
+        Detect[Language Detection]
+        Select[Language Selection]
+        Default[Default Language]
+    end
+
+    subgraph "Translation System"
+        Files[Language Files]
+        Strings[String Resources]
+        Dynamic[Dynamic Content]
+    end
+
+    subgraph "Cultural Adaptation"
+        Date[Date Formats]
+        Currency[Currency Display]
+        Numbers[Number Formats]
+    end
+
+    subgraph "Content Management"
+        Templates[Content Templates]
+        Variables[Dynamic Variables]
+        Media[Media Assets]
+    end
+
+    Detect --> Select --> Default
+    Select --> Files --> Strings --> Dynamic
+    Select --> Date & Currency & Numbers
+    Dynamic --> Templates --> Variables --> Media
+
+    %% Integración de Gestión de Idiomas con la Topología General
+    Apache --> Detect
+    Select --> Files
+    Select --> Date
+    Select --> Currency
+    Select --> Numbers
+    Dynamic --> Templates
+    Templates --> Variables
+    Variables --> Media
+    Strings --> MariaDB
+    Files --> MariaDB
+
+    %% Nueva subgráfica de Gestión de Errores y Excepciones
+    subgraph "Exception Detection"
+        Try[Try Block]
+        Catch[Catch Block]
+        Finally[Finally Block]
+    end
+
+    subgraph "Error Classification"
+        Client[Client Errors]
+        ServerErr[Server Errors]
+        DBErr[Database Errors]
+    end
+
+    subgraph "Error Handling"
+        LogErr[Error Logging]
+        CustomErr[Custom Error Pages]
+        NotifyAdmin[Admin Notification]
+    end
+
+    subgraph "Recovery Actions"
+        RetryOp[Retry Operation]
+        FallbackLogic[Fallback Logic]
+        SystemRestore[System Restore]
+    end
+
+    Try --> Catch --> Finally
+    Catch --> Client & ServerErr & DBErr
+    Client & ServerErr & DBErr --> LogErr
+    LogErr --> CustomErr & NotifyAdmin
+    NotifyAdmin --> RetryOp & FallbackLogic & SystemRestore
+
+    %% Integración de Gestión de Errores con la Topología General
+    Apache --> Try
+    EivissaVM --> Try
+    FormenteraVM --> Try
+    Try --> Catch
+    Catch --> Client & ServerErr & DBErr
+    Client & ServerErr & DBErr --> LogErr
+    LogErr --> Logs
+    LogErr --> CustomErr
+    LogErr --> NotifyAdmin
+    NotifyAdmin --> Prometheus
+    NotifyAdmin --> Grafana
+    NotifyAdmin --> ELK
+
+Descripción de la Integración
+1. Exception Detection (Detección de Excepciones)
+
+    Try Block (Bloque Try):
+        Descripción: Sección del código donde se ejecutan operaciones susceptibles a fallos.
+        Función: Intentar ejecutar el código protegido y capturar cualquier excepción que pueda ocurrir.
+
+    Catch Block (Bloque Catch):
+        Descripción: Sección del código que captura y maneja las excepciones lanzadas en el bloque Try.
+        Función: Clasificar el tipo de error (Cliente, Servidor, Base de Datos) y redirigir al manejo adecuado.
+
+    Finally Block (Bloque Finally):
+        Descripción: Sección del código que se ejecuta independientemente de si se produjo una excepción o no.
+        Función: Limpieza de recursos, cierre de conexiones o cualquier acción necesaria después de la ejecución del bloque Try/Catch.
+
+2. Error Classification (Clasificación de Errores)
+
+    Client Errors (Errores del Cliente):
+        Descripción: Errores originados por las acciones del usuario o el cliente, como entradas inválidas.
+        Función: Identificar y categorizar errores que provienen de solicitudes incorrectas o malformadas.
+
+    Server Errors (Errores del Servidor):
+        Descripción: Errores internos del servidor, como fallos en el procesamiento de solicitudes.
+        Función: Identificar y categorizar errores que provienen de problemas internos del servidor.
+
+    DB Errors (Errores de la Base de Datos):
+        Descripción: Errores relacionados con las operaciones de la base de datos, como consultas fallidas.
+        Función: Identificar y categorizar errores que provienen de la interacción con la base de datos.
+
+3. Error Handling (Manejo de Errores)
+
+    Error Logging (Registro de Errores):
+        Descripción: Registro detallado de los errores y excepciones para análisis posterior.
+        Función: Facilitar la identificación y solución de problemas mediante el almacenamiento de logs.
+
+    Custom Error Pages (Páginas de Error Personalizadas):
+        Descripción: Páginas diseñadas para mostrar mensajes amigables al usuario cuando ocurre un error.
+        Función: Mejorar la experiencia del usuario al proporcionar información clara y útil sobre los errores.
+
+    Admin Notification (Notificación al Administrador):
+        Descripción: Sistema que notifica a los administradores sobre errores críticos o recurrentes.
+        Función: Asegurar que el equipo de soporte esté al tanto de los problemas para una rápida resolución.
+
+4. Recovery Actions (Acciones de Recuperación)
+
+    Retry Operation (Reintentar Operación):
+        Descripción: Intentar nuevamente la operación que falló, especialmente útil para errores transitorios.
+        Función: Mejorar la resiliencia del sistema reintentando operaciones fallidas automáticamente.
+
+    Fallback Logic (Lógica de Respaldo):
+        Descripción: Alternativas predefinidas que se ejecutan cuando una operación falla repetidamente.
+        Función: Proveer funcionalidad limitada o alternativas para mantener la operatividad del sistema.
+
+    System Restore (Restauración del Sistema):
+        Descripción: Restaurar el sistema a un estado anterior en caso de fallos críticos.
+        Función: Garantizar la disponibilidad y consistencia del sistema mediante la recuperación de respaldos.
+
+Integración con la Topología General del Sistema
+
+    Interacción con el Servidor Apache y las Máquinas Virtuales (Eivissa VM y Formentera VM):
+        Gestión de Excepciones: Los bloques Try/Catch dentro de las aplicaciones web alojadas en las VMs manejan las excepciones que pueden ocurrir durante la ejecución de las solicitudes.
+        Registro y Manejo de Errores: Los errores clasificados se registran en el Sistema de Logs y Monitorización para su análisis y seguimiento.
+
+    Sistema de Monitorización y Alertas:
+        Error Logging: Los registros de errores son recopilados y analizados por herramientas como Prometheus, Grafana y ELK Stack para detectar patrones y anomalías.
+        Alertas: Basándose en los logs y métricas, se generan alertas que notifican al equipo de administración sobre incidentes críticos.
+
+    Pipeline CI/CD:
+        Pruebas y Calidad: Durante las fases de Test Stage, se ejecutan pruebas unitarias y de integración que pueden detectar excepciones y errores antes de que el código se despliegue.
+        Despliegue Controlado: En caso de detectar errores durante el despliegue, se puede activar el Rollback Plan para revertir a una versión estable anterior.
+
+    Base de Datos MariaDB:
+        Errores de Base de Datos: Las excepciones relacionadas con la base de datos (DB Errors) son manejadas y registradas, asegurando que las operaciones de la base de datos sean robustas y confiables.
+
+    Panel de Administración:
+        Notificaciones y Auditoría: Los administradores reciben notificaciones sobre errores críticos y pueden revisar los Incident Reports para analizar incidentes y mejorar la gestión de errores.
+
+Ventajas de Este Enfoque de Gestión de Errores y Excepciones
+
+    Detección y Manejo Proactivo:
+        La estructura de bloques Try/Catch/Finnally permite manejar excepciones de manera eficiente, evitando que errores inesperados causen fallos mayores en el sistema.
+
+    Clasificación Precisa de Errores:
+        Clasificar los errores en Client, Server y DB permite una respuesta más dirigida y efectiva, facilitando la resolución rápida de problemas específicos.
+
+    Registro y Monitorización Eficiente:
+        El registro detallado de errores y la integración con sistemas de monitorización aseguran que los incidentes sean detectados y analizados oportunamente.
+
+    Recuperación Rápida y Resiliencia:
+        Las acciones de recuperación como Retry, Fallback y Restore garantizan que el sistema pueda recuperarse de fallos sin afectar significativamente la experiencia del usuario.
+
+    Mejora Continua:
+        Los Incident Reports y las auditorías de acceso proporcionan información valiosa para mejorar la infraestructura y las prácticas de manejo de errores, contribuyendo a la estabilidad y seguridad del sistema.
+
+Situaciones Hipotéticas Representadas en el Diagrama de Gestión de Errores y Excepciones
+
+    Error del Cliente Durante una Solicitud:
+        Flujo:
+            Un usuario ingresa datos inválidos en un formulario.
+            Se lanza una excepción que es capturada por el Catch Block como un Client Error.
+            El error se registra en Error Logging.
+            Se muestra una Custom Error Page al usuario y se notifica al administrador.
+            El administrador decide Retry Operation para intentar corregir el problema.
+
+    Fallo Interno del Servidor al Procesar una Solicitud:
+        Flujo:
+            Durante el procesamiento de una solicitud, ocurre un error en el servidor.
+            La excepción es capturada como un Server Error.
+            El error se registra y se muestra una Custom Error Page.
+            Se notifica al administrador, quien decide aplicar Fallback Logic para mantener la operatividad del sistema.
+
+    Error en la Base de Datos Durante una Transacción:
+        Flujo:
+            Una consulta a la base de datos falla debido a un problema de conexión.
+            La excepción es capturada como un DB Error.
+            El error se registra y se notifica al administrador.
+            El administrador opta por System Restore para restaurar la base de datos a un estado anterior y solucionar el problema.
+
+    Fallo en el Registro de Errores:
+        Flujo:
+            Durante el manejo de un error, el sistema no puede registrar el error en los logs.
+            La excepción se captura y se maneja para evitar que el fallo afecte la experiencia del usuario.
+            Se notifica al administrador sobre el fallo en el registro de errores para su pronta resolución.
+
+    Exceso de Errores Recurrentes en el Sistema:
+        Flujo:
+            Se detecta un patrón de errores recurrentes a través de la monitorización.
+            Se generan alertas automáticas que notifican al administrador.
+            Se realiza una Manual Intervention para investigar y solucionar la causa raíz de los errores.
+
+Conclusión
+
+El Diagrama de Gestión de Errores y Excepciones proporciona una estructura robusta y eficiente para manejar y recuperar errores dentro del sistema de la web de la librería "Sargantana Mediterrània". Al integrarse en la topología general del sistema, asegura que los errores sean detectados, clasificados, manejados y recuperados de manera efectiva, mejorando la estabilidad y la experiencia del usuario final.
+
+Este enfoque no solo mejora la resiliencia del sistema frente a fallos, sino que también facilita la identificación y resolución de problemas, contribuyendo a una operación continua y eficiente del sitio web. Además, la integración con el Sistema de Monitorización y Alertas permite una respuesta proactiva a incidentes, minimizando el impacto en los usuarios y garantizando la integridad y disponibilidad del sistema.

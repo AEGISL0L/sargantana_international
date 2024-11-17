@@ -1,0 +1,243 @@
+10.2. Diagrama de Servicios (Service Diagram)
+
+    Descripción: Muestra los servicios y microservicios que componen el sistema y cómo se comunican entre sí.
+    Componentes Incluidos: APIs, Servicios de Autenticación, Servicios de Base de Datos, Servicios de Monitorización.
+
+
+graph TD
+    subgraph "Frontend Services"
+        EivissaWeb[Eivissa Web Service]
+        FormenteraWeb[Formentera Web Service]
+        StaticContent[Static Content Service]
+    end
+
+    subgraph "Authentication Services"
+        AuthService[Authentication Service]
+        SessionService[Session Management]
+        RoleService[Role Management]
+    end
+
+    subgraph "Data Services"
+        DBService[Database Service]
+        CacheService[Cache Service]
+        BackupService[Backup Service]
+    end
+
+    subgraph "Monitoring Services"
+        LogService[Logging Service]
+        MetricsService[Metrics Service]
+        AlertService[Alert Service]
+    end
+
+    EivissaWeb & FormenteraWeb --> AuthService
+    AuthService --> SessionService & RoleService
+    SessionService & RoleService --> DBService
+    DBService --> CacheService & BackupService
+    
+    EivissaWeb & FormenteraWeb --> LogService
+    LogService --> MetricsService --> AlertService
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|     Perimeter Security    |       |   Authentication Layer    |       |      Encryption Layer     |       |        Access Control     |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| | Edge FW | |   WAF   |    |       | |BasicAuth| |DigestAuth|   |       | |   SSL   | |DataEncrypt|   |       | |RoleMgr | |PermSvc  |    |
+| | Firewall| |Firewall |    |       | |         | |         |    |       | |  SSL/TLS| |           |    |       | |Manager | |Service  |    |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| |  IPS    | | GeoIP   |    |       | |SessionMgr| |TokenSvc |   |       | |HashSvc |              |       | |AuditLog|              |    |
+| |Intrusion| |IP Filter|    |       | |         | |         |    |       | +---------+              |       | +---------+              |    |
+| |Prevention| +---------+    |       | +---------+ +---------+    |       |                          |       |                           |    |
++-----------+----------------+       +-----------+----------------+       +-----------+----------------+       +-----------+---------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |   Edge Firewall    |             |    BasicAuth      |             |       SSL         |             |    Role Manager    |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |      WAF          |             |   DigestAuth      |             |  Data Encrypt     |             |  Permission Svc    |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |   Intrusion Preven |             |   Session Manager |             |    Hash Service   |             |     Audit Log      |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            +------------+-------------------+                                 |                                 |
+                         |                                                   |                                 |
+                         v                                                   v                                 v
+                +-------------------+                              +-------------------+             +-------------------+
+                | Geographic IP Filter|                            |   Token Service    |             |                   |
+                +-------------------+                              +-------------------+             |                   |
+                                                                                                 |                   |
+                                                                                                 v                   v
+                                                                                        +-------------------+ +-------------------+
+                                                                                        |    Role Manager    | | Permission Service|
+                                                                                        +-------------------+ +-------------------+
+                                                                                                 |                   |
+                                                                                                 v                   v
+                                                                                        +-------------------+ +-------------------+
+                                                                                        |   Audit Logger    | |                   |
+                                                                                        +-------------------+ +-------------------+
+
+
+
+Descripción del Diagrama
+1. Perimeter Security (Seguridad de Perímetro)
+
+    Edge Firewall (Firewall de Perímetro):
+        Descripción: Dispositivo que filtra el tráfico de red entrante y saliente basado en reglas de seguridad predefinidas.
+        Función: Protege el perímetro de la red, bloqueando accesos no autorizados y permitiendo solo tráfico legítimo hacia los servicios internos.
+    Web Application Firewall (WAF):
+        Descripción: Firewall especializado en proteger aplicaciones web contra ataques como inyección SQL, Cross-Site Scripting (XSS), y otros.
+        Función: Filtra y monitorea el tráfico HTTP/S hacia la aplicación web, protegiendo contra amenazas específicas de aplicaciones web.
+    Intrusion Prevention System (IPS):
+        Descripción: Sistema que detecta y previene actividades maliciosas o violaciones de políticas dentro de la red.
+        Función: Monitorea el tráfico en tiempo real, detecta patrones de ataques conocidos y bloquea actividades sospechosas automáticamente.
+    Geographic IP Filter (Filtro de IP Geográfico):
+        Descripción: Mecanismo que restringe el acceso a la aplicación basado en la ubicación geográfica de la dirección IP del usuario.
+        Función: Bloquea o permite el acceso de usuarios de regiones específicas, reduciendo el riesgo de ataques provenientes de ubicaciones no deseadas.
+
+2. Authentication Layer (Capa de Autenticación)
+
+    Basic Authentication (Autenticación Básica):
+        Descripción: Método de autenticación que utiliza credenciales simples (nombre de usuario y contraseña) enviadas en cada solicitud.
+        Función: Proporciona una capa básica de seguridad para acceder a recursos protegidos, aunque es menos segura comparada con métodos más avanzados.
+    Digest Authentication (Autenticación Digest):
+        Descripción: Método de autenticación más seguro que la autenticación básica, utilizando hashes para proteger las credenciales.
+        Función: Asegura que las credenciales del usuario no se transmitan en texto plano, ofreciendo mayor protección contra interceptaciones.
+    Session Manager (Gestor de Sesiones):
+        Descripción: Componente encargado de gestionar las sesiones de usuario, incluyendo la creación, mantenimiento y expiración de sesiones.
+        Función: Mantiene el estado de autenticación de los usuarios a lo largo de su interacción con la aplicación, gestionando tokens y cookies de sesión.
+    Token Service (Servicio de Tokens):
+        Descripción: Servicio que emite y valida tokens de acceso para autenticación y autorización de usuarios.
+        Función: Genera tokens seguros (como JWT) que los clientes utilizan para acceder a recursos protegidos, permitiendo una gestión eficiente de permisos y accesos.
+
+3. Encryption Layer (Capa de Encriptación)
+
+    SSL/TLS:
+        Descripción: Protocolos de seguridad que encriptan el tráfico de red entre el cliente y el servidor.
+        Función: Aseguran que la comunicación sea confidencial e íntegra, protegiendo los datos en tránsito contra interceptaciones y manipulaciones.
+    Data Encryption (Encriptación de Datos):
+        Descripción: Mecanismo que encripta datos sensibles almacenados en bases de datos o archivos.
+        Función: Protege la información crítica incluso si se accede de manera no autorizada a los sistemas de almacenamiento.
+    Hash Service (Servicio de Hash):
+        Descripción: Servicio que aplica funciones hash a datos sensibles, como contraseñas.
+        Función: Almacena versiones hash de datos sensibles, asegurando que las contraseñas y otros datos no se almacenen en texto plano.
+
+4. Access Control (Control de Acceso)
+
+    Role Manager (Gestor de Roles):
+        Descripción: Componente que define y gestiona los roles de usuario dentro del sistema.
+        Función: Asigna roles específicos a los usuarios, determinando qué recursos y acciones están permitidos para cada rol.
+    Permission Service (Servicio de Permisos):
+        Descripción: Servicio que gestiona los permisos asociados a cada rol y usuario.
+        Función: Controla el acceso a recursos y funcionalidades basándose en los permisos definidos para cada rol.
+    Audit Logger (Registrador de Auditorías):
+        Descripción: Sistema que registra todas las acciones relacionadas con el acceso y uso de los recursos del sistema.
+        Función: Proporciona trazabilidad y evidencia para auditorías de seguridad, ayudando a detectar y analizar actividades sospechosas o no autorizadas.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Seguridad y Control de Acceso se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Protección del Perímetro de la Red:
+        Edge Firewall y WAF: Actúan como la primera línea de defensa, filtrando y monitoreando el tráfico entrante y saliente para proteger contra amenazas externas.
+        IPS y GeoIP: Añaden capas adicionales de seguridad al prevenir intrusiones y restringir accesos basados en la ubicación geográfica, reduciendo el riesgo de ataques provenientes de regiones no deseadas.
+
+    Gestión de Autenticación y Sesiones:
+        BasicAuth y DigestAuth: Proporcionan mecanismos para autenticar a los usuarios que intentan acceder a la aplicación.
+        Session Manager y Token Service: Gestionan las sesiones de usuario y emiten tokens de acceso seguros, permitiendo una gestión eficiente y segura de las autorizaciones de los usuarios.
+
+    Encriptación de Datos y Comunicación:
+        SSL/TLS: Garantiza que toda la comunicación entre los clientes y el servidor esté encriptada, protegiendo la confidencialidad e integridad de los datos en tránsito.
+        Data Encryption y Hash Service: Protegen los datos almacenados y las contraseñas de los usuarios, asegurando que incluso en caso de una violación de seguridad, la información sensible permanezca protegida.
+
+    Control de Acceso Basado en Roles:
+        Role Manager y Permission Service: Definen y gestionan los permisos de acceso, asegurando que los usuarios solo puedan acceder a los recursos y funcionalidades para los cuales están autorizados.
+        Audit Logger: Registra todas las actividades de acceso y uso de recursos, proporcionando una trazabilidad completa para auditorías y análisis de seguridad.
+
+    Integración con Otros Componentes del Sistema:
+        Core System y Aplicaciones: Los componentes de seguridad se integran directamente con los servidores web, aplicaciones y servicios internos, protegiendo todos los aspectos del sistema desde el acceso hasta la gestión de datos.
+        CI/CD Pipeline: Las configuraciones de seguridad se gestionan y versionan a través del pipeline de CI/CD, asegurando que las políticas de seguridad se apliquen consistentemente en todos los entornos.
+
+    Monitorización y Respuesta a Incidentes:
+        Audit Logger y Sistemas de Monitoreo: Proporcionan una visibilidad continua sobre las actividades de seguridad, permitiendo detectar y responder rápidamente a incidentes o comportamientos anómalos.
+        Alertas de Seguridad: Integradas con herramientas de monitoreo, las alertas notifican al equipo de TI sobre posibles amenazas o violaciones de seguridad en tiempo real.
+
+Ventajas de Este Enfoque de Seguridad y Control de Acceso
+
+    Protección Multinivel:
+        Defensa en Profundidad: La implementación de múltiples capas de seguridad (perímetro, autenticación, encriptación, control de acceso) asegura una protección robusta contra una variedad de amenazas.
+
+    Seguridad Proactiva:
+        Prevención de Intrusiones y Ataques: El uso de IPS y GeoIP filtra y bloquea intentos de acceso maliciosos antes de que puedan comprometer el sistema.
+        Escaneo de Seguridad Automatizado: Integrado en el pipeline de CI/CD, garantiza que cada cambio de código sea evaluado por posibles vulnerabilidades.
+
+    Gestión Eficiente de Accesos:
+        Control Basado en Roles: Asegura que los usuarios tengan acceso únicamente a las funcionalidades y datos necesarios para sus funciones, minimizando el riesgo de accesos no autorizados.
+        Trazabilidad y Auditoría: Los registros detallados facilitan la identificación y análisis de actividades sospechosas, cumpliendo con normativas de seguridad y privacidad.
+
+    Protección de Datos Sensibles:
+        Encriptación Integral: Protege los datos tanto en tránsito como en reposo, asegurando la confidencialidad e integridad de la información crítica.
+        Hashing Seguro: Protege las contraseñas de los usuarios, reduciendo el riesgo de que sean explotadas en caso de una brecha de seguridad.
+
+    Escalabilidad y Flexibilidad:
+        Adaptabilidad a Nuevas Amenazas: La arquitectura modular permite añadir o actualizar componentes de seguridad según evolucionan las amenazas y las necesidades del negocio.
+        Integración con Herramientas de Desarrollo: La gestión de configuraciones y políticas de seguridad a través del pipeline de CI/CD asegura una implementación consistente y escalable.
+
+    Cumplimiento Normativo:
+        Adherencia a Regulaciones: Asegura que las prácticas de seguridad cumplan con normativas como el GDPR, protegiendo tanto a la empresa como a los usuarios finales.
+
+Próximos Pasos
+
+    Implementación de Componentes de Seguridad:
+        Configurar Firewalls y WAF: Establecer reglas de seguridad en el Edge Firewall y Web Application Firewall para filtrar tráfico malicioso.
+        Desplegar IPS y GeoIP: Configurar Intrusion Prevention Systems y Geographic IP Filters para añadir capas adicionales de protección.
+
+    Configuración de la Capa de Autenticación:
+        Integrar Métodos de Autenticación: Implementar y configurar Basic Authentication y Digest Authentication según las necesidades del sistema.
+        Configurar Session Manager y Token Service: Establecer la gestión de sesiones y la emisión de tokens seguros para autenticación y autorización.
+
+    Establecer la Capa de Encriptación:
+        Configurar SSL/TLS: Asegurar que todas las comunicaciones estén encriptadas mediante certificados SSL/TLS válidos.
+        Implementar Data Encryption y Hash Service: Configurar encriptación de datos sensibles y servicios de hashing para contraseñas.
+
+    Desarrollar el Control de Acceso:
+        Definir Roles y Permisos: Establecer roles claros y asignar permisos específicos a cada uno mediante el Role Manager y Permission Service.
+        Implementar Auditorías: Configurar Audit Logger para registrar todas las actividades de acceso y uso de recursos.
+
+    Integración con el Pipeline de CI/CD:
+        Versionar Configuraciones de Seguridad: Gestionar los archivos de configuración de seguridad a través del pipeline de CI/CD para asegurar consistencia en todos los entornos.
+        Automatizar Escaneos de Seguridad: Integrar herramientas de análisis de seguridad en el pipeline para detectar vulnerabilidades en cada build.
+
+    Monitorización y Respuesta a Incidentes:
+        Configurar Sistemas de Monitoreo: Implementar herramientas de monitoreo para supervisar continuamente los componentes de seguridad.
+        Establecer Protocolos de Respuesta: Definir procedimientos claros para responder a alertas de seguridad y mitigar incidentes de manera eficiente.
+
+    Capacitación del Equipo:
+        Entrenar al Personal en Seguridad: Asegurar que el equipo de desarrollo y operaciones esté capacitado en las mejores prácticas de seguridad y uso de las herramientas implementadas.
+        Documentar Políticas y Procedimientos: Crear documentación detallada sobre las políticas de seguridad, procedimientos de autenticación y control de acceso.
+
+    Pruebas de Seguridad y Evaluación:
+        Realizar Pruebas de Penetración: Contratar o realizar pruebas de penetración para identificar y corregir vulnerabilidades en el sistema.
+        Evaluar la Eficacia de las Medidas de Seguridad: Monitorear y analizar el desempeño de las medidas de seguridad implementadas, ajustando según sea necesario.
+
+    Mejora Continua:
+        Actualizar Reglas y Políticas: Revisar y actualizar regularmente las reglas de firewall, políticas de autenticación y controles de acceso para adaptarse a nuevas amenazas y requisitos.
+        Implementar Feedback de Seguridad: Utilizar la información recopilada durante la monitorización y auditorías para mejorar continuamente las estrategias de seguridad.
+
+    Cumplimiento y Auditoría:
+        Preparar Informes de Cumplimiento: Generar informes que demuestren el cumplimiento con normativas de seguridad y privacidad.
+        Realizar Auditorías Internas: Programar auditorías regulares para asegurar que todas las políticas y procedimientos de seguridad se sigan correctamente.
+
+Conclusión
+
+El Diagrama de Seguridad y Control de Acceso proporciona una estructura integral para proteger la web de la librería "Sargantana Mediterrània" contra una amplia gama de amenazas, asegurando una autenticación robusta, encriptación efectiva y un control de acceso preciso. Al implementar múltiples capas de seguridad y gestionar cuidadosamente las configuraciones y permisos, se garantiza que los datos y recursos del sistema estén protegidos de manera eficiente y efectiva.
+
+Esta integración en la topología general del sistema asegura que todos los aspectos de la seguridad trabajen en conjunto de manera armoniosa, proporcionando una defensa sólida contra intrusiones, accesos no autorizados y vulnerabilidades. Además, la monitorización continua y la capacidad de respuesta proactiva permiten mantener la integridad y disponibilidad del sistema, ofreciendo una experiencia segura y confiable a los usuarios finales.
+
+Este enfoque no solo mejora la seguridad operativa y la protección de datos, sino que también facilita el cumplimiento de normativas y la auditoría de actividades, fortaleciendo la confianza de los usuarios y la resiliencia del sistema frente a amenazas emergentes. Si necesitas más detalles sobre la implementación de alguno de estos componentes, ajustes en el diagrama o cualquier otra consulta relacionada con la arquitectura del sistema, no dudes en indicarlo.
+

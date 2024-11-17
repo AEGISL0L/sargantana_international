@@ -1,0 +1,293 @@
+38. Diagramas de Monitoreo y Alertas
+38.1. Diagrama de Flujo de Monitoreo (Monitoring Flow Diagram)
+
+    Descripción: Muestra cómo se monitorean los diferentes componentes del sistema y cómo se gestionan las alertas.
+    Componentes Incluidos: Herramientas de Monitoreo, Métricas, Alertas, Paneles de Control.
+
+
+graph TD
+    subgraph "System Metrics"
+        Server[Server Metrics]
+        App[Application Metrics]
+        DB[Database Metrics]
+        Net[Network Metrics]
+    end
+
+    subgraph "Monitoring Tools"
+        Prometheus[Prometheus]
+        Grafana[Grafana Dashboards]
+        ELK[ELK Stack]
+    end
+
+    subgraph "Alert Management"
+        Rules[Alert Rules]
+        Notify[Notifications]
+        Escalate[Escalation]
+    end
+
+    subgraph "Response Actions"
+        Auto[Automated Response]
+        Manual[Manual Intervention]
+        Report[Incident Reports]
+    end
+
+    Server & App & DB & Net --> Prometheus
+    Prometheus --> Grafana
+    Grafana --> Rules
+    Rules --> Notify --> Escalate
+    Escalate --> Auto & Manual
+    Manual --> Report
+
+
++---------------------------+       +---------------------------+       +-----------------------+
+|      System Metrics       |       |     Monitoring Tools      |       |    Alert Management   |
+| +---------+ +-----------+ |       | +---------+ +-----------+ |       | +---------+ +-------+ |
+| | Server  | | Application| |       | |Prometheus| | Grafana   | |       | | Rules  | | Notify| |
+| | Metrics | | Metrics   | |       | |         | | Dashboards| |       | |         | |        | |
+| +---------+ +-----------+ |       | +---------+ +-----------+ |       | +---------+ +-------+ |
+| +---------+ +-----------+ |       | +---------+ +-----------+ |       | +---------+ +-------+ |
+| | DB      | | Network   | |       | | ELK     | |           | |       | | Escalate| |        | |
+| | Metrics | | Metrics   | |       | | Stack   | |           | |       | |         | |        | |
+| +---------+ +-----------+ |       | +---------+ +-----------+ |       | +---------+ +-------+ |
++-----------+----------------+       +-----------+---------------+       +-----------+-----------+
+            |                                |                                   |
+            |                                |                                   |
+            +--------------------------------+-----------------------------------+
+                                                 |
+                                                 v
+                                        +---------------------+
+                                        |   Response Actions  |
+                                        | +-------+ +--------+ |
+                                        | |Auto   | |Manual  | |
+                                        | |Resp.  | |Interv. | |
+                                        | +-------+ +--------+ |
+                                        | +-------------------+ |
+                                        | |    Incident Report | |
+                                        | +-------------------+ |
+                                        +-----------------------+
+
+
+Descripción del Diagrama
+1. System Metrics (Métricas del Sistema)
+
+    Server Metrics (Métricas del Servidor):
+        Monitorea el rendimiento del hardware del servidor, como uso de CPU, memoria, disco y carga del sistema.
+
+    Application Metrics (Métricas de la Aplicación):
+        Rastrea el rendimiento de la aplicación web, incluyendo tiempos de respuesta, tasas de error y rendimiento de las solicitudes.
+
+    DB Metrics (Métricas de la Base de Datos):
+        Supervisa el rendimiento de la base de datos MariaDB, como tiempos de consulta, uso de índices y conexiones activas.
+
+    Network Metrics (Métricas de Red):
+        Evalúa el tráfico de red, latencia, ancho de banda y posibles cuellos de botella en la comunicación entre componentes.
+
+2. Monitoring Tools (Herramientas de Monitorización)
+
+    Prometheus:
+        Herramienta de monitorización y alerta de código abierto diseñada para recopilar y almacenar métricas como series temporales.
+
+    Grafana Dashboards (Tableros de Grafana):
+        Plataforma de visualización que utiliza los datos de Prometheus para crear dashboards interactivos y gráficos detallados.
+
+    ELK Stack (Elasticsearch, Logstash, Kibana):
+        Conjunto de herramientas para la gestión y análisis de logs. Logstash recopila y procesa logs, Elasticsearch los indexa y Kibana los visualiza.
+
+3. Alert Management (Gestión de Alertas)
+
+    Alert Rules (Reglas de Alertas):
+        Definición de condiciones específicas que, cuando se cumplen, disparan alertas. Por ejemplo, uso de CPU > 80% por más de 5 minutos.
+
+    Notifications (Notificaciones):
+        Mecanismos para informar al equipo de soporte sobre alertas activas. Pueden incluir correos electrónicos, mensajes en Slack, SMS, etc.
+
+    Escalate (Escalación):
+        Proceso de escalada de alertas a niveles superiores si no se resuelven dentro de un tiempo determinado o si la gravedad de la alerta aumenta.
+
+4. Response Actions (Acciones de Respuesta)
+
+    Automated Response (Respuesta Automatizada):
+        Acciones automáticas que se ejecutan en respuesta a ciertas alertas, como reiniciar un servicio, aumentar recursos del servidor, etc.
+
+    Manual Intervention (Intervención Manual):
+        Acciones que requieren la intervención directa de un operador o administrador, como investigar un problema, aplicar parches, etc.
+
+    Incident Reports (Informes de Incidentes):
+        Documentación detallada de incidentes para análisis posterior, incluyendo causas, impactos, resoluciones y medidas preventivas.
+
+Interacciones y Flujo de Datos
+
+    Recopilación de Métricas:
+        System Metrics recopila datos del servidor, aplicación, base de datos y red.
+        Estos datos son enviados a las Monitoring Tools como Prometheus y ELK Stack para su almacenamiento y análisis.
+
+    Visualización y Análisis:
+        Grafana Dashboards utiliza las métricas de Prometheus para crear visualizaciones que ayudan a identificar tendencias y anomalías.
+        ELK Stack procesa y almacena los logs, facilitando búsquedas y análisis detallados.
+
+    Generación de Alertas:
+        Basándose en Alert Rules, Prometheus y otras herramientas detectan condiciones que requieren atención.
+        Cuando se cumplen las condiciones de alerta, se activan las Notifications para informar al equipo correspondiente.
+
+    Gestión de Alertas y Escalación:
+        Si una alerta no se resuelve rápidamente, el sistema Escalate asegura que se involucre a personal de mayor nivel o especializado.
+
+    Acciones de Respuesta:
+        Automated Response puede manejar problemas menores de forma inmediata sin intervención humana.
+        Manual Intervention se activa para problemas más complejos que requieren análisis y acción humana.
+        Incident Reports se generan para mantener un registro de los incidentes y mejorar procesos futuros.
+
+Integración con la Topología General del Sistema
+
+Este diagrama de monitorización y gestión de alertas se integra en la topología general del sistema de la siguiente manera:
+
+    Interacción con Componentes Clave:
+        Monitorización del Servidor Apache y las Máquinas Virtuales (Eivissa VM y Formentera VM):
+            Server Metrics supervisa el rendimiento de los servidores y VMs.
+        Monitorización de la Base de Datos MariaDB:
+            DB Metrics rastrea el rendimiento y la salud de MariaDB.
+        Monitorización de la Red:
+            Network Metrics evalúa la conectividad y el rendimiento de la red interna y externa.
+
+    Proceso de Respuesta a Incidentes:
+        Cuando se detecta un problema (por ejemplo, alta carga en el servidor o fallos en la base de datos), las Alert Rules generan alertas que se gestionan a través de las Monitoring Tools.
+        Las Notifications informan al equipo responsable, y las Response Actions aseguran una respuesta rápida y efectiva para minimizar el impacto en los usuarios.
+
+    Mejora Continua:
+        Los Incident Reports proporcionan información valiosa para mejorar la infraestructura, optimizar configuraciones y prevenir futuros incidentes.
+
+Representación Visual Completa Integrada
+
+Para proporcionar una visión completa, a continuación se muestra cómo se integra el sistema de monitorización con la topología del sistema previamente descrita:
+
+graph TD
+    %% Subgráficos existentes
+    subgraph "Clientes"
+        User1[Usuario en Eivissa]
+        User2[Usuario en Formentera]
+        User3[Usuario Externo]
+    end
+
+    subgraph "Internet"
+        Internet[Internet]
+    end
+
+    subgraph "Firewall Perimetral"
+        Firewall[Firewall Perimetral]
+    end
+
+    subgraph "Balanceador de Carga"
+        LoadBalancer[Balanceador de Carga]
+    end
+
+    subgraph "Servidor Apache"
+        Apache[Servidor Apache]
+    end
+
+    subgraph "Virtual Hosts"
+        Eivissa[VirtualHost: nom-llinatge-eivissa.local]
+        Formentera[VirtualHost: nom-llinatge-formentera.local]
+    end
+
+    subgraph "Máquinas Virtuales"
+        EivissaVM[Eivissa VM]
+        FormenteraVM[Formentera VM]
+    end
+
+    subgraph "Base de Datos"
+        MariaDB[MariaDB]
+    end
+
+    subgraph "Sistema de Logs y Monitorización"
+        Logs[Logs y Monitorización]
+    end
+
+    subgraph "Servicios de Respaldo y Recuperación"
+        Backup[Backup y Recuperación]
+    end
+
+    %% Nueva subgráfica de Monitorización y Gestión de Alertas
+    subgraph "Monitoring and Alerting"
+        subgraph "System Metrics"
+            Server[Server Metrics]
+            App[Application Metrics]
+            DB[Database Metrics]
+            Net[Network Metrics]
+        end
+
+        subgraph "Monitoring Tools"
+            Prometheus[Prometheus]
+            Grafana[Grafana Dashboards]
+            ELK[ELK Stack]
+        end
+
+        subgraph "Alert Management"
+            Rules[Alert Rules]
+            Notify[Notifications]
+            Escalate[Escalation]
+        end
+
+        subgraph "Response Actions"
+            Auto[Automated Response]
+            Manual[Manual Intervention]
+            Report[Incident Reports]
+        end
+
+        Server & App & DB & Net --> Prometheus
+        Prometheus --> Grafana
+        Grafana --> Rules
+        Rules --> Notify --> Escalate
+        Escalate --> Auto & Manual
+        Manual --> Report
+    end
+
+    %% Conexiones del Sistema de Monitorización con la Topología General
+    Apache --> Server
+    EivissaVM --> App
+    FormenteraVM --> App
+    MariaDB --> DB
+    Firewall --> Net
+    Network Metrics --> Net
+    Server --> Logs
+    App --> Logs
+    DB --> Logs
+    Net --> Logs
+    Prometheus --> Grafana
+    ELK --> Logs
+    Prometheus --> ELK
+    Backup --> Server & App & DB & Net
+
+Descripción de la Integración
+
+    Conexión de Métricas del Sistema:
+        Servidor Apache está conectado a Server Metrics, supervisando su rendimiento.
+        Máquinas Virtuales (Eivissa VM y Formentera VM) están conectadas a Application Metrics, monitoreando el rendimiento de las aplicaciones.
+        Base de Datos MariaDB está conectada a Database Metrics, supervisando su estado y rendimiento.
+        Firewall Perimetral está conectado a Network Metrics, evaluando el tráfico y la salud de la red.
+
+    Flujo de Datos de Monitorización:
+        Las métricas del sistema se envían a Prometheus para su recopilación.
+        Prometheus alimenta Grafana Dashboards y el ELK Stack con los datos de métricas y logs.
+        Grafana Dashboards visualiza las métricas para análisis y detección de anomalías.
+        ELK Stack centraliza y analiza los logs generados por los componentes del sistema.
+
+    Gestión de Alertas:
+        Grafana Dashboards y Prometheus utilizan Alert Rules para detectar condiciones que requieren atención.
+        Cuando se cumple una regla de alerta, se envían Notifications.
+        Si la alerta persiste o es crítica, se Escalada a niveles superiores o especializados.
+
+    Acciones de Respuesta:
+        Automated Response maneja automáticamente problemas menores o predefinidos.
+        Manual Intervention es activada para problemas que requieren análisis y acción humana.
+        Incident Reports se generan para documentar y analizar incidentes, facilitando la mejora continua.
+
+    Interacción con Servicios de Respaldo:
+        Backup y Recuperación interactúa con todos los componentes críticos (Server Metrics, Application Metrics, Database Metrics, Network Metrics) para asegurar que los respaldos se realicen de manera integral.
+
+Ventajas de Esta Arquitectura de Monitorización
+
+    Visibilidad Completa: Permite una visión detallada del rendimiento y la salud de todos los componentes del sistema.
+    Detección Proactiva de Problemas: Las Alert Rules y Monitoring Tools aseguran que los problemas se detecten y se aborden antes de que afecten a los usuarios.
+    Respuesta Eficiente: Las Response Actions garantizan una respuesta rápida y efectiva a los incidentes, minimizando el tiempo de inactividad.
+    Mejora Continua: Los Incident Reports proporcionan información valiosa para optimizar y fortalecer la infraestructura del sistema.
+    Escalabilidad: La arquitectura permite añadir más métricas, herramientas de monitorización y reglas de alerta a medida que el sistema crece.

@@ -1,0 +1,474 @@
+36. Diagramas de Optimización de Base de Datos
+36.1. Diagrama de Estrategias de Indexación (Indexing Strategies Diagram)
+
+    Descripción: Muestra las estrategias de indexación implementadas para optimizar las consultas de la base de datos.
+    Componentes Incluidos: Índices en Columnas Clave, Optimización de Consultas SQL, Uso de Índices Compuestos.
+
+graph TD
+    subgraph "Primary Indexes"
+        PK[Primary Keys]
+        UK[Unique Keys]
+        FK[Foreign Keys]
+    end
+
+    subgraph "Secondary Indexes"
+        CI[Composite Indexes]
+        CI1[username + role]
+        CI2[email + status]
+    end
+
+    subgraph "Query Optimization"
+        QP[Query Plans]
+        IS[Index Selection]
+        CS[Column Statistics]
+    end
+
+    subgraph "Index Maintenance"
+        IM[Index Monitoring]
+        IR[Index Rebuilding]
+        IS2[Index Statistics]
+    end
+
+    PK & UK & FK --> CI
+    CI --> CI1 & CI2
+    CI1 & CI2 --> QP
+    QP --> IS --> CS
+    CS --> IM --> IR --> IS2
+
+
+
++---------------------------+       +---------------------------+       +--------------------------+       +---------------------------+
+|      Primary Indexes      |       |    Secondary Indexes      |       |   Query Optimization     |       |     Index Maintenance     |
+| +---------+ +-----------+ |       | +---------+ +-----------+ |       | +---------+ +----------+ |       | +---------+ +----------+  |
+| | Primary | | Unique    | |       | |Composite| |Composite  | |       | | Query  | | Index    | |       | | Index  | | Index    |  |
+| | Keys    | | Keys      | |       | | Indexes | | Indexes   | |       | | Plans  | | Selection | |       | | Monitoring | | Rebuilding |  |
+| | (PK)    | | (UK)      | |       | | (CI)    | | (CI1, CI2)| |       | | (QP)    | | (IS)      | |       | | (IM)      | | (IR)      |  |
+| +---------+ +-----------+ |       | +---------+ +-----------+ |       | +---------+ +----------+ |       | +---------+ +----------+  |
++-----------+----------------+       +-----------+---------------+       +-----------+--------------+       +-----------+--------------+
+            |                                |                                  |                                   |
+            |                                |                                  |                                   |
+            v                                v                                  v                                   v
+    +---------------+                 +--------------+                    +--------------+                    +----------------+
+    |  Primary Keys |                 | username +   |                    | Query Plans  |                    | Index Monitoring|
+    |               |                 | role         |                    |              |                    |                 |
+    +---------------+                 +--------------+                    +--------------+                    +----------------+
+            |                                |                                  |                                   |
+            +--------------+-----------------+                                  |                                   |
+                           |                                                +---+------+                            |
+                           v                                                | Index     |                            |
+    +-------------------------------+                                   | Selection |                            |
+    |     Foreign Keys (FK)         |                                   +---+------+                            |
+    +-------------------------------+                                       |                                   |
+                           |                                                v                                   |
+                           |                                     +--------------+                            |
+                           +------------------------------------>| Column        |                           |
+                                                               | Statistics    |                           |
+                                                               +--------------+                            |
+                                                                     |                                      |
+                                                                     v                                      |
+                                                           +-------------------+                           |
+                                                           |  Index Monitoring |                           |
+                                                           +-------------------+                           |
+                                                                     |                                      |
+                                                                     v                                      |
+                                                           +-------------------+                           |
+                                                           |  Index Rebuilding  |                           |
+                                                           +-------------------+                           |
+                                                                     |                                      |
+                                                                     v                                      |
+                                                           +-------------------+                           |
+                                                           |  Index Statistics |                           |
+                                                           +-------------------+                           |
+
+
+
+
+
+
+Descripción del Diagrama
+1. Primary Indexes (Índices Primarios)
+
+    Primary Keys (PK):
+        Descripción: Claves primarias que identifican de manera única cada registro en una tabla.
+        Función: Garantizan la unicidad y la integridad referencial dentro de la base de datos.
+
+    Unique Keys (UK):
+        Descripción: Claves únicas que aseguran que los valores en una columna o conjunto de columnas sean únicos.
+        Función: Previenen la duplicación de datos en columnas específicas, como correos electrónicos o nombres de usuario.
+
+    Foreign Keys (FK):
+        Descripción: Claves foráneas que establecen relaciones entre tablas.
+        Función: Mantienen la integridad referencial, asegurando que las relaciones entre tablas sean consistentes.
+
+2. Secondary Indexes (Índices Secundarios)
+
+    Composite Indexes (CI):
+        Descripción: Índices que abarcan múltiples columnas para optimizar consultas que filtran por más de una columna.
+        Función: Mejoran el rendimiento de las consultas que utilizan múltiples condiciones en las columnas indexadas.
+    Composite Indexes Detallados:
+        CI1 (username + role): Índice compuesto que optimiza las consultas que filtran por nombre de usuario y rol.
+        CI2 (email + status): Índice compuesto que optimiza las consultas que filtran por correo electrónico y estado.
+
+3. Query Optimization (Optimización de Consultas)
+
+    Query Plans (QP):
+        Descripción: Planes de ejecución que determinan cómo se ejecutarán las consultas.
+        Función: Analizan las consultas para determinar la manera más eficiente de ejecutarlas utilizando los índices disponibles.
+
+    Index Selection (IS):
+        Descripción: Proceso de selección del índice más adecuado para una consulta específica.
+        Función: Decide qué índice utilizar para optimizar el rendimiento de una consulta.
+
+    Column Statistics (CS):
+        Descripción: Estadísticas sobre las columnas que ayudan al optimizador de consultas a tomar decisiones informadas.
+        Función: Proporcionan información sobre la distribución de datos, cardinalidad y selectividad para mejorar la precisión de los planes de consulta.
+
+4. Index Maintenance (Mantenimiento de Índices)
+
+    Index Monitoring (IM):
+        Descripción: Supervisión continua del estado y el rendimiento de los índices.
+        Función: Detecta problemas como fragmentación, falta de uso o degradación del rendimiento de los índices.
+
+    Index Rebuilding (IR):
+        Descripción: Proceso de reconstrucción de índices para optimizar su estructura y rendimiento.
+        Función: Elimina la fragmentación, actualiza las estadísticas y mejora la eficiencia de los índices.
+
+    Index Statistics (IS2):
+        Descripción: Actualización y mantenimiento de las estadísticas de los índices.
+        Función: Asegura que las estadísticas reflejen con precisión los datos actuales, mejorando la efectividad de la optimización de consultas.
+
+Integración en la Topología General del Sistema
+
+Este diagrama de estrategias de indexación y optimización de consultas se integra en la topología general del sistema de la web de la llibreria "Sargantana Mediterrània" de la siguiente manera:
+
+    Base de Datos MariaDB:
+        Estructura de Índices:
+            La base de datos está estructurada con índices primarios (PK, UK, FK) y índices secundarios (CI, CI1, CI2) para optimizar el rendimiento de las consultas.
+        Optimización de Consultas:
+            Query Optimization utiliza Query Plans para determinar cómo se ejecutan las consultas de manera eficiente, seleccionando los índices más adecuados a través de Index Selection y utilizando Column Statistics para mejorar la precisión.
+        Mantenimiento de Índices:
+            Index Maintenance asegura que los índices estén siempre en óptimas condiciones mediante Index Monitoring y Index Rebuilding, y mantiene actualizadas las Index Statistics.
+
+    Sistema de Monitorización y Alertas:
+        Monitorización de la Base de Datos:
+            Prometheus y Grafana Dashboards recopilan métricas de rendimiento de MariaDB, incluyendo el uso de índices y la eficiencia de las consultas.
+        Alertas Basadas en Índices:
+            Alert Rules pueden configurarse para detectar problemas relacionados con los índices, como alta fragmentación o consultas que no utilizan índices optimizados.
+        Acciones de Respuesta:
+            Automated Response puede iniciar procesos de Index Rebuilding automáticamente si se detecta alta fragmentación.
+            Manual Intervention se puede requerir para resolver problemas más complejos relacionados con la optimización de consultas o la estructura de índices.
+
+
+Diagrama Integrado en ASCII con Estrategias de Indexación
+
+
++------------------------+
+|      Usuarios Finales   |
+| (Eivissa, Formentera,   |
+|      y Otras Locaciones)|
++-----------+------------+
+            |
+            | Solicitud HTTPS
+            |
+            v
+     +------+-------+
+     |    Internet    |
+     +------+-------+
+            |
+            | Solicitud HTTPS
+            |
+            v
++-----------+------------+
+|    Firewall Perimetral  |
+|  - Filtra tráfico      |
+|  - Restricciones IP    |
++-----------+------------+
+            |
+            | Permite o Bloquea
+            |
+            v
+  +---------+----------+
+  | Balanceador de Carga| (Opcional)
+  +---------+----------+
+            |
+            | Distribuye tráfico
+            |
+            v
+     +------+-------+
+     |   Servidor    |
+     |    Apache     |
+     +------+-------+
+            |
+            | Determina VirtualHost
+            |
+   +--------+---------+
+   |                  |
+   v                  v
++--+------------------+--+
+|  VirtualHost:          |
+| nom-llinatge-eivissa.local |
++-----------+------------+
+            |
+            | Dirección a Eivissa VM
+            |
+            v
+   +--------+---------+
+   |   Eivissa VM      |
+   | - Sitio Web       |
+   | - Intranet        |
+   | - Framework: Skeleton |
+   +--------+---------+
+            |
+            | Interacción con
+            | Base de Datos
+            |
+            v
+     +------+-------+
+     |  MariaDB      |
+     | (Base de Datos)|
+     +------+-------+
+            |
+            | Respuesta a VM
+            |
+   +--------+---------+
+   |   Eivissa VM      |
+   | - Genera Página   |
+   | - Gestiona Sesión |
+   +--------+---------+
+            |
+            | Respuesta HTTPS
+            |
++-----------+------------+
+|       Usuario Final    |
++------------------------+
+  
+   +-----------------------------+
+   |  VirtualHost:               |
+   | nom-llinatge-formentera.local|
+   +-----------+-----------------+
+               |
+               | Dirección a Formentera VM
+               |
+               v
+   +-----------+------------+
+   |  Formentera VM          |
+   | - Sitio Web             |
+   | - Portal de Clientes    |
+   | - Framework: Bootstrap  |
+   +-----------+------------+
+               |
+               | Interacción con
+               | Base de Datos
+               |
+               v
+     +------+-------+
+     |  MariaDB      |
+     | (Base de Datos)|
+     +------+-------+
+               |
+               | Respuesta a VM
+               |
+   +-----------+------------+
+   |   Formentera VM        |
+   | - Genera Página         |
+   | - Gestiona Sesión       |
+   +-----------+------------+
+               |
+               | Respuesta HTTPS
+               |
++----------------------------+
+|       Cliente Final        |
++----------------------------+
+
++----------------------------------+
+|          Sistema de Logs         |
+| - Registra accesos y errores     |
+| - Logs separados por VirtualHost |
++----------------------------------+
+               ^
+               |
+               | Logs de Apache y VMs
+               |
+               |
++----------------------------------+
+|    Sistema de Monitorización     |
+| - Prometheus & Grafana           |
+| - Alertas en tiempo real         |
++----------------------------------+
+
++----------------------------------+
+| Servicios de Respaldo y Recuperación|
+| - Respaldos de MariaDB            |
+| - Respaldos de Configuraciones    |
+| - Almacenamiento Redundante       |
++----------------------------------+
+
++-----------------------------------------+
+|          Monitoring and Alerting        |
+| +---------------------------+           |
+| |      System Metrics      |           |
+| | +---------+ +-----------+ |           |
+| | | Server  | | Application| |           |
+| | | Metrics | | Metrics   | |           |
+| | +---------+ +-----------+ |           |
+| | +---------+ +-----------+ |           |
+| | | DB      | | Network   | |           |
+| | | Metrics | | Metrics   | |           |
+| | +---------+ +-----------+ |           |
+| +-----------+---------------+           |
+|             |                           |
+|             v                           |
+| +---------------------------+           |
+| |     Monitoring Tools      |           |
+| | +---------+ +-----------+ |           |
+| | |Prometheus| | Grafana   | |           |
+| | |         | | Dashboards| |           |
+| | +---------+ +-----------+ |           |
+| | +---------+ +-----------+ |           |
+| | | ELK     | |           | |           |
+| | | Stack   | |           | |           |
+| | +---------+ +-----------+ |           |
+| +-----------+---------------+           |
+|             |                           |
+|             v                           |
+| +---------------------------+           |
+| |      Alert Management     |           |
+| | +---------+ +-------+     |           |
+| | | Rules  | | Notify|     |           |
+| | +---------+ +-------+     |           |
+| | +---------+               |           |
+| | | Escalate|               |           |
+| | +---------+               |           |
+| +-----------+---------------+           |
+|             |                           |
+|             v                           |
+| +---------------------------+           |
+| |      Response Actions     |           |
+| | +-------+ +--------+      |           |
+| | |Auto   | |Manual  |      |           |
+| | |Resp.  | |Interv. |      |           |
+| | +-------+ +--------+      |           |
+| | +-------------------+     |           |
+| | | Incident Reports  |     |           |
+| | +-------------------+     |           |
+| +---------------------------+           |
++-----------------------------------------+
+
++---------------------------+
+|        Pipeline CI/CD     |
+| +---------+ +-----------+ |
+| | Source  | |  Build    | |
+| | Control | |  Stage    | |
+| +---------+ +-----------+ |
+| +---------+ +-----------+ |
+| |   Test  | |  Deploy   | |
+| |  Stage  | |  Stage    | |
+| +---------+ +-----------+ |
+| +---------+ +-----------+ |
+| | Monitor &|           | |
+| | Feedback |           | |
+| +---------+ +-----------+ |
++---------------------------+
+            |
+            | Integración
+            v
++----------------------------------+
+|          Monitoring and Alerting |
+| (Integrado en la Topología)      |
++----------------------------------+
+
++---------------------------+
+|  Estrategias de Indexación|
+|    y Optimización         |
+| +---------+ +-----------+ |
+| |Primary  | |Secondary  | |
+| |Indexes  | |Indexes    | |
+| +---------+ +-----------+ |
+| +---------+ +-----------+ |
+| | Query   | | Index     | |
+| | Optimization| Maintenance|
+| +---------+ +-----------+ |
++---------------------------+
+            |
+            v
+     +---------------+
+     |   MariaDB     |
+     | (Base de Datos)|
+     +---------------+
+
+
+Descripción de la Integración
+1. Estrategias de Indexación y Optimización de Consultas
+
+    Primary Indexes:
+        Primary Keys (PK), Unique Keys (UK) y Foreign Keys (FK): Garantizan la unicidad, integridad referencial y facilitan las relaciones entre tablas en MariaDB.
+    Secondary Indexes:
+        Composite Indexes (CI): Índices que abarcan múltiples columnas como username + role y email + status para optimizar consultas específicas.
+    Query Optimization:
+        Query Plans (QP): Determinan la mejor manera de ejecutar una consulta.
+        Index Selection (IS): Selecciona el índice más adecuado para una consulta específica.
+        Column Statistics (CS): Proporcionan datos sobre la distribución de valores en las columnas para mejorar la precisión de los planes de consulta.
+    Index Maintenance:
+        Index Monitoring (IM): Supervisa el estado y rendimiento de los índices.
+        Index Rebuilding (IR): Reconstruye índices para eliminar la fragmentación y mejorar la eficiencia.
+        Index Statistics (IS2): Mantiene actualizadas las estadísticas de los índices para optimizar las decisiones del optimizador de consultas.
+
+2. Base de Datos MariaDB
+
+    Interacción con Estrategias de Indexación:
+        MariaDB utiliza los Primary Indexes y Secondary Indexes para optimizar las consultas.
+        Query Optimization en MariaDB se beneficia de las Column Statistics y Query Plans para ejecutar consultas de manera eficiente.
+        Index Maintenance asegura que los índices permanezcan optimizados y actualizados, mejorando continuamente el rendimiento de la base de datos.
+
+3. Sistema de Monitorización y Alertas
+
+    Monitorización de la Base de Datos:
+        Prometheus recopila métricas relacionadas con los índices y el rendimiento de las consultas en MariaDB.
+        Grafana Dashboards visualiza estas métricas, permitiendo al equipo de administración identificar rápidamente posibles problemas.
+    Alertas Basadas en Índices:
+        Alert Rules pueden configurarse para detectar condiciones como alta fragmentación de índices, consultas lentas o falta de utilización de índices.
+        Notifications informan al equipo sobre estas alertas, permitiendo una respuesta oportuna.
+    Acciones de Respuesta:
+        Automated Response puede desencadenar acciones automáticas como la reconstrucción de índices si se detecta alta fragmentación.
+        Manual Intervention se requiere para problemas más complejos que necesitan análisis y acción humana.
+        Incident Reports documentan los incidentes para análisis posterior y mejoras continuas.
+
+Beneficios de Implementar Estrategias de Indexación y Optimización
+
+    Mejora del Rendimiento de las Consultas:
+        Los índices adecuados reducen significativamente el tiempo de respuesta de las consultas, especialmente en tablas grandes.
+    Eficiencia en el Uso de Recursos:
+        Optimizar las consultas y mantener los índices evita el uso innecesario de CPU y memoria, mejorando la eficiencia general del sistema.
+    Escalabilidad:
+        Un sistema de base de datos bien optimizado puede manejar un mayor volumen de datos y usuarios sin degradar el rendimiento.
+    Integridad y Consistencia de Datos:
+        Los índices primarios y foráneos aseguran la integridad referencial y la consistencia de los datos en la base de datos.
+    Facilidad en la Mantenimiento:
+        La monitorización y el mantenimiento regular de los índices facilitan la identificación y resolución de problemas antes de que afecten a los usuarios finales.
+
+Próximos Pasos
+
+    Implementación de Índices:
+        Asegurar que todas las tablas críticas tengan índices primarios y únicos definidos correctamente.
+        Crear índices compuestos en columnas que se utilizan frecuentemente juntas en las consultas.
+
+    Configuración de Monitorización:
+        Configurar Prometheus para recopilar métricas específicas de índices y consultas en MariaDB.
+        Diseñar Grafana Dashboards que visualicen estas métricas de manera clara y accesible.
+
+    Definición de Alert Rules:
+        Establecer reglas de alerta en Prometheus para detectar condiciones críticas relacionadas con los índices, como alta fragmentación o consultas lentas.
+
+    Automatización de Mantenimiento:
+        Implementar scripts o herramientas que permitan la reconstrucción automática de índices cuando se detecten altos niveles de fragmentación.
+        Automatizar la actualización de estadísticas de índices para mantener la precisión de los planes de consulta.
+
+    Optimización Continua:
+        Revisar y ajustar regularmente las estrategias de indexación y optimización de consultas basándose en las métricas y el feedback del sistema.
+        Realizar auditorías periódicas para identificar nuevas oportunidades de optimización a medida que el sistema crece.
+
+Conclusión
+
+La implementación de estrategias de indexación, optimización de consultas y mantenimiento de índices en la base de datos MariaDB es crucial para asegurar un rendimiento óptimo, escalabilidad y eficiencia en la web de la llibreria "Sargantana Mediterrània". Este diagrama ASCII y su explicación detallada proporcionan una comprensión clara de cómo estos componentes interactúan y se integran en la topología general del sistema, facilitando la gestión y optimización continua de la base de datos.
+
+

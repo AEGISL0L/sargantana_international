@@ -1,0 +1,208 @@
+1. Diagramas de Arquitectura General: Facilitan una comprensión macro del sistema, mostrando cómo se relacionan los componentes principales y permitiendo identificar áreas clave para optimización o mejora.
+
+1. Diagramas de Arquitectura General
+1.1. Diagrama de Arquitectura de Alto Nivel (High-Level Architecture Diagram)
+
+    Descripción: Muestra los componentes principales del sistema y cómo interactúan entre sí a un nivel macro.
+    Componentes Incluidos: Clientes, Internet, Servidor Web, Máquinas Virtuales (Eivissa y Formentera), Base de Datos, Sistema de Logs, Servicios de Respaldo, etc.
+
+
+graph TD
+    Users[Usuarios Finales] -->|HTTPS| Internet
+    Internet -->|HTTPS| FW[Firewall Perimetral]
+    FW -->|Filtrado IP| LB[Balanceador de Carga]
+    LB -->|Distribución| Apache[Servidor Apache]
+    
+    Apache -->|VirtualHost| EivissaVM[Eivissa VM]
+    Apache -->|VirtualHost| FormenteraVM[Formentera VM]
+    
+    EivissaVM -->|Queries| DB[(MariaDB)]
+    FormenteraVM -->|Queries| DB
+    
+    EivissaVM -->|Logs| Logs[Sistema de Logs]
+    FormenteraVM -->|Logs| Logs
+    Apache -->|Logs| Logs
+    
+    Logs -->|Alertas| Monitor[Sistema Monitorización]
+    
+    DB -->|Backup| Backup[Servicios de Respaldo]
+    
+    subgraph Seguridad
+        FW
+    end
+    
+    subgraph "Servidores Web"
+        Apache
+        EivissaVM
+        FormenteraVM
+    end
+    
+    subgraph "Datos y Monitoreo"
+        DB
+        Logs
+        Monitor
+        Backup
+    end
+
+
++-----------------------------+
+|        Usuarios Finales     |
++-----------------------------+
+|        | HTTPS              |
+|        v                    |
++-----------------------------+
+|         Internet            |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|  Firewall Perimetral        |
+|  (Filtrado IP)              |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|   Balanceador de Carga      |
+|   (Distribución de Tráfico) |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|        Servidor Apache      |
+|   (VirtualHost Configurado) |
++-----------------------------+
+     |                 |
+     v                 v
++------------------+  +------------------+
+| Eivissa VM       |  | Formentera VM    |
+| (Servidor Web)   |  | (Servidor Web)   |
++------------------+  +------------------+
+     |                 |
+     v                 v
++-----------------------------+
+|          MariaDB            |
+|   (Base de Datos Compartida)|
++-----------------------------+
+        |
+        v
++-----------------------------+
+|        Servicios de         |
+|        Respaldo (Backup)    |
++-----------------------------+
+
++-----------------------------+
+|        Sistema de Logs      |
++-----------------------------+
+     |                 |
+     v                 v
++-----------------------------+
+|  Sistema de Monitorización  |
+|  (Alertas y Métricas)       |
++-----------------------------+
+
+
+
+Descripción del Diagrama de Arquitectura del Sistema
+1. Usuarios Finales
+
+    Usuarios: Los usuarios finales acceden al sistema desde Internet utilizando conexiones HTTPS seguras.
+    Función: Interactúan con la interfaz de usuario de la aplicación para Eivissa y Formentera.
+
+2. Internet
+
+    Descripción: Punto de acceso para los usuarios finales.
+    Función: Redirige el tráfico a través del firewall perimetral para su filtrado y protección.
+
+3. Firewall Perimetral
+
+    Descripción: Primera línea de defensa para proteger el sistema contra accesos no autorizados.
+    Función: Aplica reglas de filtrado de IP para permitir solo el tráfico autorizado.
+
+4. Balanceador de Carga
+
+    Descripción: Distribuye el tráfico entrante entre los servidores Apache.
+    Función: Mejora la disponibilidad y el rendimiento del sistema al balancear la carga.
+
+5. Servidores Apache
+
+    Descripción: Servidor web configurado con VirtualHost para gestionar solicitudes de Eivissa y Formentera.
+    Función: Redirige las solicitudes a las máquinas virtuales correspondientes.
+
+6. Máquinas Virtuales (Eivissa VM y Formentera VM)
+
+    Descripción: Máquinas virtuales dedicadas a procesar la lógica de negocio para cada sede (Eivissa y Formentera).
+    Función: Procesan consultas y manejan la lógica del backend, interactuando con la base de datos MariaDB.
+
+7. Base de Datos MariaDB
+
+    Descripción: Base de datos compartida que almacena datos de usuarios, transacciones y registros.
+    Función: Proporciona almacenamiento persistente y permite consultas eficientes para ambas máquinas virtuales.
+
+8. Sistema de Logs
+
+    Descripción: Sistema centralizado para almacenar registros de actividades y eventos del servidor Apache y las máquinas virtuales.
+    Función: Proporciona trazabilidad y facilita auditorías y resolución de problemas.
+
+9. Sistema de Monitorización
+
+    Descripción: Monitorea el rendimiento del sistema y genera alertas en caso de problemas.
+    Función: Supervisa el estado del sistema y envía notificaciones a los administradores.
+
+10. Servicios de Respaldo (Backup)
+
+    Descripción: Servicios dedicados a realizar copias de seguridad de la base de datos.
+    Función: Asegura la recuperación de datos en caso de fallos o desastres.
+
+Flujo de Datos e Interacción entre Componentes
+
+    Acceso del Usuario:
+        Los usuarios finales acceden a la aplicación a través de HTTPS, y el tráfico es redirigido al firewall perimetral.
+
+    Filtrado y Balanceo de Tráfico:
+        El firewall filtra el tráfico según las reglas de seguridad, y el balanceador de carga distribuye las solicitudes entre los servidores Apache.
+
+    Procesamiento en Servidores Web:
+        El servidor Apache, configurado con VirtualHost, redirige las solicitudes a la máquina virtual correspondiente (Eivissa VM o Formentera VM).
+
+    Acceso a Datos:
+        Las máquinas virtuales procesan las solicitudes y realizan consultas a la base de datos MariaDB para obtener o almacenar datos.
+
+    Registro de Actividades:
+        Todas las actividades importantes se registran en el sistema de logs, incluyendo solicitudes procesadas y eventos de error.
+
+    Monitoreo y Alertas:
+        El sistema de monitorización analiza los logs y genera alertas si detecta problemas en el rendimiento o errores.
+
+    Copia de Seguridad:
+        Los datos de la base de datos se respaldan regularmente para garantizar la recuperación en caso de fallos.
+
+Ventajas de Esta Arquitectura
+
+    Alta Seguridad:
+        El uso de firewall perimetral, filtrado de IP y HTTPS protege el sistema contra accesos no autorizados y ataques.
+
+    Alta Disponibilidad:
+        El balanceador de carga distribuye el tráfico y previene la sobrecarga de los servidores web, mejorando la disponibilidad.
+
+    Rendimiento Optimizado:
+        La segmentación en máquinas virtuales para Eivissa y Formentera permite un procesamiento eficiente y específico para cada sede.
+
+    Monitoreo Centralizado:
+        El sistema de logs y monitoreo centralizado facilita la detección de problemas y permite una respuesta rápida.
+
+Próximos Pasos para la Implementación
+
+    Configurar Firewall y Balanceador de Carga:
+        Definir reglas de filtrado y configurar el balanceador de carga para distribuir el tráfico adecuadamente.
+
+    Desplegar Máquinas Virtuales y Servidores Apache:
+        Configurar el servidor Apache y las máquinas virtuales para manejar solicitudes y procesar la lógica del backend.
+
+    Configurar el Sistema de Logs y Monitorización:
+        Implementar herramientas de monitoreo como Prometheus o ELK Stack para supervisar el rendimiento del sistema.
+
+    Implementar Copias de Seguridad:
+        Configurar el servicio de respaldo para realizar copias de seguridad regulares de la base de datos.
+
+Si necesitas más detalles sobre la implementación o ajustes en el diagrama, estaré encantado de ayudarte.
+

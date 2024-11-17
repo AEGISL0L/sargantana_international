@@ -1,0 +1,416 @@
+graph TD
+    %% Definición de subgráficos para organizar los componentes
+    subgraph "Clientes"
+        User1[Usuario en Eivissa]
+        User2[Usuario en Formentera]
+        User3[Usuario Externo]
+    end
+
+    subgraph "Internet"
+        Internet[Internet]
+    end
+
+    subgraph "Firewall Perimetral"
+        Firewall[Firewall Perimetral]
+    end
+
+    subgraph "Balanceador de Carga"
+        LoadBalancer[Balanceador de Carga]
+    end
+
+    subgraph "Servidor Apache"
+        Apache[Servidor Apache]
+    end
+
+    subgraph "Virtual Hosts"
+        Eivissa[VirtualHost: nom-llinatge-eivissa.local]
+        Formentera[VirtualHost: nom-llinatge-formentera.local]
+    end
+
+    subgraph "Máquinas Virtuales"
+        EivissaVM[Eivissa VM]
+        FormenteraVM[Formentera VM]
+    end
+
+    subgraph "Base de Datos"
+        MariaDB[MariaDB]
+    end
+
+    subgraph "Sistema de Logs y Monitorización"
+        Logs[Logs y Monitorización]
+    end
+
+    subgraph "Servicios de Respaldo y Recuperación"
+        Backup[Backup y Recuperación]
+    end
+
+    %% Definición de la capa de Seguridad
+    subgraph "Security Layer"
+        JWT[JWT Tokens]
+        OAuth[OAuth 2.0]
+        Rate[Rate Limiting]
+    end
+
+    %% Flujo principal de solicitudes
+    User1 -->|Acceso HTTPS| Internet
+    User2 -->|Acceso HTTPS| Internet
+    User3 -->|Acceso HTTPS| Internet
+
+    Internet -->|Tráfico HTTPS| Firewall
+    Firewall -->|Permite| LoadBalancer
+    Firewall -->|Bloquea| Error[Acceso Denegado]
+
+    LoadBalancer --> Apache
+    Apache --> Eivissa
+    Apache --> Formentera
+
+    Eivissa --> EivissaVM
+    Formentera --> FormenteraVM
+
+    EivissaVM -->|Interacción con| MariaDB
+    FormenteraVM -->|Interacción con| MariaDB
+
+    EivissaVM --> Logs
+    FormenteraVM --> Logs
+    Apache --> Logs
+
+    EivissaVM --> Backup
+    FormenteraVM --> Backup
+    MariaDB --> Backup
+
+    %% Integración de la capa de seguridad
+    JWT & OAuth & Rate --> Auth[Authentication]
+
+    %% Situaciones Hipotéticas
+    User3 -->|Intenta Acceso a Eivissa| Internet --> Firewall --> Error
+    EivissaVM -->|Fallo en MariaDB| Logs
+    FormenteraVM -->|Fallo en MariaDB| Logs
+    Apache -->|Fallo en Servidor| Logs
+    ```
+
+### **Descripción del Diagrama**
+
+1. **Clientes:**
+   - **User1 (Usuario en Eivissa):** Accede al sitio `nom-llinatge-eivissa.local`.
+   - **User2 (Usuario en Formentera):** Accede al sitio `nom-llinatge-formentera.local`.
+   - **User3 (Usuario Externo):** Intentará acceder a cualquiera de los sitios, pero estará restringido según la IP.
+
+2. **Internet:**
+   - Medio por el cual los usuarios acceden a los sitios web.
+
+3. **Firewall Perimetral:**
+   - **Funciones:**
+     - Filtra el tráfico entrante y saliente.
+     - Aplica restricciones de acceso por IP según la ubicación geográfica (Eivissa, Formentera).
+     - Bloquea accesos no autorizados y redirige a una página de "Acceso Denegado" si la IP no está permitida.
+
+4. **Balanceador de Carga:**
+   - **Funciones:**
+     - Distribuye el tráfico entre múltiples instancias del Servidor Apache para mejorar el rendimiento y la disponibilidad.
+     - Opcional: Puede escalar horizontalmente añadiendo más servidores según la demanda.
+
+5. **Servidor Apache:**
+   - **Funciones:**
+     - Gestiona las solicitudes HTTP/HTTPS.
+     - Determina el VirtualHost correspondiente según el dominio solicitado (`nom-llinatge-eivissa.local` o `nom-llinatge-formentera.local`).
+     - Dirige el tráfico a las Máquinas Virtuales correspondientes.
+
+6. **Virtual Hosts:**
+   - **nom-llinatge-eivissa.local:**
+     - Dirige las solicitudes al **Eivissa VM**.
+     - Configurado con restricciones para permitir solo IPs de Eivissa.
+     - Utiliza el framework **Skeleton** con colores corporativos específicos.
+   - **nom-llinatge-formentera.local:**
+     - Dirige las solicitudes al **Formentera VM**.
+     - Configurado con restricciones para permitir solo IPs de Formentera.
+     - Utiliza el framework **Bootstrap** con colores corporativos específicos.
+
+7. **Máquinas Virtuales (VMs):**
+   - **Eivissa VM:**
+     - Hospeda el sitio `nom-llinatge-eivissa.local` y la intranet `/intranet`.
+     - Gestiona funcionalidades específicas como la gestión de usuarios y roles.
+     - Interactúa con la **Base de Datos MariaDB** para obtener y almacenar información.
+   - **Formentera VM:**
+     - Hospeda el sitio `nom-llinatge-formentera.local` y el portal de clientes `/portalclient`.
+     - Gestiona funcionalidades específicas como la gestión de clientes.
+     - Interactúa con la **Base de Datos MariaDB** para obtener y almacenar información.
+
+8. **Base de Datos (MariaDB):**
+   - **Funciones:**
+     - Centraliza la gestión de usuarios, roles y datos de clientes.
+     - Asegura la integridad y disponibilidad de los datos.
+     - Configurada con replicación maestro-esclavo para alta disponibilidad.
+
+9. **Sistema de Logs y Monitorización:**
+   - **Funciones:**
+     - Registra accesos, errores y actividades de los servidores y VMs.
+     - Utiliza herramientas como ELK Stack (Elasticsearch, Logstash, Kibana), Prometheus y Grafana para análisis y visualización.
+     - Facilita la detección y resolución de problemas.
+
+10. **Servicios de Respaldo y Recuperación:**
+    - **Funciones:**
+      - Realiza respaldos periódicos de la base de datos y configuraciones del sistema.
+      - Almacena los respaldos en ubicaciones seguras y redundantes para garantizar la recuperación ante desastres.
+
+11. **Capa de Seguridad (Security Layer):**
+    - **Componentes:**
+      - **JWT Tokens:** Para la autenticación y autorización de usuarios.
+      - **OAuth 2.0:** Para manejar autorizaciones seguras y delegadas.
+      - **Rate Limiting:** Para proteger el sistema contra ataques de denegación de servicio (DoS) limitando el número de solicitudes permitidas.
+
+### **Situaciones Hipotéticas Representadas**
+
+1. **Acceso Exitoso desde Eivissa:**
+   - **Flujo:**
+     - Un usuario en Eivissa accede al sitio correspondiente.
+     - La solicitud pasa por el Firewall, es permitida y balanceada hacia el Servidor Apache.
+     - Apache dirige la solicitud al **Eivissa VM**, que procesa la solicitud y responde al usuario.
+
+2. **Intento de Acceso No Autorizado desde Formentera a Eivissa:**
+   - **Flujo:**
+     - Un usuario en Formentera intenta acceder al sitio de Eivissa.
+     - La solicitud es filtrada por el Firewall y bloqueada.
+     - Se muestra una página de "Acceso Denegado" al usuario.
+
+3. **Fallo en la Base de Datos MariaDB:**
+   - **Flujo:**
+     - Tanto la **Eivissa VM** como la **Formentera VM** dependen de MariaDB.
+     - Si MariaDB falla, las VMs no pueden procesar solicitudes que requieren acceso a la base de datos.
+     - Los errores se registran en el sistema de Logs y Monitorización para su posterior análisis.
+
+4. **Fallo en el Servidor Apache:**
+   - **Flujo:**
+     - Si Apache falla, no puede dirigir las solicitudes a las VMs.
+     - Los usuarios reciben una página de error, y el incidente se registra en los Logs.
+
+5. **Registro de Usuario con Errores de Validación:**
+   - **Flujo:**
+     - Un usuario intenta registrarse en `registre.php`.
+     - Las validaciones en el frontend (JavaScript) detectan errores (por ejemplo, contraseña débil).
+     - Se muestran alertas al usuario indicando los problemas, y el formulario no se envía hasta que se corrijan los errores.
+
+6. **Autenticación y Control de Acceso:**
+   - **Flujo:**
+     - Un usuario inicia sesión en `login.php`.
+     - PHP verifica las credenciales contra MariaDB.
+     - Si son válidas, se inicia una sesión y se generan tokens JWT.
+     - El usuario puede acceder a páginas protegidas según sus roles y permisos.
+
+### **Cómo Visualizar el Diagrama**
+
+Para visualizar este diagrama de flujo en formato gráfico, puedes utilizar herramientas que soportan **Mermaid.js**, como:
+
+- **Mermaid Live Editor:** [https://mermaid-js.github.io/mermaid-live-editor/](https://mermaid-js.github.io/mermaid-live-editor/)
+- **Visual Studio Code** con la extensión **Markdown Preview Mermaid Support**
+- **Obsidian** o cualquier otro editor que soporte Mermaid.js
+
+### **Próximos Pasos**
+
+1. **Validación del Diagrama:**
+   - Revisa que todos los componentes y flujos reflejen correctamente la arquitectura y las interacciones deseadas.
+   - Asegúrate de que las restricciones de acceso por IP y las capas de seguridad están correctamente representadas.
+
+2. **Ampliación del Diagrama:**
+   - **Integración de APIs Internas y Externas:**
+     - Si planeas tener APIs internas para funcionalidades específicas, puedes añadirlas al diagrama.
+     - Representar la comunicación con servicios externos como gateways de pago, servicios de correo electrónico, y almacenamiento en la nube.
+
+3. **Detallado de Componentes Específicos:**
+   - **Monitorización y Alertas:**
+     - Detallar qué herramientas específicas se están utilizando y cómo se configuran las alertas.
+   - **Servicios de Respaldo:**
+     - Incluir detalles sobre la frecuencia de los respaldos y las ubicaciones de almacenamiento.
+
+4. **Inclusión de Flujos Adicionales:**
+   - **Manejo de Sesiones:**
+     - Representar cómo se gestionan las sesiones de usuario y la expiración de tokens.
+   - **Recuperación ante Desastres:**
+     - Mostrar cómo se recupera el sistema en caso de fallos críticos, incluyendo la restauración desde respaldos.
+
+5. **Implementación de Seguridad Avanzada:**
+   - **WAF (Web Application Firewall):**
+     - Añadir un componente de WAF para proteger contra ataques más sofisticados.
+   - **Autenticación de Dos Factores (2FA):**
+     - Representar la implementación de 2FA para mejorar la seguridad de las cuentas de usuario.
+
+### **Ejemplo de Diagrama Ampliado con APIs Internas y Servicios Externos**
+
+A continuación, se presenta una versión ampliada del diagrama incluyendo APIs internas y servicios externos:
+
+```mermaid
+graph TD
+    %% Definición de subgráficos para organizar los componentes
+    subgraph "Clientes"
+        User1[Usuario en Eivissa]
+        User2[Usuario en Formentera]
+        User3[Usuario Externo]
+    end
+
+    subgraph "Internet"
+        Internet[Internet]
+    end
+
+    subgraph "Firewall Perimetral"
+        Firewall[Firewall Perimetral]
+    end
+
+    subgraph "Balanceador de Carga"
+        LoadBalancer[Balanceador de Carga]
+    end
+
+    subgraph "Servidor Apache"
+        Apache[Servidor Apache]
+    end
+
+    subgraph "Virtual Hosts"
+        Eivissa[VirtualHost: nom-llinatge-eivissa.local]
+        Formentera[VirtualHost: nom-llinatge-formentera.local]
+    end
+
+    subgraph "Máquinas Virtuales"
+        EivissaVM[Eivissa VM]
+        FormenteraVM[Formentera VM]
+    end
+
+    subgraph "Base de Datos"
+        MariaDB[MariaDB]
+    end
+
+    subgraph "Sistema de Logs y Monitorización"
+        Logs[Logs y Monitorización]
+    end
+
+    subgraph "Servicios de Respaldo y Recuperación"
+        Backup[Backup y Recuperación]
+    end
+
+    subgraph "Capa de Seguridad"
+        JWT[JWT Tokens]
+        OAuth[OAuth 2.0]
+        Rate[Rate Limiting]
+    end
+
+    subgraph "APIs Internas"
+        UserAPI[User API]
+        DataAPI[Data API]
+        AdminAPI[Admin API]
+    end
+
+    subgraph "Servicios Externos"
+        Payment[Payment Gateway]
+        EmailService[Email Service]
+        CloudStorage[Cloud Storage]
+    end
+
+    %% Flujo principal de solicitudes
+    User1 -->|Acceso HTTPS| Internet
+    User2 -->|Acceso HTTPS| Internet
+    User3 -->|Acceso HTTPS| Internet
+
+    Internet -->|Tráfico HTTPS| Firewall
+    Firewall -->|Permite| LoadBalancer
+    Firewall -->|Bloquea| Error[Acceso Denegado]
+
+    LoadBalancer --> Apache
+    Apache --> Eivissa
+    Apache --> Formentera
+
+    Eivissa --> EivissaVM
+    Formentera --> FormenteraVM
+
+    EivissaVM -->|Interacción con| MariaDB
+    FormenteraVM -->|Interacción con| MariaDB
+
+    EivissaVM --> Logs
+    FormenteraVM --> Logs
+    Apache --> Logs
+
+    EivissaVM --> Backup
+    FormenteraVM --> Backup
+    MariaDB --> Backup
+
+    %% Integración de la capa de seguridad
+    JWT & OAuth & Rate --> Auth[Authentication]
+
+    %% Integración de APIs Internas
+    EivissaVM --> UserAPI
+    EivissaVM --> DataAPI
+    EivissaVM --> AdminAPI
+
+    FormenteraVM --> UserAPI
+    FormenteraVM --> DataAPI
+    FormenteraVM --> AdminAPI
+
+    %% Integración con Servicios Externos
+    UserAPI --> Payment
+    UserAPI --> EmailService
+    DataAPI --> CloudStorage
+
+    %% Situaciones Hipotéticas
+    User3 -->|Intenta Acceso a Eivissa| Internet --> Firewall --> Error
+    EivissaVM -->|Fallo en MariaDB| Logs
+    FormenteraVM -->|Fallo en MariaDB| Logs
+    Apache -->|Fallo en Servidor| Logs
+    UserAPI -->|Error en Servicio Externo| Logs
+    Payment -->|Fallo en Gateway de Pago| Logs
+    EmailService -->|Fallo en Servicio de Email| Logs
+    CloudStorage -->|Fallo en Almacenamiento en la Nube| Logs
+    ```
+
+### **Descripción del Diagrama Ampliado**
+
+1. **APIs Internas:**
+   - **User API:** Gestiona las operaciones relacionadas con los usuarios, como registro, inicio de sesión y gestión de perfiles.
+   - **Data API:** Maneja el acceso y la manipulación de los datos almacenados en la base de datos.
+   - **Admin API:** Permite la gestión administrativa de la plataforma, como la asignación de roles y la supervisión del sistema.
+
+2. **Servicios Externos:**
+   - **Payment Gateway:** Procesa las transacciones financieras de los clientes.
+   - **Email Service:** Envía correos electrónicos de confirmación, notificaciones y otros tipos de comunicaciones.
+   - **Cloud Storage:** Almacena archivos y datos de manera escalable y segura en la nube.
+
+3. **Integración de APIs Internas y Servicios Externos:**
+   - Las **APIs Internas** interactúan con los **Servicios Externos** para funcionalidades específicas.
+   - Por ejemplo, la **User API** puede interactuar con el **Payment Gateway** para procesar pagos y con el **Email Service** para enviar confirmaciones de registro.
+
+4. **Situaciones Hipotéticas Adicionales:**
+   - **Errores en Servicios Externos:** Si alguno de los servicios externos falla (como el gateway de pago o el servicio de email), se registra el incidente en el sistema de Logs y Monitorización para su posterior análisis y resolución.
+
+### **Cómo Utilizar Este Diagrama**
+
+1. **Visualización:**
+   - Copia el código en un editor compatible con Mermaid.js, como [Mermaid Live Editor](https://mermaid-js.github.io/mermaid-live-editor/), para ver el diagrama de forma gráfica.
+
+2. **Documentación del Proyecto:**
+   - Incluye este diagrama en la documentación técnica del proyecto para facilitar la comprensión de la arquitectura a los desarrolladores, administradores y stakeholders.
+
+3. **Planificación y Desarrollo:**
+   - Utiliza el diagrama para identificar las dependencias entre componentes y planificar el desarrollo y despliegue de nuevas funcionalidades.
+
+4. **Monitorización y Mantenimiento:**
+   - Refleja cómo los componentes interactúan entre sí y cómo se manejan los errores, lo que es esencial para la monitorización efectiva y el mantenimiento del sistema.
+
+### **Próximos Pasos**
+
+1. **Refinamiento del Diagrama:**
+   - **Detalles Específicos:** Añade más detalles sobre los flujos de datos específicos, protocolos utilizados y tecnologías implementadas.
+   - **Componentes Adicionales:** Si hay otros componentes o servicios en tu infraestructura, inclúyelos en el diagrama para una visión completa.
+
+2. **Automatización y Herramientas de Despliegue:**
+   - Considera integrar herramientas de **CI/CD** (Integración Continua y Despliegue Continuo) y representarlas en el diagrama para mostrar el flujo de desarrollo y despliegue.
+
+3. **Seguridad Avanzada:**
+   - Implementa y representa capas adicionales de seguridad, como **Web Application Firewall (WAF)**, **Autenticación Multifactor (MFA)** y **Monitorización de Amenazas**.
+
+4. **Optimización de Rendimiento:**
+   - Añade componentes como **CDN (Content Delivery Network)**, **Cache In-memory (Redis, Memcached)** y **Optimización de Consultas SQL** en el diagrama para reflejar estrategias de mejora de rendimiento.
+
+5. **Escalabilidad y Alta Disponibilidad:**
+   - Representa configuraciones para escalar horizontalmente (añadir más servidores) y asegurar alta disponibilidad mediante **clusters** y **replicación de bases de datos**.
+
+### **Conclusión**
+
+El diagrama proporcionado y su versión ampliada ofrecen una **visión integral** de la topología del sistema para la web de la llibreria "Sargantana Mediterrània". Este enfoque facilita la comprensión de cómo interactúan los diferentes componentes, cómo se gestionan los datos y cómo se manejan las situaciones de error, asegurando una arquitectura robusta, segura y escalable.
+
+Si necesitas ayuda adicional para refinar el diagrama, añadir más componentes específicos o cualquier otra asistencia relacionada con la arquitectura del sistema, no dudes en indicarlo.
+

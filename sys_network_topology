@@ -1,0 +1,259 @@
+
+2.Diagramas de Red y Topología: Esenciales para diseñar y gestionar la infraestructura de red, garantizando que las comunicaciones sean seguras, eficientes y escalables.
+
+2. Diagramas de Red y Topología
+2.1. Diagrama de Topología de Red (Network Topology Diagram)
+
+    Descripción: Representa la disposición física y lógica de los dispositivos de red y cómo están interconectados.
+    Componentes Incluidos: Routers, Firewalls, Switches, Servidores, Máquinas Virtuales, Balanceadores de Carga, etc.
+
+graph TD
+    subgraph "Internet Zone"
+        Internet((Internet))
+        Router[Edge Router]
+    end
+
+    subgraph "DMZ"
+        FW1[Primary Firewall]
+        LB[Load Balancer]
+        WAF[Web Application Firewall]
+    end
+
+    subgraph "Web Layer"
+        WebSW[Web Switch]
+        Apache1[Apache Server 1]
+        Apache2[Apache Server 2]
+    end
+
+    subgraph "Application Layer"
+        AppSW[App Switch]
+        EivissaVM1[Eivissa VM Primary]
+        EivissaVM2[Eivissa VM Backup]
+        FormenteraVM1[Formentera VM Primary]
+        FormenteraVM2[Formentera VM Backup]
+    end
+
+    subgraph "Database Layer"
+        DBSW[DB Switch]
+        MariaDB1[MariaDB Master]
+        MariaDB2[MariaDB Slave]
+    end
+
+    Internet <--> Router
+    Router <--> FW1
+    FW1 <--> LB
+    LB <--> WAF
+    WAF <--> WebSW
+    WebSW <--> |HTTPS| Apache1
+    WebSW <--> |HTTPS| Apache2
+    Apache1 <--> AppSW
+    Apache2 <--> AppSW
+    AppSW <--> EivissaVM1
+    AppSW <--> EivissaVM2
+    AppSW <--> FormenteraVM1
+    AppSW <--> FormenteraVM2
+    EivissaVM1 <--> DBSW
+    EivissaVM2 <--> DBSW
+    FormenteraVM1 <--> DBSW
+    FormenteraVM2 <--> DBSW
+    DBSW <--> MariaDB1
+    DBSW <--> MariaDB2
+
+
+
+
++-----------------------------+
+|       Internet Zone         |
++-----------------------------+
+|  +---------+                |
+|  | Internet|                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Edge    |                |
+|  | Router  |                |
+|  +---------+                |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|            DMZ              |
++-----------------------------+
+|  +---------+                |
+|  | Primary  |               |
+|  | Firewall |               |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Load    |                |
+|  | Balancer|                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | WAF     |                |
+|  | Web App |                |
+|  | Firewall|                |
+|  +---------+                |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|         Web Layer           |
++-----------------------------+
+|  +---------+                |
+|  | Web     |                |
+|  | Switch  |                |
+|  +---------+                |
+|    |         |              |
+|  +---------+  +---------+   |
+|  | Apache   |  | Apache   | |
+|  | Server 1 |  | Server 2 | |
+|  +---------+  +---------+   |
++-----------------------------+
+     |           |
+     v           v
++-----------------------------+
+|     Application Layer       |
++-----------------------------+
+|  +---------+                |
+|  | App     |                |
+|  | Switch  |                |
+|  +---------+                |
+|    |         |              |
+|  +---------+  +---------+   |
+|  | Eivissa   |  | Eivissa   | |
+|  | VM Primary|  | VM Backup | |
+|  +---------+  +---------+   |
+|    |         |              |
+|  +---------+  +---------+   |
+|  | Formentera|  | Formentera| |
+|  | VM Primary|  | VM Backup | |
+|  +---------+  +---------+   |
++-----------------------------+
+     |           |
+     v           v
++-----------------------------+
+|     Database Layer          |
++-----------------------------+
+|  +---------+                |
+|  | DB      |                |
+|  | Switch  |                |
+|  +---------+                |
+|    |         |              |
+|  +---------+  +---------+   |
+|  | MariaDB   |  | MariaDB   | |
+|  | Master    |  | Slave     | |
+|  +---------+  +---------+   |
++-----------------------------+
+
+
+Descripción del Diagrama de Topología de Red
+1. Internet Zone (Zona de Internet)
+
+    Internet:
+        Descripción: Punto de entrada para todo el tráfico externo.
+        Función: Recibe solicitudes de usuarios y redirige el tráfico al enrutador de borde.
+
+    Edge Router (Enrutador de Borde):
+        Descripción: Dispositivo que conecta la red interna con Internet.
+        Función: Realiza el enrutamiento de tráfico y aplica reglas básicas de filtrado.
+
+2. DMZ (Zona Desmilitarizada)
+
+    Primary Firewall (Cortafuegos Primario):
+        Descripción: Primer nivel de defensa que filtra el tráfico entrante y saliente.
+        Función: Protege la red interna de ataques externos aplicando reglas de seguridad.
+
+    Load Balancer (Balanceador de Carga):
+        Descripción: Distribuye el tráfico entrante entre los servidores web.
+        Función: Asegura alta disponibilidad y equilibrio de carga.
+
+    Web Application Firewall (WAF):
+        Descripción: Protege la aplicación web contra ataques comunes (SQL Injection, XSS).
+        Función: Filtra el tráfico HTTP/HTTPS y bloquea solicitudes maliciosas.
+
+3. Web Layer (Capa Web)
+
+    Web Switch (Switch de Red Web):
+        Descripción: Conecta los servidores web con el WAF y balancea el tráfico dentro de la capa web.
+        Función: Gestiona el tráfico entre el WAF y los servidores Apache.
+
+    Apache Server 1 y Apache Server 2:
+        Descripción: Servidores web que manejan solicitudes HTTP/HTTPS.
+        Función: Procesan las solicitudes y las redirigen a las máquinas virtuales en la capa de aplicación.
+
+4. Application Layer (Capa de Aplicación)
+
+    App Switch (Switch de Aplicación):
+        Descripción: Conecta las máquinas virtuales de Eivissa y Formentera.
+        Función: Balancea el tráfico entre las máquinas virtuales de la capa de aplicación.
+
+    Eivissa VMs y Formentera VMs:
+        Descripción: Máquinas virtuales que ejecutan la lógica de la aplicación para cada región.
+        Función: Procesan las solicitudes y se comunican con la capa de base de datos.
+
+5. Database Layer (Capa de Base de Datos)
+
+    DB Switch (Switch de Base de Datos):
+        Descripción: Conecta las máquinas virtuales de la capa de aplicación con los servidores de base de datos.
+        Función: Gestiona el tráfico de consultas a la base de datos.
+
+    MariaDB Master y MariaDB Slave:
+        Descripción: Clúster de base de datos con replicación maestro-esclavo.
+        Función: Proporciona almacenamiento persistente y permite alta disponibilidad mediante la replicación de datos.
+
+Flujo de Datos e Interacción entre Componentes
+
+    Acceso desde Internet:
+        Los usuarios acceden a la aplicación a través de Internet, y el tráfico es filtrado por el enrutador de borde.
+
+    Filtrado en la DMZ:
+        El tráfico pasa a través del cortafuegos primario y el balanceador de carga, que distribuye las solicitudes entre los servidores Apache después de ser filtrado por el WAF.
+
+    Procesamiento en la Capa Web:
+        Los servidores Apache procesan las solicitudes HTTPS y se comunican con las máquinas virtuales en la capa de aplicación.
+
+    Ejecución de la Lógica de Negocio:
+        Las máquinas virtuales de Eivissa y Formentera ejecutan la lógica de la aplicación y realizan consultas a la base de datos.
+
+    Acceso a la Base de Datos:
+        Las consultas de la aplicación se envían al switch de base de datos, que direcciona las solicitudes al servidor MariaDB maestro o esclavo.
+
+    Replicación y Backup:
+        Los datos se replican entre el servidor maestro y esclavo para asegurar alta disponibilidad y resiliencia.
+
+Ventajas de Esta Arquitectura de Red
+
+    Alta Seguridad:
+        La segmentación en zonas (DMZ, capa web, capa de aplicación y capa de base de datos) proporciona múltiples capas de seguridad.
+
+    Alta Disponibilidad y Escalabilidad:
+        El uso de balanceadores de carga y replicación de bases de datos asegura que el sistema pueda manejar altos volúmenes de tráfico y sea tolerante a fallos.
+
+    Optimización del Rendimiento:
+        La distribución del tráfico y el uso de switches dedicados mejoran el rendimiento y reducen la latencia.
+
+    Monitoreo y Mantenimiento Simplificado:
+        La estructura segmentada facilita el monitoreo y la resolución de problemas, permitiendo identificar fácilmente cualquier cuello de botella o fallo.
+
+Próximos Pasos para la Implementación
+
+    Configurar la DMZ y los Firewalls:
+        Definir reglas de filtrado y configuraciones de seguridad para proteger la red interna.
+
+    Desplegar los Servidores Web y de Aplicación:
+        Configurar los servidores Apache y las máquinas virtuales para manejar el tráfico y ejecutar la lógica de negocio.
+
+    Configurar el Clúster de Base de Datos:
+        Implementar replicación entre el servidor maestro y esclavo para asegurar alta disponibilidad.
+
+    Implementar el WAF:
+        Configurar reglas para proteger la aplicación web contra ataques comunes.
+
+    Realizar Pruebas de Red:
+        Ejecutar pruebas de carga y seguridad para validar el rendimiento y la robustez de la topología.
+
+Si necesitas más detalles sobre la implementación o ajustes en el diagrama, estaré encantado de ayudarte.
+
+
+

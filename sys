@@ -1,0 +1,3860 @@
+4. Configuración de Apache y HTTPS
+
+    Configurar el servidor Apache para acceder con protocolo HTTPS:
+        Instalar y configurar certificados SSL.
+    Definir VirtualHosts para los dos sitios web:
+        nom-llinatge-eivissa.local
+        nom-llinatge-formentera.local
+    Configurar restricciones de acceso por IP:
+        nom-llinatge-eivissa.local: Permitir solo IPs de Eivissa y bloquear Formentera.
+        nom-llinatge-formentera.local: Permitir solo IPs de Formentera.
+
+5. Implementación de la Intranet
+
+    Crear el sitio intranet accesible en nom-llinatge-eivissa.local/intranet:
+        Autenticación básica para el usuario 'sargantana'.
+        Mostrar una tabla HTML con los trabajadores y sus roles.
+        Página usuaris.php para listar usuarios autorizados en Eivissa.
+
+7. Configuración de Logs y Rotación de Logs
+
+    Configurar archivos de log y error para cada sitio web en carpetas y archivos separados:
+        nom-llinatge-eivissa.local
+        nom-llinatge-formentera.local
+    Implementar rotación diaria de los logs (rotación cada 24 horas).
+
+
+8. Personalización del Diseño (Skeleton y Bootstrap)
+
+    Unificar el diseño de cada VirtualHost utilizando:
+        Skeleton para nom-llinatge-eivissa.local con colores corporativos especificados.
+        Bootstrap para nom-llinatge-formentera.local con sus respectivos colores corporativos.
+    Modificar archivos CSS para aplicar los colores corporativos definidos.
+
+
+1. Arquitectura General del Sistema
+
+La topologia del sistema es una arquitectura cliente-servidor distribuida en múltiples máquinas virtuales (VM) per a gestionar els diferents components de la web. Es compon dels següents elements principals:
+
+    Servidor Web Principal (Amfitrió):
+        Sistema Operatiu: Linux (per exemple, Ubuntu Server).
+        Components:
+            Servidor Apache: Gestiona les sol·licituds HTTP/HTTPS.
+            Base de Dades MariaDB: Albergada localment o en un servidor separat.
+            Certificats SSL: Per a la seguretat HTTPS.
+            Configuració de VirtualHosts: Per allotjar dos llocs web diferents.
+            Fitxers de Log: Separats per cada lloc web amb rotació diària.
+
+    Máquines Virtuals:
+        Eivissa VM:
+            Lloc Web: nom-llinatge-eivissa.local
+            Intranet: nom-llinatge-eivissa.local/intranet
+            Sistema de Gestió: Accés restringit per IPs d'Eivissa i excloent Formentera.
+            Disseny: Utilitza Skeleton amb colors corporatius específics.
+        Formentera VM:
+            Lloc Web: nom-llinatge-formentera.local
+            Portal de Clients: nom-llinatge-formentera.local/portalclient
+            Sistema de Gestió: Accés restringit només a IPs de Formentera.
+            Disseny: Utilitza Bootstrap amb colors corporatius específics.
+        Amfitrió VM (Opcional):
+            Gestió Centralitzada: Controla les VM d'Eivissa i Formentera si es decideix distribuir els serveis.
+
+2. Components Detallats i les seves Interaccions
+a. Servidor Web Apache
+
+    Funcions:
+        Gestiona les sol·licituds HTTP/HTTPS dels clients.
+        Serveix les pàgines web de Eivissa i Formentera mitjançant la configuració de VirtualHosts.
+        Implementa la seguretat HTTPS amb certificats SSL per assegurar les comunicacions.
+        Gestiona les restriccions d'accés per IP segons la ubicació geogràfica.
+        Manté fitxers de log separats per a cada VirtualHost amb rotació diària.
+
+    Configuració de VirtualHosts:
+        VirtualHost per Eivissa:
+            Domini: nom-llinatge-eivissa.local
+            Rutes: /, /llibreria, /registre, /quisom, /logout
+            Intranet: /intranet
+            Restriccions d'IP: Permet només IPs d'Eivissa, bloqueja Formentera.
+            Autenticació: Bàsica per a la intranet.
+            Disseny: Skeleton amb colors corporatius específics.
+        VirtualHost per Formentera:
+            Domini: nom-llinatge-formentera.local
+            Rutes: /, /llibreria, /registre, /quisom, /logout
+            Portal de Clients: /portalclient
+            Restriccions d'IP: Permet només IPs de Formentera.
+            Autenticació: Digest per al portal de clients.
+            Disseny: Bootstrap amb colors corporatius específics.
+
+b. Base de Dades MariaDB
+
+    Ubicació: Pot estar instal·lada en el mateix servidor Apache o en un servidor separat per millorar la seguretat i el rendiment.
+    Estructura:
+        Base de Dades: llibreria
+        Taules:
+            usuari: Columns ID, nomUsuari, Nom, Llinatges, correu, contrasenya, id_rol.
+            rol: Definició dels diferents rols (SuperAdministrador, CapDepartament, Administratiu, Informatic, Dissenyador).
+    Accés: Els scripts PHP de les dues VM interactuen amb MariaDB per gestionar usuaris, rols i dades dels clients.
+
+c. Gestió de Sessions i Autenticació
+
+    Sessions PHP:
+        Utilitzades per controlar l'accés a les pàgines després de l'inici de sessió.
+        session_start() implementat en pàgines com llibreria.php i quisom.php.
+        Mostra el nom de l'usuari i el seu rol a la part superior dreta de cada pàgina.
+    Autenticació:
+        Intranet (Eivissa): Autenticació bàsica per l'usuari 'sargantana'.
+        Portal de Clients (Formentera): Autenticació Digest per l'usuari 'client'.
+
+d. Frontend Responsive
+
+    Llibreria (llibreria.php):
+        Graella responsive:
+            Escritori: 4 columnes.
+            Tablet: 2 columnes.
+            Mòbil: 1 columna.
+        Implementada amb Skeleton per Eivissa i Bootstrap per Formentera, ajustant els estils CSS segons els colors corporatius.
+
+e. Sistema de Logs
+
+    Configuració:
+        Logs d'accés i errors per cada VirtualHost en carpetes separades.
+        Rotació de Logs: Implementada per rotar els logs cada 24 hores, assegurant una gestió eficient dels fitxers de registre.
+
+3. Diagrama de Topologia (Descripció Textual)
+
+    Clients (Usuaris Finals):
+        Accedeixen als llocs web mitjançant navegadors web.
+        Realitzen sol·licituds HTTPS als dominis nom-llinatge-eivissa.local o nom-llinatge-formentera.local segons la seva ubicació.
+
+    Servidor Web Principal (Amfitrió):
+        Rep les sol·licituds dels clients.
+        Apache gestiona les sol·licituds mitjançant VirtualHosts per dirigir-les al lloc corresponent (Eivissa o Formentera).
+        MariaDB gestiona les dades de la base de dades llibreria.
+
+    Máquines Virtuals:
+        Eivissa VM:
+            Serveix el lloc nom-llinatge-eivissa.local i la intranet /intranet.
+            Gestiona les restriccions d'IP per permetre només accés des d'Eivissa.
+            Autenticació bàsica per a l'accés a la intranet.
+        Formentera VM:
+            Serveix el lloc nom-llinatge-formentera.local i el portal de clients /portalclient.
+            Gestiona les restriccions d'IP per permetre només accés des de Formentera.
+            Autenticació Digest per al portal de clients.
+
+    Base de Dades MariaDB:
+        Accessible per ambdues VM per gestionar usuaris, rols i dades dels clients.
+        Implementa mesures de seguretat per protegir les dades sensibles.
+
+    Seguretat i Accés:
+        HTTPS: Tots els llocs web són accessibles només a través de connexions segures HTTPS.
+        Restriccions d'IP: Configurades a nivell de servidor Apache per assegurar l'accés geogràfic.
+        Autenticació: Diferents tipus d'autenticació (bàsica i Digest) per protegir les intranets i portals.
+
+    Logs i Monitoreig:
+        Logs d'accés i errors separats per cada lloc web.
+        Rotació diària per mantenir la integritat i la gestió eficient dels logs.
+
+4. Flux de Dades i Accés
+
+    Usuari Final:
+        Accedeix al lloc web des de la seva ubicació.
+        Si és client, accedeix al portal de clients després d'autenticar-se.
+        Si és empleat, accedeix a la intranet després d'autenticar-se.
+
+    Servidor Web Apache:
+        Rep la sol·licitud HTTPS.
+        Determina el VirtualHost corresponent segons el domini sol·licitat.
+        Aplica les restriccions d'IP configurades.
+        Serveix les pàgines web PHP amb les dades dinàmiques obtingudes de MariaDB.
+
+    Base de Dades MariaDB:
+        Gestiona les consultes SQL per a la validació d'usuaris, gestió de rols i dades dels clients.
+        Respon les consultes del servidor web per proporcionar les dades necessàries per a les pàgines web.
+
+    Autenticació i Control d'Accés:
+        Verifica les credencials dels usuaris (sessions PHP).
+        Assigna permisos segons els rols definits.
+        Permet l'accés a funcionalitats específiques basant-se en els rols dels usuaris.
+
+5. Consideracions Addicionals
+
+    Seguretat:
+        Protecció de Dades: Encriptació de contrasenyes i altres dades sensibles a la base de dades.
+        Actualitzacions de Seguretat: Mantenir el servidor i els components actualitzats per evitar vulnerabilitats.
+        Còpies de Seguretat: Implementar còpies de seguretat regulars de la base de dades i dels fitxers del servidor.
+
+    Escalabilitat:
+        Possibilitat de distribuir els serveis en múltiples servidors si el trànsit creix.
+        Utilitzar tècniques de balanceig de càrrega si és necessari.
+
+    Manteniment:
+        Monitoritzar els logs per detectar i resoldre problemes.
+        Revisar regularment els permisos d'accés i les configuracions de seguretat.
+
+6. Resum Visual (Descripció)
+
+    Clients: Diversos usuaris des de Eivissa, Formentera i altres ubicacions accedint als llocs web via Internet.
+    Servidor Apache: Gestiona les sol·licituds entrant, aplica les restriccions d'IP i serveix les pàgines adequades.
+    Máquines Virtuals Eivissa i Formentera: Cada VM gestiona el seu propi lloc web amb les funcionalitats específiques (intranet o portal de clients).
+    Base de Dades MariaDB: Centralitzada o distribuïda, accessible per ambdues VM per gestionar les dades de l'aplicació.
+    Seguretat: Implementada a través de HTTPS, restriccions d'IP, autenticacions específiques i gestió adequada de les sessions.
+
+
+Seguridad del Sistema
+
+La seguridad es un aspecto crítico en la arquitectura del sistema para proteger los datos sensibles y garantizar la integridad y disponibilidad de los servicios. A continuación, se detallan las medidas de seguridad implementadas:
+a. Seguridad en la Comunicación
+
+    HTTPS:
+        Certificados SSL/TLS: Implementación de certificados válidos para cifrar las comunicaciones entre los clientes y el servidor web. Esto protege contra ataques de intermediarios (Man-in-the-Middle).
+        Configuración Segura de SSL/TLS: Deshabilitar protocolos y cifrados obsoletos (como TLS 1.0 y 1.1) y habilitar versiones más seguras (TLS 1.2 y 1.3).
+        HTTP Strict Transport Security (HSTS): Forzar a los navegadores a usar HTTPS para todas las futuras conexiones.
+
+b. Autenticación y Autorización
+
+    Gestión de Sesiones:
+        Uso de session_start() en PHP para manejar sesiones de usuario.
+        Implementación de medidas para prevenir el secuestro de sesiones, como regenerar el ID de sesión tras el login (session_regenerate_id()).
+    Almacenamiento Seguro de Contraseñas:
+        Uso de funciones de hashing seguro como password_hash() y password_verify() en PHP para almacenar y verificar contraseñas.
+    Control de Acceso Basado en Roles (RBAC):
+        Definición clara de roles y permisos en la base de datos.
+        Verificación de roles en cada página para asegurar que solo los usuarios autorizados puedan acceder a ciertos recursos.
+    Autenticación HTTP:
+        Autenticación Básica: Utilizada para el acceso a la intranet, restringida al usuario 'sargantana'.
+        Autenticación Digest: Utilizada para el portal de clientes, ofreciendo un método más seguro que la autenticación básica.
+
+c. Protección Contra Ataques Comunes
+
+    Inyección SQL:
+        Uso de consultas preparadas (prepared statements) en PHP para prevenir inyecciones SQL.
+    Cross-Site Scripting (XSS):
+        Escapar correctamente las salidas (output escaping) en las páginas web para prevenir la inyección de scripts maliciosos.
+    Cross-Site Request Forgery (CSRF):
+        Implementación de tokens CSRF en formularios para asegurar que las solicitudes provienen de usuarios autenticados.
+    Validación de Entradas:
+        Validación tanto en el frontend (JavaScript) como en el backend (PHP) para asegurar que los datos recibidos cumplen con los formatos esperados.
+
+8. Escalabilidad y Rendimiento
+
+Para asegurar que el sistema pueda manejar un aumento en el tráfico y las solicitudes sin degradar su rendimiento, se implementarán las siguientes estrategias:
+a. Escalabilidad Horizontal
+
+    Balanceo de Carga:
+        Utilización de un balanceador de carga (por ejemplo, HAProxy o Nginx) para distribuir las solicitudes entrantes entre múltiples instancias del servidor web.
+    Replicación de la Base de Datos:
+        Configuración de réplicas de MariaDB para distribuir la carga de consultas y mejorar la disponibilidad.
+
+b. Caché
+
+    Caching de Contenido:
+        Implementación de mecanismos de caché como Varnish o el uso de mod_cache en Apache para almacenar y servir contenido estático de manera eficiente.
+    Caché de Base de Datos:
+        Uso de sistemas de caché como Redis o Memcached para almacenar resultados de consultas frecuentes y reducir la carga en MariaDB.
+
+c. Optimización de Código y Recursos
+
+    Optimización de Consultas SQL:
+        Análisis y optimización de consultas para asegurar que sean eficientes y rápidas.
+    Minificación de Recursos:
+        Minificar archivos CSS y JavaScript para reducir el tamaño de las descargas.
+    Compresión de Contenido:
+        Habilitar la compresión Gzip en Apache para reducir el tamaño de los datos transferidos.
+
+9. Mantenibilidad y Gestión del Sistema
+
+La mantenibilidad del sistema es esencial para facilitar futuras actualizaciones, correcciones y mejoras. Se implementarán las siguientes prácticas:
+a. Gestión de Configuración
+
+    Control de Versiones:
+        Uso de sistemas de control de versiones como Git para gestionar el código fuente y las configuraciones del sistema.
+    Automatización de Despliegues:
+        Implementación de herramientas como Ansible, Chef o Docker para automatizar el despliegue y la configuración del entorno de producción.
+
+b. Documentación
+
+    Documentación Técnica:
+        Creación de documentación detallada sobre la arquitectura del sistema, configuraciones de servidores, estructuras de bases de datos y flujo de trabajo.
+    Documentación de Código:
+        Uso de comentarios claros y consistentes en el código fuente para facilitar la comprensión y el mantenimiento.
+
+c. Actualizaciones y Parches de Seguridad
+
+    Actualizaciones Regulares:
+        Mantener el sistema operativo, Apache, PHP y MariaDB actualizados con los últimos parches de seguridad.
+    Monitoreo de Vulnerabilidades:
+        Uso de herramientas como Nessus o OpenVAS para escanear el sistema en busca de vulnerabilidades conocidas.
+
+10. Monitorización y Alertas
+
+Para asegurar la disponibilidad y el correcto funcionamiento del sistema, se implementará una solución de monitorización que permita detectar y reaccionar ante posibles problemas de manera proactiva.
+a. Monitorización de Infraestructura
+
+    Uso de Herramientas de Monitorización:
+        Implementación de herramientas como Prometheus y Grafana para recolectar métricas del sistema y visualizarlas en dashboards.
+    Monitorización de Servicios:
+        Supervisión de los servicios críticos como Apache, MariaDB, balanceadores de carga y máquinas virtuales para asegurar que estén funcionando correctamente.
+
+b. Monitorización de Aplicaciones
+
+    Logging Centralizado:
+        Uso de soluciones como ELK Stack (Elasticsearch, Logstash, Kibana) o Graylog para centralizar y analizar los logs de las aplicaciones.
+    Alertas en Tiempo Real:
+        Configuración de alertas basadas en métricas y logs para notificar al equipo de desarrollo sobre eventos críticos, como fallos en servicios, altos tiempos de respuesta o intentos de acceso no autorizados.
+
+11. Diagrama de Topología del Sistema
+
+Aunque no puedo proporcionar un diagrama gráfico directamente, a continuación se describe cómo estructurar uno para visualizar la topología del sistema:
+Componentes Principales del Diagrama:
+
+    Clientes (Usuarios Finales):
+        Representados como múltiples íconos de dispositivos (computadoras, tablets, móviles) conectados a Internet.
+
+    Internet:
+        Representado como una nube que conecta a los clientes con el servidor principal.
+
+    Servidor Web Principal (Amfitrió):
+        Un nodo central que incluye:
+            Servidor Apache.
+            Base de Datos MariaDB.
+            Certificados SSL/TLS.
+            Configuración de VirtualHosts.
+
+    Máquinas Virtuales (VMs):
+        Eivissa VM:
+            Conectada al Servidor Web Principal.
+            Incluye el sitio nom-llinatge-eivissa.local y la intranet /intranet.
+        Formentera VM:
+            Conectada al Servidor Web Principal.
+            Incluye el sitio nom-llinatge-formentera.local y el portal de clientes /portalclient.
+
+    Base de Datos MariaDB:
+        Conectada tanto a la Eivissa VM como a la Formentera VM.
+
+    Balanceador de Carga (Opcional):
+        Entre los clientes y el Servidor Web Principal para distribuir el tráfico.
+
+    Sistema de Caché y Replicación:
+        Representado como componentes adicionales conectados a la Base de Datos MariaDB.
+
+    Monitorización y Alertas:
+        Conectado al Servidor Web Principal y a las VMs para supervisar el estado del sistema.
+
+    Seguridad:
+        Firewalls y dispositivos de seguridad representados entre Internet y el Servidor Web Principal para filtrar el tráfico no autorizado.
+
+Flujo de Datos en el Diagrama:
+
+    Solicitudes de los Clientes:
+        Los clientes realizan solicitudes HTTPS que pasan por el balanceador de carga (si está implementado) hacia el Servidor Web Principal.
+    Servidor Web Principal:
+        Apache recibe las solicitudes y las dirige a la VM correspondiente (Eivissa o Formentera) según el VirtualHost.
+    Máquinas Virtuales:
+        Cada VM maneja su propio sitio web, interactuando con la Base de Datos MariaDB para recuperar o almacenar datos según sea necesario.
+    Base de Datos MariaDB:
+        Gestiona las consultas de las VMs, asegurando la integridad y disponibilidad de los datos.
+    Monitorización:
+        Herramientas de monitorización recolectan métricas y logs, enviando alertas en caso de detectar anomalías.
+
+12. Flujo de Trabajo y Procesos
+
+Para asegurar una implementación eficiente y coordinada, se seguirán los siguientes pasos en el desarrollo y despliegue del sistema:
+a. Desarrollo y Testing
+
+    Configuración del Entorno de Desarrollo:
+        Configurar máquinas locales o entornos virtuales que reflejen la topología del sistema.
+    Desarrollo de Funcionalidades:
+        Seguir las tareas definidas previamente para desarrollar el frontend, backend y las funcionalidades específicas.
+    Pruebas Unitarias y de Integración:
+        Implementar pruebas para asegurar que cada componente funciona correctamente de manera aislada y en conjunto.
+    Revisión de Código:
+        Realizar revisiones de código entre miembros del equipo para mantener la calidad y consistencia del código.
+
+b. Despliegue y Puesta en Producción
+
+    Configuración de Servidores:
+        Configurar los servidores web, bases de datos y otros componentes en los entornos de producción.
+    Despliegue de Aplicaciones:
+        Utilizar herramientas de automatización para desplegar el código en los servidores de producción de manera consistente y repetible.
+    Migración de Datos:
+        Asegurar que las bases de datos estén correctamente configuradas y pobladas con los datos iniciales necesarios.
+    Pruebas de Aceptación:
+        Realizar pruebas finales en el entorno de producción para asegurar que todo funciona como se espera.
+
+c. Mantenimiento Continuo
+
+    Actualizaciones y Mejoras:
+        Implementar nuevas funcionalidades y mejoras basadas en el feedback de los usuarios y las necesidades del negocio.
+    Monitorización Continua:
+        Supervisar el rendimiento y la seguridad del sistema, respondiendo rápidamente a cualquier incidente.
+    Backups Regulares:
+        Realizar copias de seguridad periódicas de las bases de datos y configuraciones para asegurar la recuperación en caso de fallos.
+
+13. Resumen Final
+
+La topología del sistema para la web de la llibreria "Sargantana Mediterrània" está diseñada para cumplir con todos los requisitos funcionales y no funcionales especificados, garantizando una arquitectura robusta, segura y escalable. La división en dos máquinas virtuales para Eivissa y Formentera permite una gestión eficiente y un diseño personalizado para cada ubicación, mientras que el uso de tecnologías como Apache, MariaDB, PHP y frameworks de diseño como Skeleton y Bootstrap aseguran una implementación moderna y mantenible.
+
+La incorporación de medidas de seguridad avanzadas, junto con estrategias de escalabilidad y monitorización, asegura que el sistema pueda crecer y adaptarse a futuras necesidades, proporcionando una base sólida para la operación y el crecimiento del negocio en línea de "Sargantana Mediterrània".
+
+
+Estrategias de Respaldo y Recuperación
+
+Garantizar la disponibilidad y la integridad de los datos es crucial para cualquier sistema web. A continuación, se describen las estrategias de respaldo y recuperación implementadas:
+a. Respaldo de la Base de Datos MariaDB
+
+    Respaldo Completo:
+        Realizar respaldos completos de la base de datos llibreria de manera periódica (por ejemplo, semanalmente).
+        Utilizar herramientas como mysqldump para exportar todas las tablas y datos.
+    Respaldo Incremental:
+        Realizar respaldos incrementales diarios para capturar solo los cambios realizados desde el último respaldo completo.
+        Configurar la replicación binaria de MariaDB para facilitar los respaldos incrementales.
+    Almacenamiento de Respaldo:
+        Almacenar los archivos de respaldo en un almacenamiento seguro fuera del servidor principal, como un servicio de almacenamiento en la nube (AWS S3, Google Cloud Storage) o en un servidor de respaldo dedicado.
+    Automatización de Respaldo:
+        Implementar scripts automatizados (por ejemplo, con cron jobs) para programar y ejecutar los respaldos sin intervención manual.
+
+b. Respaldo de Archivos del Servidor
+
+    Respaldo de Configuraciones y Código Fuente:
+        Utilizar sistemas de control de versiones como Git para gestionar el código fuente y las configuraciones del servidor.
+        Realizar copias de seguridad regulares de los archivos de configuración de Apache, certificados SSL, y otros archivos críticos.
+    Almacenamiento de Respaldo:
+        Similar al respaldo de la base de datos, almacenar los respaldos de archivos en ubicaciones seguras y redundantes.
+
+c. Recuperación ante Desastres
+
+    Plan de Recuperación:
+        Documentar procedimientos detallados para restaurar la base de datos y los archivos del servidor a partir de los respaldos en caso de fallos.
+    Pruebas de Restauración:
+        Realizar pruebas periódicas de restauración para asegurar que los respaldos son válidos y que los procedimientos de recuperación funcionan correctamente.
+    Redundancia Geográfica:
+        Almacenar respaldos en múltiples ubicaciones geográficas para protegerse contra desastres naturales o fallos de infraestructura en una ubicación específica.
+
+15. Arquitectura de Red Detallada
+
+Una arquitectura de red bien diseñada es esencial para la seguridad, el rendimiento y la escalabilidad del sistema. A continuación, se detalla la arquitectura de red propuesta:
+a. Segmentación de la Red
+
+    Red Pública:
+        Acceso a Internet: Los clientes acceden a los sitios web nom-llinatge-eivissa.local y nom-llinatge-formentera.local a través de Internet.
+        Firewall Perimetral: Implementar un firewall para filtrar el tráfico entrante y saliente, permitiendo solo los puertos necesarios (por ejemplo, 443 para HTTPS).
+    Red Interna:
+        Servidores Web y de Base de Datos: Ubicados en una red interna protegida, inaccesible directamente desde Internet.
+        Comunicación Segura: Utilizar VLANs o subredes separadas para aislar los servidores web de los servidores de base de datos.
+    DMZ (Zona Desmilitarizada):
+        Servidores de Aplicación: Colocar los servidores web en una DMZ para agregar una capa adicional de seguridad.
+        Acceso Controlado: Limitar el acceso desde la DMZ a la red interna únicamente a los puertos y servicios necesarios.
+
+b. Componentes de Red
+
+    Router:
+        Gestiona el enrutamiento del tráfico entre las diferentes redes (pública, DMZ, interna).
+    Firewall:
+        Configurado para permitir solo el tráfico necesario hacia y desde los servidores.
+        Implementar reglas estrictas para limitar el acceso por IP según los requisitos de ubicación geográfica.
+    Switches:
+        Gestionan la comunicación dentro de la red interna, conectando los servidores y otros dispositivos de red.
+    Balanceador de Carga (Opcional):
+        Distribuye el tráfico entrante entre múltiples servidores web para mejorar el rendimiento y la disponibilidad.
+
+c. Seguridad de la Red
+
+    Firewall de Aplicaciones Web (WAF):
+        Implementar un WAF para proteger las aplicaciones web contra ataques comunes como inyección SQL, XSS, y otros exploits.
+    Segmentación de Servicios:
+        Aislar servicios críticos (como la base de datos) en segmentos de red separados para reducir la superficie de ataque.
+    VPN (Virtual Private Network):
+        Permitir el acceso seguro a la intranet y al portal de clientes mediante conexiones VPN para usuarios remotos autorizados.
+
+16. Alta Disponibilidad y Redundancia
+
+Para asegurar que el sistema esté siempre disponible y minimizar el tiempo de inactividad, se implementarán estrategias de alta disponibilidad y redundancia:
+a. Servidores Redundantes
+
+    Cluster de Servidores Web:
+        Implementar múltiples instancias de servidores web en distintas máquinas virtuales.
+        Utilizar un balanceador de carga para distribuir el tráfico entre los servidores, de modo que si uno falla, los demás continúen atendiendo las solicitudes.
+    Replicación de la Base de Datos:
+        Configurar la replicación de MariaDB en modo maestro-esclavo o maestro-maestro para asegurar que si una instancia de la base de datos falla, otra pueda asumir el rol sin pérdida de datos.
+
+b. Balanceo de Carga
+
+    Hardware o Software:
+        Utilizar soluciones de balanceo de carga como HAProxy, Nginx o servicios gestionados en la nube para distribuir el tráfico de manera eficiente.
+    Monitoreo de Salud:
+        Configurar el balanceador de carga para monitorear la salud de los servidores y redirigir el tráfico en caso de detección de fallos.
+
+c. Failover Automatizado
+
+    Automatización de Failover:
+        Implementar mecanismos que detecten automáticamente fallos en componentes críticos y activen el failover a sistemas redundantes sin intervención manual.
+    Scripts de Supervisión:
+        Utilizar scripts que monitoreen continuamente el estado de los servicios y activen el failover cuando sea necesario.
+
+17. Estrategias de Despliegue
+
+El despliegue eficiente y confiable del sistema es esencial para minimizar interrupciones y garantizar una transición suave desde el desarrollo hasta la producción.
+a. Integración Continua y Despliegue Continuo (CI/CD)
+
+    Herramientas de CI/CD:
+        Utilizar herramientas como Jenkins, GitLab CI, Travis CI o GitHub Actions para automatizar el proceso de integración y despliegue.
+    Pipelines de Despliegue:
+        Configurar pipelines que automaticen la construcción, pruebas y despliegue del código en los entornos de desarrollo, prueba y producción.
+    Pruebas Automatizadas:
+        Integrar pruebas unitarias, de integración y de aceptación en el pipeline para asegurar la calidad del código antes del despliegue.
+
+b. Contenedorización
+
+    Uso de Docker:
+        Contenerizar las aplicaciones web y los servicios de base de datos para asegurar consistencia entre los entornos de desarrollo y producción.
+    Orquestación de Contenedores:
+        Utilizar herramientas como Kubernetes para gestionar y escalar contenedores de manera eficiente.
+
+c. Infraestructura como Código (IaC)
+
+    Herramientas de IaC:
+        Implementar herramientas como Terraform, Ansible o Chef para definir y gestionar la infraestructura de manera declarativa.
+    Automatización de Configuraciones:
+        Escribir scripts que automaticen la configuración de servidores, redes y servicios, asegurando consistencia y facilitando la replicación del entorno.
+
+18. Interacciones Específicas entre Componentes
+
+Para garantizar una comprensión clara de cómo interactúan los distintos componentes del sistema, se describen a continuación las interacciones específicas:
+a. Flujo de Solicitudes Web
+
+    Cliente Accede al Sitio Web:
+        El usuario ingresa la URL (nom-llinatge-eivissa.local o nom-llinatge-formentera.local) en su navegador.
+        La solicitud HTTPS es enviada al balanceador de carga (si está implementado) o directamente al servidor web.
+    Servidor Apache Gestiona la Solicitud:
+        Apache identifica el VirtualHost correspondiente según el dominio.
+        Verifica las restricciones de IP y aplica las reglas de firewall.
+    Autenticación del Usuario:
+        Si el usuario accede a una sección protegida (intranet o portal de clientes), se le solicita la autenticación (básica o Digest).
+        Las credenciales son verificadas contra la base de datos MariaDB.
+    Procesamiento de la Solicitud:
+        Una vez autenticado, Apache ejecuta los scripts PHP correspondientes para generar la página solicitada.
+        Los scripts PHP interactúan con MariaDB para obtener o almacenar datos según sea necesario.
+    Respuesta al Cliente:
+        La página generada es enviada de vuelta al cliente a través de una conexión HTTPS segura.
+
+b. Gestión de Sesiones y Roles
+
+    Inicio de Sesión:
+        El usuario ingresa sus credenciales en login.php.
+        PHP valida las credenciales contra la base de datos.
+        Si son válidas, se inicia una sesión con session_start() y se almacenan los detalles del usuario y sus roles.
+    Acceso a Páginas Protegidas:
+        Al acceder a llibreria.php o quisom.php, el script PHP verifica que la sesión está activa y que el usuario tiene los permisos necesarios.
+        El nombre y rol del usuario se muestran en la parte superior derecha de la página.
+    Control de Acceso Basado en Roles:
+        Dependiendo del rol del usuario (por ejemplo, SuperAdministrador), se permiten o restringen ciertas acciones, como gestionar clientes.
+    Cierre de Sesión:
+        Al acceder a logout.php, se destruye la sesión y el usuario es redirigido a index.php.
+
+c. Interacción entre Frontend y Backend
+
+    Formulario de Registro (registre.php):
+        El usuario completa el formulario de registro con validaciones en JavaScript.
+        Al enviar, los datos son procesados por PHP, que valida nuevamente los datos y realiza inserciones en la base de datos.
+    Visualización de Datos:
+        Las páginas llibreria.php, usuaris.php y clients.php obtienen datos de MariaDB para mostrar tablas HTML con información relevante.
+    Gestión de Roles y Permisos:
+        PHP consulta la base de datos para determinar los roles de cada usuario y asignar permisos en tiempo real.
+
+19. Mejores Prácticas y Consideraciones Adicionales
+
+Implementar un sistema siguiendo las mejores prácticas garantiza su eficiencia, seguridad y facilidad de mantenimiento. A continuación, se enumeran algunas consideraciones adicionales:
+a. Seguridad Adicional
+
+    CORS (Cross-Origin Resource Sharing):
+        Configurar políticas de CORS adecuadas para controlar qué dominios pueden interactuar con la API o los recursos del servidor.
+    Protección de Archivos Sensibles:
+        Restringir el acceso a archivos sensibles como configuraciones de servidor, scripts de respaldo y archivos .env.
+    Actualizaciones de Seguridad Automáticas:
+        Configurar el sistema para recibir actualizaciones automáticas de seguridad, especialmente para componentes críticos como el sistema operativo, Apache, PHP y MariaDB.
+
+b. Optimización del Rendimiento
+
+    Minimización de Solicitudes HTTP:
+        Combinar archivos CSS y JavaScript para reducir el número de solicitudes necesarias para cargar una página.
+    Uso de CDN (Content Delivery Network):
+        Distribuir contenido estático (imágenes, CSS, JS) a través de una CDN para reducir la latencia y mejorar el tiempo de carga.
+    Optimización de Imágenes:
+        Comprimir y redimensionar imágenes para reducir su tamaño sin comprometer la calidad visual.
+
+c. Accesibilidad
+
+    Cumplimiento de Estándares de Accesibilidad:
+        Asegurar que el sitio web cumpla con las pautas de accesibilidad (como WCAG) para ser usable por personas con discapacidades.
+    Uso de Etiquetas Semánticas:
+        Utilizar etiquetas HTML semánticas para mejorar la accesibilidad y el SEO del sitio web.
+    Compatibilidad con Navegadores:
+        Probar el sitio web en múltiples navegadores y dispositivos para asegurar una experiencia consistente.
+
+d. Documentación y Formación
+
+    Documentación de la Arquitectura:
+        Mantener una documentación detallada de la arquitectura del sistema, incluyendo diagramas, configuraciones de servidores y procedimientos de respaldo.
+    Formación del Equipo:
+        Asegurar que todos los miembros del equipo estén capacitados en las tecnologías y herramientas utilizadas, así como en las mejores prácticas de desarrollo y seguridad.
+
+20. Implementación de Servicios Adicionales
+
+Para mejorar la funcionalidad y la experiencia del usuario, se pueden considerar los siguientes servicios adicionales:
+a. Sistema de Notificaciones
+
+    Notificaciones por Correo Electrónico:
+        Implementar un sistema para enviar correos electrónicos de confirmación de registro, restablecimiento de contraseñas y notificaciones de cambios en la cuenta.
+    Notificaciones en Tiempo Real:
+        Utilizar tecnologías como WebSockets o Pusher para enviar notificaciones en tiempo real a los usuarios sobre actualizaciones importantes.
+
+b. Integración con Redes Sociales
+
+    Inicio de Sesión Social:
+        Permitir a los usuarios registrarse e iniciar sesión utilizando cuentas de redes sociales como Google, Facebook o Twitter para facilitar el proceso de autenticación.
+    Compartir Contenido:
+        Integrar botones para compartir contenido del sitio web en redes sociales, aumentando la visibilidad y el alcance.
+
+c. Analítica y Seguimiento
+
+    Google Analytics:
+        Integrar Google Analytics u otras herramientas de analítica para monitorear el tráfico del sitio web, comportamiento de los usuarios y métricas clave.
+    Mapas de Calor:
+        Utilizar herramientas como Hotjar para analizar cómo los usuarios interactúan con el sitio web, identificando áreas de mejora.
+
+21. Consideraciones de SEO (Search Engine Optimization)
+
+Optimizar el sitio web para motores de búsqueda es esencial para aumentar la visibilidad y atraer más visitantes.
+a. Optimización On-Page
+
+    Etiquetas Meta:
+        Incluir etiquetas meta relevantes como title, description y keywords en cada página para mejorar el SEO.
+    URLs Amigables:
+        Utilizar URLs limpias y descriptivas que faciliten la indexación por parte de los motores de búsqueda.
+    Contenido de Calidad:
+        Crear contenido relevante y de alta calidad que responda a las necesidades y preguntas de los usuarios.
+
+b. Optimización Técnica
+
+    Velocidad del Sitio:
+        Optimizar la velocidad de carga del sitio mediante la compresión de recursos, el uso de caché y la minimización de solicitudes HTTP.
+    Responsive Design:
+        Asegurar que el sitio sea completamente responsive para ofrecer una experiencia óptima en dispositivos móviles, lo cual es un factor importante para el SEO.
+    Sitemap y Robots.txt:
+        Crear y mantener un sitemap XML para facilitar la indexación y configurar el archivo robots.txt para guiar a los rastreadores de los motores de búsqueda.
+
+c. Link Building
+
+    Backlinks de Calidad:
+        Fomentar la obtención de backlinks de sitios web relevantes y de autoridad para mejorar la reputación y el posicionamiento en los motores de búsqueda.
+    Interlinking:
+        Utilizar enlaces internos estratégicos para mejorar la navegación y distribuir la autoridad de la página de manera efectiva.
+
+22. Gestión de Usuarios y Roles Avanzada
+
+Para una gestión más eficiente y segura de los usuarios y sus roles, se pueden implementar las siguientes mejoras:
+a. Administración Centralizada de Roles
+
+    Panel de Administración:
+        Desarrollar un panel de administración accesible solo para SuperAdministradores donde puedan gestionar usuarios, asignar roles y configurar permisos.
+    Asignación Dinámica de Roles:
+        Permitir la asignación y modificación de roles de manera dinámica sin necesidad de acceder directamente a la base de datos.
+
+b. Auditoría y Registro de Actividades
+
+    Registro de Acciones de Usuarios:
+        Implementar un sistema de auditoría que registre las acciones críticas realizadas por los usuarios, como cambios en la configuración, creación o eliminación de cuentas, etc.
+    Revisión de Logs de Auditoría:
+        Facilitar la revisión de los logs de auditoría a través del panel de administración para detectar y responder a actividades sospechosas.
+
+c. Políticas de Contraseñas y Seguridad
+
+    Requisitos de Contraseña:
+        Establecer políticas estrictas de contraseñas que requieran una combinación de letras mayúsculas, minúsculas, números y caracteres especiales.
+    Expiración de Contraseñas:
+        Implementar la expiración periódica de contraseñas obligando a los usuarios a cambiarlas después de un periodo determinado.
+    Autenticación de Dos Factores (2FA):
+        Añadir una capa adicional de seguridad mediante la implementación de 2FA, requiriendo que los usuarios verifiquen su identidad a través de un segundo método (como SMS, aplicaciones de autenticación, etc.).
+
+23. Estrategias de Cache Avanzadas
+
+Para mejorar aún más el rendimiento del sitio web, se pueden implementar estrategias de cache avanzadas:
+a. Cache de Aplicación
+
+    Cache de Página Completa:
+        Utilizar herramientas como Varnish para almacenar en cache páginas completas y servirlas rápidamente a los usuarios.
+    Cache de Fragmentos:
+        Implementar cache de fragmentos de página (por ejemplo, partes dinámicas que no cambian frecuentemente) para reducir la carga en el servidor backend.
+
+b. Cache del Navegador
+
+    Control de Cache del Navegador:
+        Configurar encabezados HTTP adecuados para indicar a los navegadores cuánto tiempo deben almacenar en cache ciertos recursos.
+    Versionado de Recursos:
+        Utilizar técnicas de versionado para recursos estáticos (CSS, JS, imágenes) para facilitar la actualización sin afectar la cache del navegador.
+
+24. Estrategias de Optimización de Base de Datos
+
+Optimizar la base de datos es esencial para garantizar un rendimiento rápido y eficiente.
+a. Indexación Eficiente
+
+    Creación de Índices:
+        Crear índices en columnas frecuentemente consultadas (por ejemplo, nomUsuari, correu) para acelerar las consultas.
+    Optimización de Consultas:
+        Revisar y optimizar las consultas SQL para asegurar que aprovechen los índices existentes.
+
+b. Normalización y Desnormalización
+
+    Normalización de Datos:
+        Asegurar que las tablas de la base de datos estén normalizadas para reducir la redundancia y mejorar la integridad de los datos.
+    Desnormalización Selectiva:
+        En casos específicos donde el rendimiento lo requiera, desnormalizar ciertas tablas para reducir la complejidad de las consultas.
+
+c. Mantenimiento Regular
+
+    Reindexación:
+        Realizar reindexación periódica para mantener la eficiencia de los índices.
+    Optimización de Tablas:
+        Utilizar comandos como OPTIMIZE TABLE para mantener las tablas de la base de datos en buen estado.
+
+25. Gestión de Errores y Excepciones
+
+Una gestión adecuada de errores y excepciones mejora la estabilidad y la experiencia del usuario.
+a. Manejo de Errores en PHP
+
+    Uso de Try-Catch:
+        Implementar bloques try-catch para manejar excepciones y errores de manera controlada.
+    Registro de Errores:
+        Configurar PHP para registrar errores en archivos de log específicos para facilitar la depuración.
+    Mensajes de Error Amigables:
+        Mostrar mensajes de error amigables al usuario sin revelar información sensible del sistema.
+
+b. Páginas de Error Personalizadas
+
+    Páginas 404 y 500 Personalizadas:
+        Crear páginas de error personalizadas para manejar errores comunes como "Página no encontrada" (404) y "Error interno del servidor" (500).
+    Redirección en Caso de Errores:
+        Configurar Apache para redirigir a las páginas de error personalizadas cuando se detecten errores específicos.
+
+26. Optimización para Dispositivos Móviles
+
+Dado que una parte significativa del tráfico web proviene de dispositivos móviles, es crucial optimizar el sitio para estos dispositivos.
+a. Diseño Responsive
+
+    Uso de Frameworks Responsivos:
+        Utilizar frameworks como Skeleton y Bootstrap para asegurar que el diseño se adapte a diferentes tamaños de pantalla.
+    Pruebas en Dispositivos Móviles:
+        Realizar pruebas exhaustivas en una variedad de dispositivos móviles para asegurar una experiencia de usuario consistente y óptima.
+
+b. Optimización de Rendimiento en Móviles
+
+    Minimización de Recursos:
+        Reducir el tamaño de archivos CSS y JavaScript para acelerar los tiempos de carga en conexiones móviles más lentas.
+    Carga Diferida (Lazy Loading):
+        Implementar técnicas de carga diferida para imágenes y otros recursos pesados, cargándolos solo cuando sean necesarios.
+
+27. Implementación de Seguridad Avanzada
+
+Además de las medidas de seguridad básicas, se pueden implementar prácticas avanzadas para proteger el sistema.
+a. Firewall de Aplicaciones Web (WAF)
+
+    Protección contra Ataques Específicos:
+        Implementar un WAF para detectar y bloquear ataques específicos dirigidos a las aplicaciones web, como inyecciones SQL, XSS, y ataques de denegación de servicio (DoS).
+    Reglas Personalizadas:
+        Configurar reglas personalizadas en el WAF para adaptarse a las necesidades específicas de la aplicación y proteger contra amenazas emergentes.
+
+b. Escaneo de Vulnerabilidades
+
+    Herramientas de Escaneo:
+        Utilizar herramientas como OWASP ZAP, Nessus o OpenVAS para escanear regularmente el sistema en busca de vulnerabilidades.
+    Corrección de Vulnerabilidades:
+        Establecer un proceso para corregir rápidamente cualquier vulnerabilidad identificada durante los escaneos.
+
+c. Protección contra Ataques de Fuerza Bruta
+
+    Limitación de Intentos de Inicio de Sesión:
+        Implementar mecanismos que limiten la cantidad de intentos de inicio de sesión permitidos para prevenir ataques de fuerza bruta.
+    Bloqueo Temporal de IPs:
+        Bloquear temporalmente las direcciones IP que intenten múltiples inicios de sesión fallidos.
+    Uso de Captchas:
+        Integrar captchas en los formularios de inicio de sesión para distinguir entre usuarios legítimos y bots automatizados.
+
+28. Implementación de APIs y Servicios Externos
+
+Para ampliar las funcionalidades del sitio web y mejorar la integración con otros servicios, se pueden implementar APIs y servicios externos.
+a. Desarrollo de APIs RESTful
+
+    Creación de Endpoints:
+        Desarrollar APIs RESTful para permitir la interacción con la base de datos y otros servicios desde aplicaciones externas o móviles.
+    Autenticación y Autorización:
+        Proteger las APIs mediante autenticación basada en tokens (por ejemplo, JWT) y control de acceso basado en roles.
+    Documentación de APIs:
+        Documentar las APIs utilizando herramientas como Swagger para facilitar su uso y mantenimiento.
+
+b. Integración con Servicios de Terceros
+
+    Pasarelas de Pago:
+        Integrar pasarelas de pago como PayPal, Stripe o MercadoPago para facilitar transacciones seguras en línea.
+    Servicios de Envío de Correos Electrónicos:
+        Utilizar servicios como SendGrid, Mailgun o Amazon SES para gestionar el envío de correos electrónicos de manera eficiente y escalable.
+    APIs de Redes Sociales:
+        Integrar APIs de redes sociales para funciones como compartir contenido, inicio de sesión social, o recuperación de datos de perfiles.
+
+29. Estrategias de Gestión de Contenidos (CMS)
+
+Aunque el proyecto actual utiliza páginas PHP estáticas, integrar un sistema de gestión de contenidos puede facilitar la administración y actualización del sitio web.
+a. Implementación de un CMS
+
+    Elección del CMS:
+        Considerar la implementación de un CMS ligero como WordPress, Drupal o Joomla si se requiere una gestión más dinámica de contenidos.
+    Integración con el Sistema Existente:
+        Integrar el CMS con la estructura actual del sitio web, asegurando compatibilidad con las funcionalidades existentes.
+
+b. Gestión de Contenidos Personalizados
+
+    Desarrollo de Plugins o Módulos:
+        Crear plugins o módulos personalizados para gestionar funcionalidades específicas como la gestión de usuarios, roles y datos de clientes.
+    Interfaces de Administración:
+        Desarrollar interfaces de administración amigables que permitan a los administradores gestionar contenidos sin necesidad de conocimientos técnicos avanzados.
+
+30. Cumplimiento Normativo y Legal
+
+Asegurar que el sistema cumple con las normativas legales y de protección de datos es esencial para evitar sanciones y proteger a los usuarios.
+a. Protección de Datos Personales (GDPR)
+
+    Consentimiento del Usuario:
+        Implementar mecanismos para obtener el consentimiento explícito de los usuarios para la recopilación y procesamiento de sus datos personales.
+    Política de Privacidad:
+        Crear y mostrar una política de privacidad clara que informe a los usuarios sobre cómo se manejan sus datos.
+    Derechos de los Usuarios:
+        Permitir que los usuarios accedan, rectifiquen y eliminen sus datos personales conforme a las regulaciones.
+
+b. Cumplimiento con Leyes Locales
+
+    Regulaciones Específicas:
+        Asegurar el cumplimiento con las leyes locales aplicables en las ubicaciones de Eivissa y Formentera, así como con la legislación internacional si se expande a otros mercados.
+    Protección de Datos de Menores:
+        Implementar medidas adicionales si el sitio web permite el registro de menores de edad, conforme a las leyes correspondientes.
+
+c. Seguridad Legal
+
+    Términos y Condiciones:
+        Establecer términos y condiciones claros que definan las responsabilidades y derechos tanto del usuario como de la empresa.
+    Notificación de Brechas de Seguridad:
+        Establecer procedimientos para notificar a los usuarios y autoridades competentes en caso de brechas de seguridad que comprometan datos personales.
+
+31. Estrategias de Internacionalización y Localización
+
+Si la llibreria planea expandirse a otros mercados, es importante considerar la internacionalización y localización del sitio web.
+a. Soporte Multilingüe
+
+    Implementación de Idiomas Múltiples:
+        Permitir que el sitio web soporte múltiples idiomas para atender a una audiencia más amplia.
+    Traducción de Contenidos:
+        Utilizar herramientas y servicios de traducción para asegurar que los contenidos estén correctamente traducidos y adaptados culturalmente.
+
+b. Adaptación a Normas Locales
+
+    Formatos de Fecha y Moneda:
+        Ajustar los formatos de fecha, hora y moneda según las preferencias locales de cada mercado.
+    Cumplimiento con Normativas Locales:
+        Asegurar que el sitio cumpla con las normativas locales de cada país o región donde se ofrezcan servicios.
+
+c. Optimización para Motores de Búsqueda Locales
+
+    SEO Local:
+        Optimizar el sitio web para motores de búsqueda locales, utilizando palabras clave y estrategias específicas para cada mercado.
+    Registro en Directorios Locales:
+        Registrar la empresa en directorios locales y plataformas relevantes para aumentar la visibilidad en cada región.
+
+32. Estrategias de Backup y Alta Disponibilidad para Servicios Críticos
+
+Para servicios críticos como la autenticación y la base de datos, se deben implementar estrategias específicas de respaldo y alta disponibilidad.
+a. Replicación de Base de Datos
+
+    MariaDB Replicación Maestro-Esclavo:
+        Configurar la replicación maestro-esclavo para asegurar que haya una copia de la base de datos en otro servidor, lo que permite una recuperación rápida en caso de fallo del servidor principal.
+    MariaDB Replicación Multi-Maestro:
+        Implementar una replicación multi-maestro si se requiere una alta disponibilidad y la capacidad de realizar escrituras en múltiples nodos.
+
+b. Servidores de Autenticación Redundantes
+
+    Clusters de Autenticación:
+        Configurar múltiples servidores de autenticación para manejar las solicitudes de inicio de sesión, asegurando que si uno falla, los demás puedan continuar atendiendo las solicitudes.
+    Balanceo de Carga para Autenticación:
+        Utilizar un balanceador de carga para distribuir las solicitudes de autenticación entre los servidores disponibles.
+
+c. Respaldo en Tiempo Real
+
+    Snapshots de Máquina Virtual:
+        Utilizar snapshots de las máquinas virtuales para capturar el estado del sistema en tiempo real, facilitando la recuperación rápida en caso de fallos.
+    Replicación de Datos en Tiempo Real:
+        Implementar soluciones de replicación en tiempo real para asegurar que los datos estén siempre actualizados y disponibles en múltiples ubicaciones.
+
+33. Gestión de Configuraciones y Secretos
+
+Gestionar de manera segura las configuraciones y secretos (como contraseñas, claves API) es vital para la seguridad del sistema.
+a. Almacenamiento Seguro de Secretos
+
+    Uso de Herramientas de Gestión de Secretos:
+        Implementar herramientas como HashiCorp Vault, AWS Secrets Manager o Azure Key Vault para almacenar y gestionar secretos de manera segura.
+    Variables de Entorno:
+        Utilizar variables de entorno para pasar configuraciones sensibles a las aplicaciones, evitando almacenarlas directamente en el código fuente.
+
+b. Control de Acceso a Configuraciones
+
+    Permisos Restrictivos:
+        Asegurar que solo los servicios y usuarios autorizados tengan acceso a las configuraciones y secretos.
+    Rotación de Secretos:
+        Implementar la rotación periódica de contraseñas y claves API para minimizar el riesgo de compromisos.
+
+c. Separación de Configuraciones por Entorno
+
+    Configuraciones por Entorno:
+        Mantener configuraciones separadas para los entornos de desarrollo, prueba y producción, evitando que configuraciones sensibles se mezclen entre entornos.
+    Uso de Archivos de Configuración Seguros:
+        Almacenar archivos de configuración sensibles fuera del directorio raíz del servidor web y restringir su acceso.
+
+34. Integración de Sistemas de Gestión de Proyectos y Colaboración
+
+Para coordinar eficientemente el desarrollo y mantenimiento del sistema, se pueden integrar herramientas de gestión de proyectos y colaboración.
+a. Uso de Herramientas de Gestión de Proyectos
+
+    KanbanFlow, Trello o Jira:
+        Utilizar herramientas como KanbanFlow, Trello o Jira para gestionar tareas, asignar responsabilidades y seguir el progreso del proyecto.
+    Sprints y Metodologías Ágiles:
+        Adoptar metodologías ágiles como Scrum para organizar el trabajo en sprints y mejorar la flexibilidad y adaptabilidad del equipo de desarrollo.
+
+b. Colaboración y Comunicación
+
+    Plataformas de Comunicación:
+        Utilizar plataformas como Slack, Microsoft Teams o Discord para facilitar la comunicación en tiempo real entre los miembros del equipo.
+    Documentación Colaborativa:
+        Mantener documentación actualizada y accesible para todo el equipo mediante herramientas como Confluence, Notion o Google Docs.
+
+c. Seguimiento de Bugs y Problemas
+
+    Sistemas de Gestión de Incidencias:
+        Implementar sistemas como Bugzilla, Redmine o GitHub Issues para reportar, rastrear y gestionar bugs y problemas en el sistema.
+    Priorización y Resolución:
+        Establecer un proceso claro para priorizar y resolver incidencias según su impacto y urgencia.
+
+35. Evaluación y Mejora Continua
+
+Para mantener y mejorar la calidad del sistema a lo largo del tiempo, es importante implementar procesos de evaluación y mejora continua.
+a. Auditorías Regulares
+
+    Auditorías de Seguridad:
+        Realizar auditorías de seguridad periódicas para identificar y corregir vulnerabilidades.
+    Auditorías de Rendimiento:
+        Evaluar regularmente el rendimiento del sistema y optimizar componentes según sea necesario.
+
+b. Feedback de Usuarios
+
+    Recopilación de Feedback:
+        Implementar mecanismos para que los usuarios puedan proporcionar feedback sobre su experiencia en el sitio web.
+    Análisis de Feedback:
+        Analizar el feedback recibido para identificar áreas de mejora y priorizar nuevas funcionalidades o ajustes.
+
+c. Actualizaciones y Mejoras Tecnológicas
+
+    Adopción de Nuevas Tecnologías:
+        Estar al tanto de las últimas tecnologías y tendencias en desarrollo web para incorporar mejoras que aumenten la eficiencia y la seguridad.
+    Refactorización de Código:
+        Revisar y refactorizar el código regularmente para mantener su calidad, legibilidad y eficiencia.
+
+36. Consideraciones de Escalabilidad a Futuro
+
+Planificar para el crecimiento futuro asegura que el sistema pueda adaptarse a un aumento en la demanda sin necesidad de una reestructuración completa.
+a. Escalabilidad Horizontal
+
+    Añadir Más Servidores:
+        Diseñar la arquitectura de manera que sea fácil añadir más servidores web o de base de datos según aumente el tráfico.
+    Distribución Geográfica:
+        Considerar la distribución de servidores en diferentes regiones geográficas para reducir la latencia y mejorar la experiencia del usuario global.
+
+b. Microservicios
+
+    Descomposición en Microservicios:
+        A medida que el sistema crece, considerar la adopción de una arquitectura de microservicios para dividir funcionalidades en servicios independientes y escalables.
+    Comunicación entre Microservicios:
+        Utilizar APIs RESTful o gRPC para facilitar la comunicación entre microservicios de manera eficiente y segura.
+
+c. Uso de Servicios Gestionados en la Nube
+
+    Migración a la Nube:
+        Evaluar la posibilidad de migrar partes del sistema a servicios gestionados en la nube (como AWS, Azure o Google Cloud) para aprovechar su escalabilidad y fiabilidad.
+    Servicios Gestionados:
+        Utilizar servicios gestionados para bases de datos, balanceadores de carga, y almacenamiento para reducir la carga operativa y mejorar la escalabilidad.
+
+37. Resumen Completo de la Topología del Sistema
+
+A continuación, se presenta un resumen consolidado de la topología del sistema para la web de la llibreria "Sargantana Mediterrània":
+
+    Clientes (Usuarios Finales):
+        Acceden al sitio web desde diversas ubicaciones (Eivissa, Formentera, y otras).
+
+    Internet:
+        Conecta a los clientes con el servidor web a través de una conexión HTTPS segura.
+
+    Firewall Perimetral:
+        Filtra el tráfico entrante y saliente, permitiendo solo los puertos y protocolos necesarios.
+
+    Balanceador de Carga (Opcional):
+        Distribuye el tráfico entre múltiples servidores web para mejorar el rendimiento y la disponibilidad.
+
+    Servidor Web Principal (Amfitrió):
+        Ejecuta Apache, gestionando las solicitudes de los clientes y dirigiéndolas a los VirtualHosts correspondientes.
+        Aloja los sitios nom-llinatge-eivissa.local y nom-llinatge-formentera.local.
+
+    Máquinas Virtuales (VMs):
+        Eivissa VM:
+            Hospeda el sitio nom-llinatge-eivissa.local y la intranet /intranet.
+            Utiliza el framework Skeleton con colores corporativos específicos.
+            Acceso restringido a IPs de Eivissa, excluyendo Formentera.
+        Formentera VM:
+            Hospeda el sitio nom-llinatge-formentera.local y el portal de clientes /portalclient.
+            Utiliza el framework Bootstrap con colores corporativos específicos.
+            Acceso restringido a IPs de Formentera.
+
+    Base de Datos MariaDB:
+        Centralizada o distribuida, accesible por ambas VMs para gestionar usuarios, roles y datos de clientes.
+        Implementa replicación maestro-esclavo para alta disponibilidad.
+
+    Red Interna y Segmentación:
+        Aisla los servidores web de los servidores de base de datos mediante segmentación de red y VLANs.
+        Protege los servicios críticos con reglas de firewall estrictas.
+
+    Sistema de Logs:
+        Archivos de log y error separados por cada sitio web con rotación diaria.
+        Centralizados para facilitar la monitorización y auditoría.
+
+    Monitorización y Alertas:
+        Herramientas como Prometheus y Grafana para monitorear el rendimiento y la salud del sistema.
+        ELK Stack para la centralización y análisis de logs.
+        Alertas configuradas para notificar al equipo ante eventos críticos.
+
+    Respaldo y Recuperación:
+        Respaldo regular de la base de datos y archivos del servidor.
+        Planes de recuperación ante desastres documentados y probados periódicamente.
+
+    Seguridad Avanzada:
+        Implementación de WAF, escaneo de vulnerabilidades, protección contra ataques de fuerza bruta y autenticación de dos factores.
+
+    Despliegue y Automatización:
+        Uso de CI/CD, contenedorización con Docker, y herramientas de Infraestructura como Código para facilitar despliegues consistentes y escalables.
+
+    Gestión de Usuarios y Roles:
+        Panel de administración centralizado, auditoría de actividades y políticas de seguridad robustas.
+
+    Optimización y Escalabilidad:
+        Estrategias de cache avanzadas, optimización de consultas SQL, y planes de escalabilidad horizontal y vertical para adaptarse al crecimiento.
+
+    Cumplimiento Legal y SEO:
+        Adherencia a normativas de protección de datos y optimización para motores de búsqueda para mejorar la visibilidad y cumplir con requisitos legales.
+
+38. Conclusión
+
+La topología de los sistemas para la web de la llibreria "Sargantana Mediterrània" está diseñada para ser robusta, segura, escalable y mantenible, cumpliendo con todos los requisitos funcionales y no funcionales especificados. La arquitectura distribuida en múltiples máquinas virtuales, junto con una base de datos centralizada y estrategias avanzadas de seguridad y rendimiento, asegura que el sistema pueda manejar eficazmente las operaciones diarias y adaptarse al crecimiento futuro.
+
+La implementación de prácticas de mejora continua, automatización, y monitorización proactiva garantiza que el sistema se mantenga actualizado, eficiente y seguro a lo largo del tiempo, proporcionando una experiencia de usuario óptima y protegiendo los datos sensibles de la empresa y sus clientes.
+
+
+
+
+
+
+
+
+
+ntendido. A continuación, se presenta una descripción detallada de un diagrama de flujo completo de la topología de los sistemas para la web de la llibreria "Sargantana Mediterrània", incluyendo la comunicación entre los componentes al interactuar con el sitio web y todas las posibles situaciones hipotéticas.
+1. Introducción
+
+La topología del sistema describe la estructura y las interacciones entre los diferentes componentes que conforman la infraestructura de la web de la llibreria "Sargantana Mediterrània". Este diagrama de flujo abarca desde la interacción inicial del usuario hasta el procesamiento interno de las solicitudes, considerando aspectos de seguridad, autenticación, gestión de datos y manejo de errores.
+2. Componentes Principales del Sistema
+
+    Clientes (Usuarios Finales):
+        Dispositivos: Computadoras, tablets, smartphones.
+        Ubicaciones: Eivissa, Formentera y otras ubicaciones.
+
+    Internet:
+        Medio de comunicación entre los clientes y el servidor web.
+
+    Firewall Perimetral:
+        Filtra el tráfico entrante y saliente.
+        Aplica restricciones de IP según la ubicación geográfica.
+
+    Balanceador de Carga (Opcional):
+        Distribuye el tráfico entre múltiples servidores web para mejorar el rendimiento y la disponibilidad.
+
+    Servidor Web Principal (Amfitrió):
+        Apache: Gestiona las solicitudes HTTP/HTTPS.
+        VirtualHosts:
+            nom-llinatge-eivissa.local
+            nom-llinatge-formentera.local
+
+    Máquinas Virtuales (VMs):
+        Eivissa VM:
+            Sitio Web: nom-llinatge-eivissa.local
+            Intranet: /intranet
+            Framework: Skeleton
+        Formentera VM:
+            Sitio Web: nom-llinatge-formentera.local
+            Portal de Clientes: /portalclient
+            Framework: Bootstrap
+
+    Base de Datos MariaDB:
+        Gestiona las tablas usuari y rol.
+        Configurada con replicación para alta disponibilidad.
+
+    Sistema de Logs y Monitorización:
+        Registra accesos, errores y actividades.
+        Herramientas: ELK Stack (Elasticsearch, Logstash, Kibana), Prometheus, Grafana.
+
+    Servicios de Respaldo y Recuperación:
+        Respaldos periódicos de bases de datos y configuraciones.
+        Almacenamiento en ubicaciones seguras y redundantes.
+
+3. Flujo de Comunicación
+
+A continuación, se describe el flujo de comunicación entre los componentes cuando un usuario interactúa con el sitio web, abarcando diferentes situaciones hipotéticas.
+3.1. Acceso al Sitio Web desde Eivissa
+
+    Solicitud del Usuario:
+        El usuario en Eivissa accede a https://nom-llinatge-eivissa.local mediante su navegador.
+
+    Paso por Internet:
+        La solicitud HTTPS viaja a través de Internet hacia el servidor web.
+
+    Firewall Perimetral:
+        El firewall verifica que la IP de origen pertenece a Eivissa.
+        Permite el tráfico hacia nom-llinatge-eivissa.local y lo bloquea si la IP no es válida.
+
+    Balanceador de Carga (si está implementado):
+        Distribuye la solicitud a uno de los servidores web disponibles.
+
+    Servidor Apache:
+        Identifica el VirtualHost correspondiente (nom-llinatge-eivissa.local).
+        Procesa la solicitud y la dirige a la VM de Eivissa.
+
+    Máquina Virtual Eivissa:
+        Ejecuta los scripts PHP necesarios para generar la página solicitada.
+        Interactúa con la Base de Datos MariaDB para obtener o almacenar datos.
+
+    Respuesta al Usuario:
+        El servidor genera la respuesta y la envía de vuelta al navegador del usuario a través de HTTPS.
+
+3.2. Acceso al Portal de Clientes desde Formentera
+
+    Solicitud del Cliente:
+        El cliente en Formentera accede a https://nom-llinatge-formentera.local/portalclient.
+
+    Paso por Internet:
+        La solicitud HTTPS viaja a través de Internet hacia el servidor web.
+
+    Firewall Perimetral:
+        Verifica que la IP de origen pertenece a Formentera.
+        Permite el tráfico hacia nom-llinatge-formentera.local y lo bloquea si la IP no es válida.
+
+    Balanceador de Carga (si está implementado):
+        Distribuye la solicitud a uno de los servidores web disponibles.
+
+    Servidor Apache:
+        Identifica el VirtualHost correspondiente (nom-llinatge-formentera.local).
+        Procesa la solicitud y la dirige a la VM de Formentera.
+
+    Máquina Virtual Formentera:
+        Ejecuta los scripts PHP necesarios para generar el portal de clientes.
+        Interactúa con la Base de Datos MariaDB para gestionar las solicitudes del cliente.
+
+    Autenticación Digest:
+        El cliente debe autenticarse mediante autenticación Digest.
+        Verificación de credenciales contra la base de datos.
+
+    Respuesta al Cliente:
+        Tras la autenticación, se muestra la interfaz del portal de clientes.
+        El servidor envía la respuesta a través de HTTPS.
+
+3.3. Intento de Acceso No Autorizado
+
+    Solicitud desde Formentera a Eivissa:
+        Un usuario intenta acceder a https://nom-llinatge-eivissa.local desde una IP de Formentera.
+
+    Paso por Internet y Firewall:
+        El firewall detecta que la IP no pertenece a Eivissa.
+        Bloquea la solicitud y devuelve un error de acceso denegado.
+
+3.4. Proceso de Registro de Usuario
+
+    Acceso a la Página de Registro:
+        El usuario accede a https://nom-llinatge-eivissa.local/registre.php.
+
+    Validación del Formulario (Frontend):
+        Funciones JavaScript validan los campos del formulario (nombre de usuario, correo, contraseña, etc.).
+
+    Envío de Datos al Servidor:
+        Tras la validación, los datos se envían al servidor mediante una solicitud POST.
+
+    Procesamiento en el Servidor (PHP):
+        PHP valida nuevamente los datos.
+        Inserta los datos en la Base de Datos MariaDB.
+
+    Respuesta al Usuario:
+        Si el registro es exitoso, se muestra un mensaje de confirmación y se redirige al usuario a la página correspondiente.
+        Si hay errores, se muestran mensajes de alerta indicando los problemas encontrados.
+
+3.5. Manejo de Sesiones y Cierre de Sesión
+
+    Inicio de Sesión:
+        El usuario ingresa sus credenciales en index.php.
+        PHP verifica las credenciales y, si son válidas, inicia una sesión (session_start()).
+
+    Acceso a Páginas Protegidas:
+        El usuario puede acceder a llibreria.php, quisom.php, etc., siempre que la sesión esté activa.
+        El nombre y rol del usuario se muestran en la parte superior derecha de cada página.
+
+    Cierre de Sesión:
+        Al acceder a logout.php, la sesión se destruye (session_destroy()) y el usuario es redirigido a index.php.
+
+3.6. Situaciones Hipotéticas Adicionales
+
+    Fallos en la Base de Datos:
+        Si MariaDB no responde, el servidor web muestra una página de error personalizada (500).
+        Los logs registran el incidente para su posterior análisis.
+
+    Intentos de Acceso Maliciosos:
+        Un atacante intenta realizar una inyección SQL.
+        El WAF detecta el patrón malicioso y bloquea la solicitud, registrando el intento en los logs.
+
+    Rotación de Logs y Mantenimiento:
+        Cada 24 horas, los logs se rotan automáticamente para mantener el sistema organizado.
+        Durante el mantenimiento, el servidor puede mostrar una página de mantenimiento temporal.
+
+    Actualizaciones de Certificados SSL:
+        Al renovar un certificado SSL, se actualizan las configuraciones en Apache.
+        Se realiza una prueba para asegurar que HTTPS funciona correctamente después de la actualización.
+
+
+
+
+
+
+[Cliente (Usuario Final)]
+          |
+          | Solicitud HTTPS a nom-llinatge-eivissa.local o nom-llinatge-formentera.local
+          |
+      [Internet]
+          |
+          | Solicitud HTTPS llega al Firewall Perimetral
+          |
+   [Firewall Perimetral]
+          |
+          | Verifica IP de origen según VirtualHost
+          |
+   [Balanceador de Carga] (Opcional)
+          |
+          | Distribuye la solicitud a uno de los Servidores Apache
+          |
+    [Servidor Apache]
+          |
+          | Identifica VirtualHost y dirige a la VM correspondiente
+          |
+     [Máquina Virtual]
+    /             \
+[Eivissa VM]   [Formentera VM]
+    |               |
+    |               |
+[Intranet]      [Portal de Clientes]
+    |               |
+    |               |
+[Autenticación] [Autenticación Digest]
+    |               |
+    |               |
+[Base de Datos MariaDB] <--> [Servidor Apache]
+          |
+    [Sistema de Logs]
+          |
+ [Monitorización y Alertas]
+
+
+
+
+
+i6. Ejemplo de Flujo de Comunicación en Situaciones Hipotéticas
+6.1. Acceso Exitoso desde Eivissa
+
+    Usuario en Eivissa accede a nom-llinatge-eivissa.local.
+    Firewall Perimetral verifica que la IP es válida para Eivissa.
+    Servidor Apache recibe la solicitud y la dirige a la Eivissa VM.
+    Eivissa VM procesa la solicitud, interactúa con MariaDB, y genera la respuesta.
+    Respuesta es enviada de vuelta al usuario a través de HTTPS.
+
+6.2. Intento de Acceso desde Formentera a Eivissa
+
+    Usuario en Formentera intenta acceder a nom-llinatge-eivissa.local.
+    Firewall Perimetral detecta que la IP no es válida para Eivissa.
+    Solicitud Bloqueada y se muestra una página de acceso denegado al usuario.
+
+6.3. Registro de Usuario con Errores de Validación
+
+    Usuario completa el formulario en registre.php.
+    JavaScript realiza validaciones en el frontend y detecta errores (por ejemplo, contraseña débil).
+    Alertas son mostradas al usuario indicando los problemas.
+    Formulario no se Envía hasta que se corrijan los errores.
+
+6.4. Fallo en la Base de Datos
+
+    Servidor Apache intenta acceder a MariaDB para procesar una solicitud.
+    MariaDB no responde (caída del servicio).
+    Servidor Apache captura el error y muestra una página de error 500 al usuario.
+    Sistema de Logs registra el incidente para su posterior análisis.
+
+
+
+
+Entendido. A continuación, se presenta un diagrama ASCII completo de la topología de los sistemas para la web de la llibreria "Sargantana Mediterrània". Este diagrama incluye la comunicación entre los componentes al interactuar con el sitio web, así como todas las posibles situaciones hipotéticas.
+Diagrama de Flujo ASCII de la Topología del Sistema
+
++------------------------+
+|      Usuarios Finales   |
+| (Eivissa, Formentera,   |
+|      y Otras Locaciones)|
++-----------+------------+
+            |
+            | Solicitud HTTPS
+            |
+            v
+     +------+-------+
+     |    Internet    |
+     +------+-------+
+            |
+            | Solicitud HTTPS
+            |
+            v
++-----------+------------+
+|    Firewall Perimetral  |
+|  - Filtra tráfico      |
+|  - Restricciones IP    |
++-----------+------------+
+            |
+            | Permite o Bloquea
+            |
+            v
+  +---------+----------+
+  | Balanceador de Carga| (Opcional)
+  +---------+----------+
+            |
+            | Distribuye tráfico
+            |
+            v
+     +------+-------+
+     |   Servidor    |
+     |    Apache     |
+     +------+-------+
+            |
+            | Determina VirtualHost
+            |
+   +--------+---------+
+   |                  |
+   v                  v
++--+------------------+--+
+|  VirtualHost:          |
+| nom-llinatge-eivissa.local |
++-----------+------------+
+            |
+            | Dirección a Eivissa VM
+            |
+            v
+   +--------+---------+
+   |   Eivissa VM      |
+   | - Sitio Web       |
+   | - Intranet        |
+   | - Framework: Skeleton |
+   +--------+---------+
+            |
+            | Interacción con
+            | Base de Datos
+            |
+            v
+     +------+-------+
+     |  MariaDB      |
+     | (Base de Datos)|
+     +------+-------+
+            |
+            | Respuesta a VM
+            |
+            v
+   +--------+---------+
+   |   Eivissa VM      |
+   | - Genera Página   |
+   | - Gestiona Sesión |
+   +--------+---------+
+            |
+            | Respuesta HTTPS
+            |
+            v
++-----------+------------+
+|       Usuario Final    |
++------------------------+
+
+   +-----------------------------+
+   |  VirtualHost:               |
+   | nom-llinatge-formentera.local|
+   +-----------+-----------------+
+               |
+               | Dirección a Formentera VM
+               |
+               v
+   +-----------+------------+
+   |  Formentera VM          |
+   | - Sitio Web             |
+   | - Portal de Clientes    |
+   | - Framework: Bootstrap  |
+   +-----------+------------+
+               |
+               | Interacción con
+               | Base de Datos
+               |
+               v
+     +------+-------+
+     |  MariaDB      |
+     | (Base de Datos)|
+     +------+-------+
+               |
+               | Respuesta a VM
+               |
+               v
+   +-----------+------------+
+   |   Formentera VM        |
+   | - Genera Página         |
+   | - Gestiona Sesión       |
+   +-----------+------------+
+               |
+               | Respuesta HTTPS
+               |
+               v
++----------------------------+
+|       Cliente Final        |
++----------------------------+
+
++----------------------------------+
+|          Sistema de Logs         |
+| - Registra accesos y errores     |
+| - Logs separados por VirtualHost |
++----------------------------------+
+               ^
+               |
+               | Logs de Apache y VMs
+               |
+               |
++----------------------------------+
+|    Sistema de Monitorización     |
+| - Prometheus & Grafana           |
+| - Alertas en tiempo real         |
++----------------------------------+
+
++----------------------------------+
+| Servicios de Respaldo y Recuperación|
+| - Respaldos de MariaDB            |
+| - Respaldos de Configuraciones    |
+| - Almacenamiento Redundante       |
++----------------------------------+
+
+
+
+Descripción del Diagrama
+
+    Usuarios Finales:
+        Ubicaciones: Eivissa, Formentera y otras.
+        Dispositivos: Computadoras, tablets, smartphones.
+        Acción: Realizan solicitudes HTTPS a los dominios correspondientes.
+
+    Internet:
+        Medio por el cual las solicitudes HTTPS viajan desde los usuarios hasta el servidor web.
+
+    Firewall Perimetral:
+        Funciones:
+            Filtra el tráfico entrante y saliente.
+            Aplica restricciones de acceso por IP según la ubicación geográfica.
+        Decisión:
+            Permite o Bloquea la solicitud según las reglas configuradas.
+
+    Balanceador de Carga (Opcional):
+        Funciones:
+            Distribuye el tráfico entre múltiples instancias del Servidor Apache para mejorar rendimiento y disponibilidad.
+        Nota: Es opcional y depende de la infraestructura específica.
+
+    Servidor Apache:
+        Funciones:
+            Gestiona las solicitudes HTTP/HTTPS.
+            Determina el VirtualHost correspondiente según el dominio solicitado.
+        Decisión:
+            Dirige la solicitud a la Máquina Virtual (VM) correspondiente.
+
+    VirtualHosts:
+        nom-llinatge-eivissa.local:
+            Destino: Eivissa VM.
+            Acceso: Restringido a IPs de Eivissa.
+            Framework: Skeleton con colores corporativos específicos.
+        nom-llinatge-formentera.local:
+            Destino: Formentera VM.
+            Acceso: Restringido a IPs de Formentera.
+            Framework: Bootstrap con colores corporativos específicos.
+
+    Máquinas Virtuales (VMs):
+        Eivissa VM:
+            Componentes: Sitio Web, Intranet.
+            Funciones:
+                Ejecuta scripts PHP para generar páginas web.
+                Gestiona sesiones de usuario.
+                Interactúa con la Base de Datos MariaDB.
+        Formentera VM:
+            Componentes: Sitio Web, Portal de Clientes.
+            Funciones:
+                Ejecuta scripts PHP para generar páginas web.
+                Gestiona sesiones de cliente.
+                Interactúa con la Base de Datos MariaDB.
+
+    Base de Datos MariaDB:
+        Funciones:
+            Gestiona las tablas usuari y rol.
+            Almacena datos de usuarios, roles y clientes.
+        Interacción:
+            Recibe consultas de las VMs y devuelve datos según sea necesario.
+
+    Sistema de Logs:
+        Funciones:
+            Registra accesos, errores y actividades de los usuarios.
+            Mantiene logs separados para cada VirtualHost.
+        Interacción:
+            Recibe logs de Apache y las VMs.
+
+    Sistema de Monitorización:
+        Herramientas: Prometheus, Grafana.
+        Funciones:
+            Monitorea el rendimiento y la salud del sistema.
+            Genera alertas en tiempo real ante eventos críticos.
+
+    Servicios de Respaldo y Recuperación:
+        Funciones:
+            Realiza respaldos periódicos de la base de datos y configuraciones.
+            Almacena los respaldos en ubicaciones seguras y redundantes.
+            Facilita la recuperación ante desastres.
+
+Situaciones Hipotéticas y Flujos Alternativos
+
+A continuación, se describen algunas situaciones hipotéticas y cómo se gestionan dentro de la topología del sistema:
+1. Acceso Exitoso desde Eivissa
+
+[Usuario en Eivissa]
+        |
+        | Solicitud HTTPS a nom-llinatge-eivissa.local
+        |
+        v
+[Firewall Perimetral] --> [Permite]
+        |
+        v
+[Servidor Apache] --> [VirtualHost Eivissa]
+        |
+        v
+[Eivissa VM] --> [Interacción con MariaDB]
+        |
+        v
+[Respuesta HTTPS] --> [Usuario Final]
+
+
+2. Intento de Acceso No Autorizado desde Formentera a Eivissa
+
+[Usuario en Formentera]
+        |
+        | Solicitud HTTPS a nom-llinatge-eivissa.local
+        |
+        v
+[Firewall Perimetral] --> [Bloquea]
+        |
+        v
+[Respuesta de Error] --> [Usuario Final]
+
+
+3. Fallo en la Base de Datos MariaDB
+
+[Eivissa VM / Formentera VM]
+        |
+        | Consulta a MariaDB
+        |
+        v
+[MariaDB] --> [No Responde]
+        |
+        v
+[Eivissa VM / Formentera VM] --> [Muestra Error 500]
+        |
+        v
+[Sistema de Logs] --> [Registra Incidente]
+
+
+4. Registro de Usuario con Errores de Validación
+
+[Usuario Final]
+        |
+        | Completa formulario en registre.php
+        |
+        v
+[JavaScript Frontend] --> [Detecta Errores]
+        |
+        v
+[Muestra Alertas al Usuario]
+        |
+        v
+[Formulario no se Envía]
+
+
+5. Autenticación y Control de Acceso
+
+[Usuario Final]
+        |
+        | Inicia Sesión en login.php
+        |
+        v
+[Eivissa VM / Formentera VM] --> [Verifica Credenciales en MariaDB]
+        |
+        v
+[Credenciales Válidas] --> [Inicia Sesión y Genera Token]
+        |
+        v
+[Muestra Página Protegida] --> [Usuario Final]
+
+
+6. Manejo de Logs y Monitorización
+
+[Servidor Apache / VMs]
+        |
+        | Genera Logs de Acceso y Errores
+        |
+        v
+[Sistema de Logs] --> [Centraliza Logs]
+        |
+        v
+[Sistema de Monitorización] --> [Analiza Logs]
+        |
+        v
+[Alertas] --> [Notifica al Equipo]
+
+
+
+Notas Adicionales
+
+    Autenticación:
+        Intranet (Eivissa VM): Autenticación básica para el usuario 'sargantana'.
+        Portal de Clientes (Formentera VM): Autenticación Digest para el usuario 'client'.
+
+    Respaldo y Recuperación:
+        Respaldos Regulares: Tanto de la base de datos como de las configuraciones de los servidores.
+        Almacenamiento Seguro: Respaldos almacenados en ubicaciones redundantes para garantizar la disponibilidad.
+
+    Monitorización y Alertas:
+        Prometheus y Grafana: Monitorean métricas del sistema y generan dashboards visuales.
+        Alertas en Tiempo Real: Notifican al equipo sobre incidentes críticos como caídas de servicios o intentos de acceso no autorizados.
+
+    Sistema de Logs:
+        Logs Separados por VirtualHost: Facilita la identificación y resolución de problemas específicos de cada sitio web.
+        Rotación de Logs Diaria: Mantiene los archivos de log manejables y organiza el almacenamiento.
+
+
+
+
+
+1. Diagramas de Arquitectura General: Facilitan una comprensión macro del sistema, mostrando cómo se relacionan los componentes principales y permitiendo identificar áreas clave para optimización o mejora.
+
+1. Diagramas de Arquitectura General
+1.1. Diagrama de Arquitectura de Alto Nivel (High-Level Architecture Diagram)
+
+    Descripción: Muestra los componentes principales del sistema y cómo interactúan entre sí a un nivel macro.
+    Componentes Incluidos: Clientes, Internet, Servidor Web, Máquinas Virtuales (Eivissa y Formentera), Base de Datos, Sistema de Logs, Servicios de Respaldo, etc.
+
+
+graph TD
+    Users[Usuarios Finales] -->|HTTPS| Internet
+    Internet -->|HTTPS| FW[Firewall Perimetral]
+    FW -->|Filtrado IP| LB[Balanceador de Carga]
+    LB -->|Distribución| Apache[Servidor Apache]
+    
+    Apache -->|VirtualHost| EivissaVM[Eivissa VM]
+    Apache -->|VirtualHost| FormenteraVM[Formentera VM]
+    
+    EivissaVM -->|Queries| DB[(MariaDB)]
+    FormenteraVM -->|Queries| DB
+    
+    EivissaVM -->|Logs| Logs[Sistema de Logs]
+    FormenteraVM -->|Logs| Logs
+    Apache -->|Logs| Logs
+    
+    Logs -->|Alertas| Monitor[Sistema Monitorización]
+    
+    DB -->|Backup| Backup[Servicios de Respaldo]
+    
+    subgraph Seguridad
+        FW
+    end
+    
+    subgraph "Servidores Web"
+        Apache
+        EivissaVM
+        FormenteraVM
+    end
+    
+    subgraph "Datos y Monitoreo"
+        DB
+        Logs
+        Monitor
+        Backup
+    end
+
+
+
+1.2. Diagrama de Arquitectura de Software
+
+    Descripción: Detalla la estructura interna del software, incluyendo módulos, componentes y sus relaciones.
+    Componentes Incluidos: Módulos PHP, Frameworks (Skeleton y Bootstrap), Scripts de Validación, etc.
+
+
+graph TD
+    subgraph "Frontend Layer"
+        EivissaUI[Eivissa UI - Skeleton]
+        FormenteraUI[Formentera UI - Bootstrap]
+        JS[JavaScript Validation]
+        CSS[CSS Styles]
+    end
+
+    subgraph "Application Layer"
+        Auth[Authentication Module]
+        Session[Session Management]
+        UserMgmt[User Management]
+        RoleMgmt[Role Management]
+        Validation[PHP Validation]
+        Logger[Logging Module]
+    end
+
+    subgraph "Data Access Layer"
+        DBAccess[Database Access]
+        QueryBuilder[SQL Query Builder]
+    end
+
+    subgraph "Security Layer"
+        BasicAuth[Basic Authentication]
+        DigestAuth[Digest Authentication]
+        IPFilter[IP Filtering]
+        SSL[SSL/TLS Handler]
+    end
+
+    EivissaUI -->|Requests| Auth
+    FormenteraUI -->|Requests| Auth
+    JS -->|Client Validation| Validation
+    
+    Auth -->|Verify| Session
+    Auth -->|Check| RoleMgmt
+    UserMgmt -->|CRUD| DBAccess
+    RoleMgmt -->|Permissions| DBAccess
+    
+    DBAccess -->|Execute| QueryBuilder
+    Logger -->|Write| DBAccess
+
+    BasicAuth -->|Intranet| Auth
+    DigestAuth -->|Portal| Auth
+    IPFilter -->|Restrict| Auth
+
+
+
+
+2.Diagramas de Red y Topología: Esenciales para diseñar y gestionar la infraestructura de red, garantizando que las comunicaciones sean seguras, eficientes y escalables.
+
+2. Diagramas de Red y Topología
+2.1. Diagrama de Topología de Red (Network Topology Diagram)
+
+    Descripción: Representa la disposición física y lógica de los dispositivos de red y cómo están interconectados.
+    Componentes Incluidos: Routers, Firewalls, Switches, Servidores, Máquinas Virtuales, Balanceadores de Carga, etc.
+
+graph TD
+    subgraph "Internet Zone"
+        Internet((Internet))
+        Router[Edge Router]
+    end
+
+    subgraph "DMZ"
+        FW1[Primary Firewall]
+        LB[Load Balancer]
+        WAF[Web Application Firewall]
+    end
+
+    subgraph "Web Layer"
+        WebSW[Web Switch]
+        Apache1[Apache Server 1]
+        Apache2[Apache Server 2]
+    end
+
+    subgraph "Application Layer"
+        AppSW[App Switch]
+        EivissaVM1[Eivissa VM Primary]
+        EivissaVM2[Eivissa VM Backup]
+        FormenteraVM1[Formentera VM Primary]
+        FormenteraVM2[Formentera VM Backup]
+    end
+
+    subgraph "Database Layer"
+        DBSW[DB Switch]
+        MariaDB1[MariaDB Master]
+        MariaDB2[MariaDB Slave]
+    end
+
+    Internet <--> Router
+    Router <--> FW1
+    FW1 <--> LB
+    LB <--> WAF
+    WAF <--> WebSW
+    WebSW <--> |HTTPS| Apache1
+    WebSW <--> |HTTPS| Apache2
+    Apache1 <--> AppSW
+    Apache2 <--> AppSW
+    AppSW <--> EivissaVM1
+    AppSW <--> EivissaVM2
+    AppSW <--> FormenteraVM1
+    AppSW <--> FormenteraVM2
+    EivissaVM1 <--> DBSW
+    EivissaVM2 <--> DBSW
+    FormenteraVM1 <--> DBSW
+    FormenteraVM2 <--> DBSW
+    DBSW <--> MariaDB1
+    DBSW <--> MariaDB2
+
+
+
+2.2. Diagrama de Segmentación de Red (Network Segmentation Diagram)
+
+    Descripción: Muestra cómo se divide la red en diferentes segmentos o VLANs para mejorar la seguridad y el rendimiento.
+    Componentes Incluidos: Redes Públicas, DMZ, Redes Internas, VLANs específicas para servidores web y bases de datos.
+
+
+graph TD
+    subgraph "Public Network - VLAN 10"
+        Internet((Internet))
+        Router[Edge Router]
+    end
+
+    subgraph "DMZ - VLAN 20"
+        FW[Firewall]
+        LB[Load Balancer]
+        WAF[Web Application Firewall]
+    end
+
+    subgraph "Web Servers - VLAN 30"
+        Apache1[Apache Server - Eivissa]
+        Apache2[Apache Server - Formentera]
+    end
+
+    subgraph "Application - VLAN 40"
+        EivissaVM[Eivissa VMs]
+        FormenteraVM[Formentera VMs]
+    end
+
+    subgraph "Database - VLAN 50"
+        MariaDB[MariaDB Servers]
+        Backup[Backup Storage]
+    end
+
+    subgraph "Management - VLAN 60"
+        Monitor[Monitoring Systems]
+        Logs[Log Servers]
+    end
+
+    Internet --> Router
+    Router --> FW
+    FW --> LB
+    LB --> WAF
+    WAF --> Apache1 & Apache2
+    Apache1 & Apache2 --> EivissaVM & FormenteraVM
+    EivissaVM & FormenteraVM --> MariaDB
+    MariaDB --> Backup
+    FW --> Monitor
+    Apache1 & Apache2 & EivissaVM & FormenteraVM --> Logs
+
+
+
+
+2.3. Diagrama de Seguridad de Red (Network Security Diagram)
+
+    Descripción: Detalla las medidas de seguridad implementadas en la red.
+    Componentes Incluidos: Firewalls, WAF (Firewall de Aplicaciones Web), VPN, Sistemas de Detección de Intrusos (IDS), etc.
+
+graph TD
+    subgraph "External Security"
+        Internet((Internet))
+        DDOS[DDoS Protection]
+        EdgeFW[Edge Firewall]
+        IDS[Intrusion Detection]
+        WAF[Web App Firewall]
+    end
+
+    subgraph "Access Control"
+        IPFilter[IP Filtering]
+        GeoBlock[Geo Blocking]
+        VPN[VPN Gateway]
+    end
+
+    subgraph "Application Security"
+        AuthBasic[Basic Auth - Eivissa]
+        AuthDigest[Digest Auth - Formentera]
+        SSL[SSL/TLS]
+        SessionMgr[Session Manager]
+    end
+
+    subgraph "Monitoring & Response"
+        SIEM[Security Monitoring]
+        IPS[Intrusion Prevention]
+        Logger[Security Logs]
+    end
+
+    Internet --> DDOS
+    DDOS --> EdgeFW
+    EdgeFW --> IDS
+    IDS --> WAF
+    
+    EdgeFW --> IPFilter
+    IPFilter --> GeoBlock
+    EdgeFW --> VPN
+    
+    WAF --> AuthBasic & AuthDigest
+    AuthBasic & AuthDigest --> SSL
+    SSL --> SessionMgr
+    
+    IDS --> SIEM
+    SIEM --> IPS
+    IPS --> Logger
+
+
+
+
+
+
+
+
+
+3.Diagramas de Flujo de Datos: Ayudan a visualizar cómo los datos se mueven a través del sistema, identificando puntos críticos donde se puede mejorar la eficiencia o la seguridad.
+
+
+3. Diagramas de Flujo de Datos
+3.1. Diagrama de Flujo de Datos (Data Flow Diagram - DFD)
+
+    Descripción: Ilustra cómo los datos se mueven a través del sistema, desde la entrada del usuario hasta el almacenamiento en la base de datos.
+    Componentes Incluidos: Procesos, Almacenes de Datos, Entidades Externas, Flujos de Datos.
+
+
+graph TD
+    subgraph "External Entities"
+        EivissaUser[Eivissa Users]
+        FormenteraUser[Formentera Users]
+        Admin[Administrators]
+    end
+
+    subgraph "Processes"
+        Auth[Authentication Process]
+        UserMgmt[User Management]
+        RoleMgmt[Role Management]
+        SessionHandler[Session Handler]
+        DataValidator[Data Validation]
+    end
+
+    subgraph "Data Stores"
+        UserDB[(User Database)]
+        RoleDB[(Role Database)]
+        SessionDB[(Session Store)]
+        LogDB[(Log Storage)]
+    end
+
+    EivissaUser -->|Login Data| Auth
+    FormenteraUser -->|Login Data| Auth
+    Admin -->|Admin Credentials| Auth
+
+    Auth -->|Validate| UserDB
+    Auth -->|Create| SessionHandler
+    SessionHandler -->|Store| SessionDB
+
+    UserMgmt -->|CRUD Operations| UserDB
+    RoleMgmt -->|Role Assignment| RoleDB
+    
+    DataValidator -->|Validated Data| UserMgmt
+    DataValidator -->|Access Rights| RoleMgmt
+
+    Auth -->|Log Activity| LogDB
+    UserMgmt -->|Log Changes| LogDB
+    RoleMgmt -->|Log Updates| LogDB
+
+
+3.2. Diagrama de Integración de Sistemas (System Integration Diagram)
+
+    Descripción: Muestra cómo diferentes sistemas y servicios externos (por ejemplo, servicios de correo electrónico, APIs de terceros) se integran con la web.
+    Componentes Incluidos: APIs, Servicios de Terceros, Módulos Internos, Conexiones de Datos.
+
+
+graph TD
+    subgraph "Core System"
+        WebApp[Web Application]
+        AuthSystem[Authentication System]
+        DBSystem[Database System]
+    end
+
+    subgraph "External Services"
+        EmailService[Email Service]
+        PaymentGW[Payment Gateway]
+        Analytics[Analytics Service]
+        CDN[Content Delivery Network]
+    end
+
+    subgraph "Internal APIs"
+        UserAPI[User Management API]
+        RoleAPI[Role Management API]
+        LogAPI[Logging API]
+    end
+
+    subgraph "Integration Layer"
+        APIGateway[API Gateway]
+        MessageQueue[Message Queue]
+        Cache[Cache Layer]
+    end
+
+    WebApp -->|REST| APIGateway
+    APIGateway -->|Route| UserAPI & RoleAPI & LogAPI
+    
+    WebApp -->|Static Content| CDN
+    WebApp -->|Events| MessageQueue
+    
+    AuthSystem -->|Verify| UserAPI
+    DBSystem -->|Data| Cache
+    
+    MessageQueue -->|Notifications| EmailService
+    APIGateway -->|Transactions| PaymentGW
+    WebApp -->|Usage Data| Analytics
+
+
+Diagramas de Base de Datos: Cruciales para diseñar una base de datos eficiente y bien estructurada, asegurando la integridad de los datos y optimizando las consultas.
+
+
+4. Diagramas de Base de Datos
+4.1. Diagrama Entidad-Relación (Entity-Relationship Diagram - ERD)
+
+    Descripción: Representa la estructura de la base de datos, mostrando las entidades, sus atributos y las relaciones entre ellas.
+    Componentes Incluidos: Tablas (usuari, rol), Claves Primarias y Foráneas, Relaciones (uno a muchos, muchos a muchos).
+
+4.2. Diagrama de Modelo Relacional (Relational Model Diagram)
+
+    Descripción: Detalla cómo las tablas de la base de datos se relacionan entre sí mediante claves y restricciones.
+    Componentes Incluidos: Tablas, Columnas, Tipos de Datos, Claves, Índices.
+
+
+
+
+
+Diagramas de Secuencia y Flujo de Trabajo: Permiten entender la interacción temporal entre componentes y cómo se ejecutan los procesos dentro del sistema.
+
+5. Diagramas de Secuencia y Flujo de Trabajo
+5.1. Diagrama de Secuencia (Sequence Diagram)
+
+    Descripción: Muestra cómo los objetos o componentes interactúan en una secuencia temporal para realizar una funcionalidad específica.
+    Escenarios Incluidos: Proceso de inicio de sesión, registro de usuario, manejo de sesión, cierre de sesión.
+
+sequenceDiagram
+    participant User
+    participant Browser
+    participant Apache
+    participant AuthModule
+    participant SessionMgr
+    participant MariaDB
+
+    %% Login Flow
+    User->>Browser: Enter Credentials
+    Browser->>Apache: POST /login.php
+    Apache->>AuthModule: Validate Request
+    AuthModule->>MariaDB: Query User Data
+    MariaDB-->>AuthModule: Return User Info
+    AuthModule->>SessionMgr: Create Session
+    SessionMgr-->>AuthModule: Session Token
+    AuthModule-->>Browser: Set Session Cookie
+    Browser-->>User: Redirect to Dashboard
+
+    %% Session Check
+    Browser->>Apache: Request Protected Page
+    Apache->>SessionMgr: Verify Session
+    SessionMgr->>MariaDB: Validate Token
+    MariaDB-->>SessionMgr: Session Valid
+    SessionMgr-->>Apache: Allow Access
+    Apache-->>Browser: Return Protected Content
+
+    %% Logout Flow
+    User->>Browser: Click Logout
+    Browser->>Apache: GET /logout.php
+    Apache->>SessionMgr: Destroy Session
+    SessionMgr->>MariaDB: Remove Session
+    MariaDB-->>SessionMgr: Session Removed
+    SessionMgr-->>Browser: Clear Cookie
+    Browser-->>User: Redirect to Login
+
+
+5.2. Diagrama de Actividades (Activity Diagram)
+
+    Descripción: Representa el flujo de actividades o procesos dentro del sistema.
+    Escenarios Incluidos: Flujo de registro de usuario, validación de formularios, gestión de roles.
+
+
+graph TD
+    Start((Start)) --> FormInput[User Fills Registration Form]
+    
+    FormInput --> JSValidation{JavaScript Validation}
+    JSValidation -->|Invalid| ShowErrors[Show Form Errors]
+    ShowErrors --> FormInput
+    
+    JSValidation -->|Valid| SubmitForm[Submit Form to Server]
+    
+    SubmitForm --> PHPValidation{PHP Validation}
+    PHPValidation -->|Invalid| ReturnErrors[Return Validation Errors]
+    ReturnErrors --> FormInput
+    
+    PHPValidation -->|Valid| CheckIP{Check IP Location}
+    CheckIP -->|Not Allowed| BlockAccess[Block Registration]
+    
+    CheckIP -->|Allowed| CheckRole{Assign Role}
+    CheckRole -->|Basic User| CreateUser[Create User Account]
+    CheckRole -->|Admin| RequireApproval[Require Admin Approval]
+    
+    CreateUser --> SaveDB[Save to Database]
+    RequireApproval --> NotifyAdmin[Notify Administrator]
+    
+    SaveDB --> SendEmail[Send Confirmation Email]
+    SendEmail --> CreateSession[Create User Session]
+    
+    CreateSession --> End((End))
+    BlockAccess --> End
+    NotifyAdmin --> End
+
+
+
+Diagramas de Componentes y Despliegue: Ayudan a planificar cómo se distribuirán los componentes de software en el hardware disponible, optimizando recursos y asegurando una implementación eficiente.
+
+6. Diagramas de Componentes y Despliegue
+6.1. Diagrama de Componentes (Component Diagram)
+
+    Descripción: Muestra cómo los diferentes componentes de software se organizan y se relacionan entre sí.
+    Componentes Incluidos: Módulos PHP, Frameworks, Servicios Web, Librerías de Validación.
+
+
+graph TD
+    subgraph "Frontend Components"
+        Skeleton[Skeleton Framework]
+        Bootstrap[Bootstrap Framework]
+        ValidationJS[JavaScript Validation]
+        StylesCSS[CSS Styles]
+    end
+
+    subgraph "Backend Components"
+        PHP[PHP Runtime]
+        Apache[Apache Server]
+        MariaDB[MariaDB Database]
+    end
+
+    subgraph "Application Modules"
+        AuthModule[Authentication Module]
+        UserModule[User Management]
+        RoleModule[Role Management]
+        SessionModule[Session Handler]
+        LogModule[Logging System]
+    end
+
+    subgraph "Service Layer"
+        APIService[API Services]
+        ValidationService[Validation Service]
+        SecurityService[Security Service]
+    end
+
+    Skeleton --> PHP
+    Bootstrap --> PHP
+    ValidationJS --> ValidationService
+    
+    PHP --> AuthModule & UserModule & RoleModule
+    AuthModule --> SecurityService
+    UserModule --> APIService
+    RoleModule --> SecurityService
+    
+    SecurityService --> MariaDB
+    APIService --> MariaDB
+    LogModule --> MariaDB
+
+
+
+6.2. Diagrama de Despliegue (Deployment Diagram)
+
+    Descripción: Representa la distribución física de los componentes de software en el hardware.
+    Componentes Incluidos: Servidores Web, Máquinas Virtuales, Bases de Datos, Balanceadores de Carga.
+
+graph TD
+    subgraph "Production Environment"
+        LB[Load Balancer]
+        
+        subgraph "Web Servers"
+            WS1[Apache Server 1]
+            WS2[Apache Server 2]
+        end
+        
+        subgraph "Virtual Machines"
+            EVM1[Eivissa VM Primary]
+            EVM2[Eivissa VM Backup]
+            FVM1[Formentera VM Primary]
+            FVM2[Formentera VM Backup]
+        end
+        
+        subgraph "Database Cluster"
+            DBM[MariaDB Master]
+            DBS[MariaDB Slave]
+            DBBackup[Backup Storage]
+        end
+        
+        subgraph "Monitoring"
+            Monitor[Monitoring Server]
+            LogServer[Log Server]
+        end
+    end
+
+    LB --> WS1 & WS2
+    WS1 --> EVM1 & FVM1
+    WS2 --> EVM2 & FVM2
+    
+    EVM1 & EVM2 & FVM1 & FVM2 --> DBM
+    DBM --> DBS
+    DBM --> DBBackup
+    
+    WS1 & WS2 & EVM1 & EVM2 & FVM1 & FVM2 --> LogServer
+    LogServer --> Monitor
+
+
+
+
+Diagramas de Casos de Uso y Funcionalidades: Útiles para definir y comunicar las funcionalidades que el sistema debe ofrecer desde la perspectiva del usuario.
+
+
+
+7. Diagramas de Casos de Uso y Funcionalidades
+7.1. Diagrama de Casos de Uso (Use Case Diagram)
+
+    Descripción: Ilustra las interacciones entre los actores (usuarios) y el sistema, mostrando las funcionalidades principales.
+    Actores Incluidos: Clientes, Personal de la Empresa (SuperAdministrador, CapDepartament, etc.), Administradores del Sistema.
+    Casos de Uso Incluidos: Registro de Usuario, Inicio de Sesión, Gestión de Datos, Acceso a Intranet, Acceso al Portal de Clientes.
+
+
+
+graph TD
+    subgraph "Actors"
+        Client[Client]
+        SuperAdmin[Super Administrator]
+        DeptHead[Department Head]
+        SysAdmin[System Administrator]
+    end
+
+    subgraph "Authentication"
+        Login[Login]
+        Register[Register]
+        Logout[Logout]
+    end
+
+    subgraph "Intranet Access"
+        ViewIntranet[Access Intranet]
+        ManageUsers[Manage Users]
+        AssignRoles[Assign Roles]
+        ViewReports[View Reports]
+    end
+
+    subgraph "Client Portal"
+        AccessPortal[Access Client Portal]
+        ViewProfile[View Profile]
+        UpdateData[Update Personal Data]
+    end
+
+    Client --> Register
+    Client --> Login
+    Client --> Logout
+    Client --> AccessPortal
+    Client --> ViewProfile
+    Client --> UpdateData
+
+    SuperAdmin --> Login
+    SuperAdmin --> ManageUsers
+    SuperAdmin --> AssignRoles
+    SuperAdmin --> ViewReports
+    SuperAdmin --> ViewIntranet
+
+    DeptHead --> Login
+    DeptHead --> ViewIntranet
+    DeptHead --> ViewReports
+
+    SysAdmin --> Login
+    SysAdmin --> ManageUsers
+    SysAdmin --> ViewIntranet
+
+
+Diagramas de Estados y Ciclos de Vida: Importantes para entender cómo cambian los estados de los objetos dentro del sistema y cómo se manejan las transiciones entre estados.
+
+8. Diagramas de Estados y Ciclos de Vida
+8.1. Diagrama de Estados (State Diagram)
+
+    Descripción: Representa los diferentes estados por los que pasa un objeto (por ejemplo, sesión de usuario) y las transiciones entre ellos.
+    Escenarios Incluidos: Estados de una sesión (Inactiva, Activa, Expirada), Ciclo de vida de un usuario (Registrado, Verificado, Activo).
+
+
+
+stateDiagram-v2
+    %% Session States
+    state SessionStates {
+        [*] --> Inactive
+        Inactive --> Active: Login
+        Active --> Expired: Timeout
+        Active --> Inactive: Logout
+        Expired --> Inactive: Reset
+    }
+
+    %% User Account States
+    state UserStates {
+        [*] --> Registered
+        Registered --> Verified: Email Verification
+        Verified --> Active: Admin Approval
+        Active --> Suspended: Admin Action
+        Suspended --> Active: Admin Restore
+        Active --> [*]: Account Deletion
+    }
+
+    %% State Descriptions
+    state Inactive: Initial Session State
+    state Active: User Logged In
+    state Expired: Session Timeout
+    state Registered: Account Created
+    state Verified: Email Verified
+    state Active: Account Enabled
+
+
+
+Diagramas de Flujo de Proceso: Ayudan a detallar los pasos específicos dentro de los procesos del sistema, facilitando la identificación de mejoras y optimizaciones.
+
+
+9. Diagramas de Flujo de Proceso
+9.1. Diagrama de Proceso (Process Flow Diagram)
+
+    Descripción: Muestra los pasos específicos en los procesos del sistema.
+    Escenarios Incluidos: Proceso de validación de formulario, Proceso de asignación de roles, Proceso de autenticación.
+
+
+graph TD
+    %% Form Validation Process
+    subgraph "Form Validation"
+        Start1[Form Submit] --> JS1[JavaScript Validation]
+        JS1 --> |Valid| PHP1[PHP Validation]
+        JS1 --> |Invalid| Error1[Show Client Errors]
+        PHP1 --> |Valid| Save1[Save Data]
+        PHP1 --> |Invalid| Error2[Return Server Errors]
+    end
+
+    %% Role Assignment Process
+    subgraph "Role Assignment"
+        Start2[New User] --> Check1[Check User Type]
+        Check1 --> |Staff| Admin1[Admin Review]
+        Check1 --> |Client| Auto1[Automatic Assignment]
+        Admin1 --> Notify1[Notify User]
+        Auto1 --> Notify1
+    end
+
+    %% Authentication Process
+    subgraph "Authentication"
+        Start3[Login Request] --> Check2[Check Location]
+        Check2 --> |Valid IP| Auth1[Verify Credentials]
+        Check2 --> |Invalid IP| Block1[Block Access]
+        Auth1 --> |Success| Session1[Create Session]
+        Auth1 --> |Failure| Error3[Show Login Error]
+    end
+
+
+
+
+Diagramas de Infraestructura y Servicios: Esenciales para planificar y gestionar la infraestructura física y virtual que soporta el sistema, asegurando que los recursos estén correctamente asignados y sean escalables.
+
+
+10. Diagramas de Infraestructura y Servicios
+10.1. Diagrama de Infraestructura (Infrastructure Diagram)
+
+    Descripción: Detalla la infraestructura física y virtual que soporta el sistema.
+    Componentes Incluidos: Servidores físicos, Máquinas Virtuales, Servicios en la Nube, Almacenamiento, Redes.
+
+
+graph TD
+    subgraph "Physical Infrastructure"
+        HW1[Physical Server 1]
+        HW2[Physical Server 2]
+        Storage[SAN Storage]
+        Network[Network Hardware]
+    end
+
+    subgraph "Virtualization Layer"
+        VMHost1[VM Host 1]
+        VMHost2[VM Host 2]
+    end
+
+    subgraph "Virtual Machines"
+        EivissaVM1[Eivissa Primary VM]
+        EivissaVM2[Eivissa Backup VM]
+        FormenteraVM1[Formentera Primary VM]
+        FormenteraVM2[Formentera Backup VM]
+        DBVM[Database VM]
+        MonitorVM[Monitoring VM]
+    end
+
+    HW1 --> VMHost1
+    HW2 --> VMHost2
+    VMHost1 --> EivissaVM1 & FormenteraVM1 & DBVM
+    VMHost2 --> EivissaVM2 & FormenteraVM2 & MonitorVM
+    
+    Storage --> VMHost1 & VMHost2
+    Network --> VMHost1 & VMHost2
+
+
+
+10.2. Diagrama de Servicios (Service Diagram)
+
+    Descripción: Muestra los servicios y microservicios que componen el sistema y cómo se comunican entre sí.
+    Componentes Incluidos: APIs, Servicios de Autenticación, Servicios de Base de Datos, Servicios de Monitorización.
+
+
+graph TD
+    subgraph "Frontend Services"
+        EivissaWeb[Eivissa Web Service]
+        FormenteraWeb[Formentera Web Service]
+        StaticContent[Static Content Service]
+    end
+
+    subgraph "Authentication Services"
+        AuthService[Authentication Service]
+        SessionService[Session Management]
+        RoleService[Role Management]
+    end
+
+    subgraph "Data Services"
+        DBService[Database Service]
+        CacheService[Cache Service]
+        BackupService[Backup Service]
+    end
+
+    subgraph "Monitoring Services"
+        LogService[Logging Service]
+        MetricsService[Metrics Service]
+        AlertService[Alert Service]
+    end
+
+    EivissaWeb & FormenteraWeb --> AuthService
+    AuthService --> SessionService & RoleService
+    SessionService & RoleService --> DBService
+    DBService --> CacheService & BackupService
+    
+    EivissaWeb & FormenteraWeb --> LogService
+    LogService --> MetricsService --> AlertService
+
+
+Diagramas de Seguridad: Vitales para diseñar y gestionar las medidas de seguridad dentro del sistema, protegiendo contra amenazas y vulnerabilidades.
+
+11. Diagramas de Seguridad
+11.1. Diagrama de Seguridad (Security Diagram)
+
+    Descripción: Representa las medidas de seguridad implementadas en el sistema.
+    Componentes Incluidos: Firewalls, WAF, Sistemas de Autenticación, Encriptación, Gestión de Accesos.
+
+graph TD
+    subgraph "Perimeter Security"
+        FW[Edge Firewall]
+        WAF[Web Application Firewall]
+        IPS[Intrusion Prevention]
+        GeoIP[Geographic IP Filter]
+    end
+
+    subgraph "Authentication Layer"
+        BasicAuth[Basic Authentication]
+        DigestAuth[Digest Authentication]
+        SessionMgr[Session Manager]
+        TokenService[Token Service]
+    end
+
+    subgraph "Encryption Layer"
+        SSL[SSL/TLS]
+        DataEncrypt[Data Encryption]
+        HashService[Hash Service]
+    end
+
+    subgraph "Access Control"
+        RoleManager[Role Manager]
+        PermissionSvc[Permission Service]
+        AuditLog[Audit Logger]
+    end
+
+    FW --> WAF --> IPS
+    GeoIP --> WAF
+    
+    WAF --> BasicAuth & DigestAuth
+    BasicAuth & DigestAuth --> SessionMgr
+    SessionMgr --> TokenService
+    
+    SSL --> DataEncrypt
+    DataEncrypt --> HashService
+    
+    TokenService --> RoleManager
+    RoleManager --> PermissionSvc
+    PermissionSvc --> AuditLog
+
+
+
+11.2. Diagrama de Control de Acceso (Access Control Diagram)
+
+    Descripción: Muestra cómo se gestionan y controlan los accesos a diferentes partes del sistema.
+    Componentes Incluidos: Roles de Usuario, Permisos, Recursos Protegidos.
+
+graph TD
+    subgraph "User Roles"
+        SuperAdmin[Super Administrator]
+        DeptHead[Department Head]
+        Staff[Staff]
+        Client[Client]
+    end
+
+    subgraph "Protected Resources"
+        Intranet[Intranet]
+        ClientPortal[Client Portal]
+        AdminPanel[Admin Panel]
+        Reports[Reports]
+    end
+
+    subgraph "Access Policies"
+        IPCheck[IP Verification]
+        RoleCheck[Role Verification]
+        PermCheck[Permission Check]
+        AuditLog[Access Logging]
+    end
+
+    SuperAdmin --> RoleCheck
+    DeptHead --> RoleCheck
+    Staff --> RoleCheck
+    Client --> IPCheck
+
+    IPCheck --> RoleCheck
+    RoleCheck --> PermCheck
+    PermCheck --> AuditLog
+
+    PermCheck --> |Allow/Deny| Intranet
+    PermCheck --> |Allow/Deny| ClientPortal
+    PermCheck --> |Allow/Deny| AdminPanel
+    PermCheck --> |Allow/Deny| Reports
+
+
+
+
+
+
+Diagramas de Ciclo de Vida del Desarrollo: Facilitan la planificación y seguimiento del desarrollo del sistema, asegurando que se sigan las fases adecuadas y se cumplan los plazos.
+
+12. Diagramas de Ciclo de Vida del Desarrollo
+12.1. Diagrama de Ciclo de Vida (Lifecycle Diagram)
+
+    Descripción: Representa las fases del desarrollo y despliegue del sistema.
+    Fases Incluidas: Planificación, Diseño, Desarrollo, Pruebas, Despliegue, Mantenimiento.
+
+
+graph TD
+    subgraph "Development Lifecycle"
+        Plan[Planning Phase]
+        Design[Design Phase]
+        Dev[Development Phase]
+        Test[Testing Phase]
+        Deploy[Deployment Phase]
+        Maintain[Maintenance Phase]
+    end
+
+    Plan --> |Requirements| Design
+    Design --> |Architecture| Dev
+    Dev --> |Code Complete| Test
+    Test --> |Validated| Deploy
+    Deploy --> |Production| Maintain
+    Maintain --> |New Requirements| Plan
+
+    subgraph "Phase Activities"
+        Plan --> |Gather Requirements| P1[Define Scope]
+        Design --> |Create Diagrams| D1[System Architecture]
+        Dev --> |Write Code| C1[Implementation]
+        Test --> |Run Tests| T1[Quality Assurance]
+        Deploy --> |Release| R1[Production Release]
+        Maintain --> |Monitor| M1[System Updates]
+    end
+
+
+
+13. Diagramas de Gestión de Configuración y Despliegue
+13.1. Diagrama de Gestión de Configuración (Configuration Management Diagram)
+
+    Descripción: Muestra cómo se gestionan las configuraciones del sistema.
+    Componentes Incluidos: Herramientas de CI/CD, Repositorios de Código, Scripts de Despliegue.
+
+
+
+
+    graph TD
+    subgraph "Version Control"
+        Git[Git Repository]
+        GitFlow[Git Flow]
+        CodeReview[Code Review]
+    end
+
+    subgraph "CI/CD Pipeline"
+        Jenkins[Jenkins]
+        BuildServer[Build Server]
+        TestEnv[Test Environment]
+        StagingEnv[Staging Environment]
+        ProdEnv[Production Environment]
+    end
+
+    subgraph "Configuration Files"
+        Apache[Apache Config]
+        PHP[PHP Config]
+        DB[Database Config]
+        Security[Security Config]
+    end
+
+    Git --> GitFlow
+    GitFlow --> CodeReview
+    CodeReview --> Jenkins
+    
+    Jenkins --> BuildServer
+    BuildServer --> TestEnv
+    TestEnv --> StagingEnv
+    StagingEnv --> ProdEnv
+    
+    Apache & PHP & DB & Security --> BuildServer
+
+13.2. Diagrama de Pipeline de Despliegue (Deployment Pipeline Diagram)
+
+    Descripción: Representa las etapas del pipeline de CI/CD.
+    Etapas Incluidas: Commit, Build, Test, Deploy, Monitor.
+
+
+graph LR
+    subgraph "Source"
+        Commit[Code Commit]
+        Push[Push to Git]
+    end
+
+    subgraph "Build"
+        Build[Build Code]
+        Deps[Install Dependencies]
+        Package[Package Application]
+    end
+
+    subgraph "Test"
+        Unit[Unit Tests]
+        Integration[Integration Tests]
+        Security[Security Scan]
+    end
+
+    subgraph "Deploy"
+        Staging[Deploy to Staging]
+        Validate[Validation Tests]
+        Production[Deploy to Production]
+    end
+
+    subgraph "Monitor"
+        Logs[Log Collection]
+        Metrics[Performance Metrics]
+        Alerts[Alert System]
+    end
+
+    Commit --> Push
+    Push --> Build --> Deps --> Package
+    Package --> Unit --> Integration --> Security
+    Security --> Staging --> Validate --> Production
+    Production --> Logs --> Metrics --> Alerts
+
+
+
+
+
+
+
+Diagramas de Gestión de Configuración y Despliegue: Ayudan a automatizar y gestionar la configuración del sistema, asegurando consistencia y eficiencia en el despliegue.
+
+Diagramas de Backup y Recuperación: Esenciales para planificar cómo se protegerán y recuperarán los datos y configuraciones en caso de fallos o desastres.
+
+
+14. Diagramas de Backup y Recuperación
+14.1. Diagrama de Estrategia de Backup (Backup Strategy Diagram)
+
+    Descripción: Detalla cómo se realizan los respaldos de datos y configuraciones.
+    Componentes Incluidos: Servidores de Backup, Frecuencia de Respaldo, Almacenamiento de Respaldo, Procedimientos de Recuperación.
+
+
+
+graph TD
+    subgraph "Data Sources"
+        MariaDB[MariaDB Database]
+        Config[Configuration Files]
+        UserFiles[User Files]
+        Logs[System Logs]
+    end
+
+    subgraph "Backup Schedule"
+        Daily[Daily Incremental]
+        Weekly[Weekly Full Backup]
+        Monthly[Monthly Archive]
+    end
+
+    subgraph "Backup Storage"
+        Primary[Primary Storage]
+        Secondary[Secondary Storage]
+        OffSite[Off-site Storage]
+    end
+
+    subgraph "Recovery Procedures"
+        Point[Point-in-Time Recovery]
+        Full[Full System Recovery]
+        Disaster[Disaster Recovery]
+    end
+
+    MariaDB & Config & UserFiles & Logs --> Daily
+    Daily --> Primary
+    Weekly --> Secondary
+    Monthly --> OffSite
+
+    Primary --> Point
+    Secondary --> Full
+    OffSite --> Disaster
+
+
+
+Diagramas de Monitorización y Alertas: Permiten visualizar cómo se supervisa el sistema y cómo se gestionan las alertas para mantener la operatividad y responder rápidamente a incidentes.
+
+
+15. Diagramas de Monitoreo y Alertas
+15.1. Diagrama de Monitorización (Monitoring Diagram)
+
+    Descripción: Muestra cómo se monitorean los componentes del sistema.
+    Componentes Incluidos: Herramientas de Monitorización (Prometheus, Grafana), Métricas Monitorizadas, Alertas Configuradas.
+
+
+
+graph TD
+    subgraph "System Components"
+        Apache[Apache Servers]
+        VMs[Virtual Machines]
+        DB[MariaDB Database]
+        Network[Network Services]
+    end
+
+    subgraph "Metrics Collection"
+        Prometheus[Prometheus]
+        NodeExp[Node Exporter]
+        MySQLExp[MySQL Exporter]
+        CustomExp[Custom Exporters]
+    end
+
+    subgraph "Visualization"
+        Grafana[Grafana Dashboards]
+        Alerts[Alert Manager]
+        Reports[Reports Generator]
+    end
+
+    Apache & VMs & DB & Network --> NodeExp & MySQLExp & CustomExp
+    NodeExp & MySQLExp & CustomExp --> Prometheus
+    Prometheus --> Grafana & Alerts & Reports
+
+
+
+
+Diagramas de Flujo de Trabajo y Operaciones: Ayudan a definir y optimizar los flujos de trabajo internos y las operaciones rutinarias, mejorando la eficiencia y la coordinación del equipo.
+
+
+16. Diagramas de Flujo de Trabajo y Operaciones
+16.1. Diagrama de Flujo de Trabajo (Workflow Diagram)
+
+    Descripción: Representa los flujos de trabajo internos y procesos operativos del sistema.
+    Escenarios Incluidos: Gestión de Usuarios, Asignación de Roles, Actualización de Contenidos.
+
+graph TD
+    subgraph "User Management"
+        NewUser[New User Request]
+        Validate[Validate Information]
+        GeoCheck[Geographic Check]
+        CreateUser[Create Account]
+    end
+
+    subgraph "Role Assignment"
+        CheckRole[Check User Type]
+        AssignRole[Assign Initial Role]
+        AdminReview[Admin Review]
+        UpdateRole[Update Permissions]
+    end
+
+    subgraph "Content Management"
+        ContentReq[Content Update Request]
+        Review[Content Review]
+        Approve[Approval Process]
+        Publish[Publish Content]
+    end
+
+    NewUser --> Validate --> GeoCheck --> CreateUser
+    CreateUser --> CheckRole --> AssignRole
+    AssignRole --> AdminReview --> UpdateRole
+    
+    ContentReq --> Review --> Approve --> Publish
+
+
+
+
+
+
+
+Diagramas de Interacción de Usuarios: Importantes para diseñar una experiencia de usuario intuitiva y eficiente, mostrando cómo los usuarios interactúan con el sistema.
+
+
+17. Diagramas de Interacción de Usuarios
+17.1. Diagrama de Interacción Usuario-Sistema (User-System Interaction Diagram)
+
+    Descripción: Ilustra cómo los usuarios interactúan con el sistema a través de la interfaz web.
+    Componentes Incluidos: Páginas Web, Formularios, Feedback al Usuario, Navegación entre Páginas.
+
+
+graph TD
+    subgraph "User Entry Points"
+        Home[Homepage]
+        Login[Login Page]
+        Register[Registration]
+    end
+
+    subgraph "Main Navigation"
+        Intranet[Intranet]
+        Portal[Client Portal]
+        Library[Library Section]
+        About[About Us]
+    end
+
+    subgraph "User Feedback"
+        Success[Success Messages]
+        Error[Error Messages]
+        Validation[Form Validation]
+    end
+
+    subgraph "Session Flow"
+        Active[Active Session]
+        Timeout[Session Timeout]
+        Logout[Logout]
+    end
+
+    Home --> Login & Register
+    Login --> |Success| Intranet & Portal
+    Login --> |Error| Error
+    Register --> Validation
+    Validation --> |Valid| Success
+    Validation --> |Invalid| Error
+    
+    Intranet & Portal --> Library & About
+    Active --> Timeout & Logout
+
+
+Diagramas de Implementación de APIs y Servicios Externos: Facilitan la planificación de cómo se integrarán servicios externos con el sistema, asegurando una comunicación efectiva y segura.
+
+
+18. Diagramas de Implementación de Servicios Externos
+18.1. Diagrama de Integración de Servicios Externos (External Services Integration Diagram)
+
+    Descripción: Muestra cómo se integran servicios externos con el sistema.
+    Componentes Incluidos: Pasarelas de Pago, APIs de Redes Sociales, Servicios de Envío de Correos Electrónicos.
+
+graph TD
+    subgraph "Core System"
+        API[API Gateway]
+        Auth[Auth Service]
+        Cache[Cache Layer]
+    end
+
+    subgraph "Payment Services"
+        Payment[Payment Gateway]
+        Stripe[Stripe API]
+        PayPal[PayPal API]
+    end
+
+    subgraph "Communication"
+        Email[Email Service]
+        SMS[SMS Gateway]
+        Push[Push Notifications]
+    end
+
+    subgraph "Social Integration"
+        Social[Social Media API]
+        Share[Share Service]
+        Login[Social Login]
+    end
+
+    API --> Auth
+    Auth --> Cache
+    
+    API --> Payment
+    Payment --> Stripe & PayPal
+    
+    API --> Email & SMS & Push
+    
+    API --> Social
+    Social --> Share & Login
+
+
+
+Diagramas de Optimización de Rendimiento: Ayudan a identificar y planificar estrategias para mejorar el rendimiento del sistema, asegurando una experiencia de usuario fluida.
+
+19. Diagramas de Optimización de Rendimiento
+19.1. Diagrama de Estrategias de Caché (Caching Strategy Diagram)
+
+    Descripción: Representa las estrategias de caché implementadas para mejorar el rendimiento.
+    Componentes Incluidos: Caché de Página Completa, Caché de Fragmentos, Caché del Navegador, CDN.
+
+
+
+graph TD
+    subgraph "Browser Caching"
+        BrowserCache[Browser Cache]
+        LocalStorage[Local Storage]
+        SessionStorage[Session Storage]
+    end
+
+    subgraph "CDN Layer"
+        CDN[Content Delivery Network]
+        StaticAssets[Static Assets]
+        Images[Image Cache]
+    end
+
+    subgraph "Server Caching"
+        PageCache[Full Page Cache]
+        FragmentCache[Fragment Cache]
+        QueryCache[Query Cache]
+    end
+
+    subgraph "Application Cache"
+        Redis[Redis Cache]
+        Memcached[Memcached]
+        DBCache[Database Cache]
+    end
+
+    BrowserCache --> CDN
+    CDN --> PageCache
+    PageCache --> FragmentCache
+    FragmentCache --> QueryCache
+    QueryCache --> Redis & Memcached
+    Redis & Memcached --> DBCache
+
+
+
+
+Diagramas de Gestión de Errores y Excepciones: Cruciales para diseñar mecanismos robustos de manejo de errores, mejorando la estabilidad y la confiabilidad del sistema.
+
+
+20. Diagramas de Gestión de Errores y Excepciones
+20.1. Diagrama de Manejo de Errores (Error Handling Diagram)
+
+    Descripción: Muestra cómo se gestionan los errores y excepciones en el sistema.
+    Componentes Incluidos: Páginas de Error Personalizadas, Registro de Errores, Notificación al Usuario.
+
+
+graph TD
+    subgraph "Error Detection"
+        ClientError[Client-Side Errors]
+        ServerError[Server-Side Errors]
+        DBError[Database Errors]
+        NetworkError[Network Errors]
+    end
+
+    subgraph "Error Processing"
+        Logger[Error Logger]
+        Handler[Error Handler]
+        Formatter[Error Formatter]
+    end
+
+    subgraph "User Notification"
+        ErrorPage[Custom Error Pages]
+        UserMessage[User Messages]
+        AdminAlert[Admin Alerts]
+    end
+
+    subgraph "Recovery Actions"
+        Retry[Retry Logic]
+        Fallback[Fallback Systems]
+        AutoRecover[Auto Recovery]
+    end
+
+    ClientError & ServerError & DBError & NetworkError --> Logger
+    Logger --> Handler
+    Handler --> Formatter
+    Formatter --> ErrorPage & UserMessage & AdminAlert
+    Handler --> Retry & Fallback & AutoRecover
+
+
+
+Diagramas de Internacionalización y Localización: Importantes si el sistema necesita soportar múltiples idiomas y adaptarse a diferentes contextos culturales.
+
+
+21. Diagramas de Internacionalización y Localización
+21.1. Diagrama de Estrategias de Internacionalización (Internationalization Strategy Diagram)
+
+    Descripción: Representa cómo se gestionan múltiples idiomas y adaptaciones culturales en el sistema.
+    Componentes Incluidos: Soporte Multilingüe, Traducción de Contenidos, Adaptación a Normas Locales.
+
+
+graph TD
+    subgraph "Language Management"
+        LangDetect[Language Detection]
+        LangSelect[Language Selection]
+        DefaultLang[Default Language]
+    end
+
+    subgraph "Content Translation"
+        StringRes[String Resources]
+        ContentDB[Content Database]
+        DynamicText[Dynamic Text]
+    end
+
+    subgraph "Regional Adaptation"
+        DateFormat[Date Formats]
+        Currency[Currency Display]
+        TimeZone[Time Zones]
+    end
+
+    subgraph "Translation Workflow"
+        Extract[Extract Strings]
+        Translate[Translation Process]
+        Import[Import Translations]
+    end
+
+    LangDetect --> LangSelect
+    LangSelect --> StringRes
+    StringRes --> ContentDB
+    ContentDB --> DynamicText
+    
+    Extract --> Translate --> Import
+    Import --> StringRes
+    
+    LangSelect --> DateFormat & Currency & TimeZone
+
+
+
+
+
+Diagramas de Gestión de Usuarios y Roles Avanzada: Facilitan la planificación de cómo se gestionaráin los diferentes roles y permisos de los usuarios, mejorando la seguridad y la organización.
+
+
+22. Diagramas de Gestión de Usuarios y Roles
+22.1. Diagrama de Gestión de Roles (Role Management Diagram)
+
+    Descripción: Muestra cómo se gestionan y asignan los roles de usuario dentro del sistema.
+    Componentes Incluidos: Roles (SuperAdministrador, CapDepartament, etc.), Permisos, Asignación de Roles.
+
+
+
+graph TD
+    subgraph "Role Hierarchy"
+        SuperAdmin[Super Administrator]
+        DeptHead[Cap Departament]
+        Staff[Staff]
+        Client[Client]
+    end
+
+    subgraph "Permission Sets"
+        AdminPerms[Admin Permissions]
+        DeptPerms[Department Permissions]
+        StaffPerms[Staff Permissions]
+        ClientPerms[Client Permissions]
+    end
+
+    subgraph "Role Assignment"
+        UserCreate[User Creation]
+        RoleAssign[Role Assignment]
+        PermAssign[Permission Assignment]
+        AuditLog[Audit Logging]
+    end
+
+    SuperAdmin --> AdminPerms
+    DeptHead --> DeptPerms
+    Staff --> StaffPerms
+    Client --> ClientPerms
+
+    UserCreate --> RoleAssign
+    RoleAssign --> PermAssign
+    PermAssign --> AuditLog
+
+
+Diagramas de Optimización de Base de Datos: Ayudan a diseñar una base de datos eficiente, optimizando consultas y garantizando un rendimiento rápido.
+
+
+
+23. Diagramas de Optimización de Base de Datos
+23.1. Diagrama de Indexación y Consultas (Indexing and Query Optimization Diagram)
+
+    Descripción: Detalla las estrategias de indexación y optimización de consultas en la base de datos.
+    Componentes Incluidos: Índices en Columnas Clave, Optimización de Consultas SQL, Normalización/Desnormalización de Tablas.
+
+
+graph TD
+    subgraph "Table Structure"
+        Users[Users Table]
+        Roles[Roles Table]
+        Permissions[Permissions Table]
+        Sessions[Sessions Table]
+    end
+
+    subgraph "Indexing Strategy"
+        PrimaryKeys[Primary Keys]
+        ForeignKeys[Foreign Keys]
+        CompoundIdx[Compound Indexes]
+        UniqueIdx[Unique Indexes]
+    end
+
+    subgraph "Query Optimization"
+        QueryCache[Query Cache]
+        PreparedStmt[Prepared Statements]
+        ExplainPlan[Explain Plans]
+    end
+
+    subgraph "Data Management"
+        Normalize[Normalization]
+        Denormalize[Strategic Denormalization]
+        Partitioning[Table Partitioning]
+    end
+
+    Users & Roles & Permissions --> PrimaryKeys & ForeignKeys
+    CompoundIdx --> QueryCache
+    UniqueIdx --> PreparedStmt
+    QueryCache & PreparedStmt --> ExplainPlan
+    
+    Normalize --> Denormalize
+    Denormalize --> Partitioning
+
+
+
+Diagramas de Alta Disponibilidad y Redundancia: Esenciales para asegurar que el sistema permanezca operativo incluso ante fallos de componentes individuales.
+
+
+24. Diagramas de Alta Disponibilidad y Redundancia
+24.1. Diagrama de Alta Disponibilidad (High Availability Diagram)
+
+    Descripción: Representa las configuraciones para asegurar que el sistema esté siempre disponible.
+    Componentes Incluidos: Clústeres de Servidores, Replicación de Base de Datos, Balanceo de Carga, Failover Automatizado.
+
+graph TD
+    subgraph "Load Balancing"
+        LB1[Primary Load Balancer]
+        LB2[Backup Load Balancer]
+    end
+
+    subgraph "Web Servers"
+        WS1[Web Server 1]
+        WS2[Web Server 2]
+        WS3[Web Server 3]
+    end
+
+    subgraph "Application Servers"
+        AS1[App Server Primary]
+        AS2[App Server Secondary]
+        AS3[App Server Failover]
+    end
+
+    subgraph "Database Cluster"
+        DB1[MariaDB Master]
+        DB2[MariaDB Slave 1]
+        DB3[MariaDB Slave 2]
+    end
+
+    LB1 --> WS1 & WS2 & WS3
+    LB2 --> WS1 & WS2 & WS3
+    
+    WS1 & WS2 & WS3 --> AS1 & AS2 & AS3
+    
+    AS1 & AS2 & AS3 --> DB1
+    DB1 --> DB2 & DB3
+
+
+
+Diagramas de Gestión de Configuración y Despliegue: Facilitan la automatización y gestión eficiente de las configuraciones y despliegues del sistema.
+
+
+25. Diagramas de Gestión de Configuración y Despliegue
+25.1. Diagrama de Infraestructura como Código (Infrastructure as Code Diagram)
+
+    Descripción: Muestra cómo se gestionan las configuraciones del sistema mediante scripts y herramientas de IaC.
+    Componentes Incluidos: Scripts de Terraform, Ansible, Docker, Kubernetes.
+
+graph TD
+    subgraph "Version Control"
+        Git[Git Repository]
+        Config[Configuration Files]
+        Scripts[IaC Scripts]
+    end
+
+    subgraph "Infrastructure Definition"
+        Terraform[Terraform]
+        Ansible[Ansible]
+        Docker[Docker]
+    end
+
+    subgraph "Orchestration"
+        K8s[Kubernetes]
+        Helm[Helm Charts]
+        Operators[K8s Operators]
+    end
+
+    subgraph "Environment Management"
+        Dev[Development]
+        Stage[Staging]
+        Prod[Production]
+    end
+
+    Git --> Config & Scripts
+    Config & Scripts --> Terraform & Ansible
+    Terraform & Ansible --> Docker
+    Docker --> K8s
+    K8s --> Helm & Operators
+    
+    Helm & Operators --> Dev & Stage & Prod
+
+
+
+Diagramas de Gestión de Proyectos y Colaboración: Ayudan a planificar y gestionar el trabajo en equipo, asegurando una coordinación efectiva y el cumplimiento de objetivos.
+
+
+26. Diagramas de Gestión de Proyectos y Colaboración
+26.1. Diagrama de Flujo de Trabajo de Desarrollo (Development Workflow Diagram)
+
+    Descripción: Representa los flujos de trabajo dentro del equipo de desarrollo.
+    Componentes Incluidos: Repositorios de Código, Integración Continua, Despliegue Continuo, Revisión de Código.
+
+
+graph TD
+    subgraph "Code Management"
+        Feature[Feature Branch]
+        Dev[Development Branch]
+        Main[Main Branch]
+        Release[Release Branch]
+    end
+
+    subgraph "Code Quality"
+        Review[Code Review]
+        Testing[Automated Tests]
+        Quality[Quality Gates]
+    end
+
+    subgraph "CI/CD Pipeline"
+        Build[Build Process]
+        Test[Test Execution]
+        Deploy[Deployment]
+    end
+
+    subgraph "Team Collaboration"
+        Planning[Sprint Planning]
+        Daily[Daily Standups]
+        Retro[Sprint Retrospective]
+    end
+
+    Feature --> Review
+    Review --> Dev
+    Dev --> Testing
+    Testing --> Quality
+    Quality --> Main
+    Main --> Release
+    
+    Planning --> Feature
+    Daily --> Review
+    Release --> Retro
+
+
+
+
+Diagramas de Cumplimiento Normativo y Legal: Importantes para asegurar que el sistema cumple con todas las normativas y leyes aplicables, evitando sanciones y protegiendo a los usuarios.
+
+
+27. Diagramas de Cumplimiento Normativo y Legal
+27.1. Diagrama de Cumplimiento de GDPR (GDPR Compliance Diagram)
+
+    Descripción: Muestra cómo el sistema cumple con las normativas de protección de datos.
+    Componentes Incluidos: Consentimiento del Usuario, Gestión de Derechos de Datos, Seguridad de Datos.
+
+graph TD
+    subgraph "User Rights Management"
+        Consent[User Consent]
+        Access[Data Access Rights]
+        Delete[Right to be Forgotten]
+        Export[Data Portability]
+    end
+
+    subgraph "Data Protection"
+        Encrypt[Data Encryption]
+        Storage[Secure Storage]
+        Transfer[Secure Transfer]
+    end
+
+    subgraph "Data Processing"
+        Purpose[Purpose Definition]
+        Minimize[Data Minimization]
+        Retention[Retention Policy]
+    end
+
+    subgraph "Compliance Monitoring"
+        Audit[Audit Trails]
+        Report[Compliance Reports]
+        Breach[Breach Detection]
+    end
+
+    Consent --> Purpose
+    Purpose --> Minimize
+    Minimize --> Storage
+    
+    Access & Delete & Export --> Audit
+    Encrypt --> Transfer
+    Transfer --> Report
+    
+    Retention --> Breach
+
+
+
+
+Diagramas de Optimización para Dispositivos Móviles: Cruciales para diseñar un sistema que ofrezca una experiencia de usuario óptima en dispositivos móviles.
+
+
+
+
+28. Diagramas de Optimización para Dispositivos Móviles
+28.1. Diagrama de Diseño Responsive (Responsive Design Diagram)
+
+    Descripción: Representa cómo el diseño del sitio se adapta a diferentes tamaños y tipos de dispositivos.
+    Componentes Incluidos: Páginas Web Adaptables, Media Queries, Componentes Flexibles.
+
+graph TD
+    subgraph "Layout Components"
+        Grid[Responsive Grid]
+        Flex[Flexbox Layout]
+        Container[Fluid Containers]
+    end
+
+    subgraph "Media Queries"
+        Desktop[Desktop Breakpoint]
+        Tablet[Tablet Breakpoint]
+        Mobile[Mobile Breakpoint]
+    end
+
+    subgraph "Responsive Elements"
+        Images[Responsive Images]
+        Nav[Navigation Menu]
+        Tables[Data Tables]
+    end
+
+    subgraph "Performance"
+        LazyLoad[Lazy Loading]
+        ImageOpt[Image Optimization]
+        MinifyCSS[CSS Minification]
+    end
+
+    Grid & Flex & Container --> Desktop & Tablet & Mobile
+    Desktop & Tablet & Mobile --> Images & Nav & Tables
+    Images --> LazyLoad & ImageOpt
+    Nav & Tables --> MinifyCSS
+
+Diagramas de Integración de APIs y Servicios Externos: Facilitan la planificación y diseño de cómo se integrarán servicios externos con el sistema, asegurando una comunicación efectiva y segura.
+
+
+
+29. Diagramas de Integración de APIs y Servicios Externos
+29.1. Diagrama de Comunicación API (API Communication Diagram)
+
+    Descripción: Muestra cómo las APIs internas y externas se comunican con el sistema.
+    Componentes Incluidos: Endpoints API, Autenticación de API, Servicios Externos Integrados.
+
+
+graph TD
+    subgraph "API Gateway"
+        Gateway[API Gateway]
+        Auth[API Authentication]
+        Rate[Rate Limiting]
+    end
+
+    subgraph "Internal APIs"
+        UserAPI[User Management API]
+        RoleAPI[Role Management API]
+        DataAPI[Data Access API]
+    end
+
+    subgraph "External APIs"
+        Payment[Payment Gateway API]
+        Email[Email Service API]
+        Social[Social Media API]
+    end
+
+    subgraph "Security Layer"
+        OAuth[OAuth 2.0]
+        JWT[JWT Tokens]
+        SSL[SSL/TLS]
+    end
+
+    Gateway --> Auth --> Rate
+    Rate --> UserAPI & RoleAPI & DataAPI
+    Rate --> Payment & Email & Social
+    
+    OAuth & JWT & SSL --> Gateway
+
+
+
+
+Diagramas de Procesos de Respaldo y Recuperación: Ayudan a planificar cómo se protegerán y recuperarán los datos y configuraciones en caso de fallos o desastres.
+
+
+
+30. Diagramas de Procesos de Respaldo y Recuperación
+30.1. Diagrama de Respaldo y Recuperación (Backup and Recovery Diagram)
+
+    Descripción: Detalla los procesos para respaldar y recuperar datos y configuraciones del sistema.
+    Componentes Incluidos: Programación de Respaldo, Almacenamiento de Respaldo, Procedimientos de Recuperación.
+
+
+graph TD
+    subgraph "Backup Schedule"
+        Daily[Daily Incremental]
+        Weekly[Weekly Full Backup]
+        Monthly[Monthly Archive]
+    end
+
+    subgraph "Backup Types"
+        Data[Database Backup]
+        Config[Configuration Files]
+        User[User Files]
+        Logs[System Logs]
+    end
+
+    subgraph "Storage Locations"
+        Local[Local Storage]
+        Remote[Remote Storage]
+        Cloud[Cloud Storage]
+    end
+
+    subgraph "Recovery Procedures"
+        Quick[Quick Recovery]
+        Full[Full System Recovery]
+        DR[Disaster Recovery]
+    end
+
+    Daily --> Data & Config
+    Weekly --> User & Logs
+    Monthly --> Local & Remote & Cloud
+    
+    Local & Remote & Cloud --> Quick & Full & DR
+
+
+
+
+31. Diagramas de Flujo de Trabajo y Operaciones
+31.1. Diagrama de Flujo de Trabajo Operativo (Operational Workflow Diagram)
+
+    Descripción: Representa los flujos de trabajo diarios y operaciones rutinarias dentro del sistema.
+    Componentes Incluidos: Tareas de Mantenimiento, Monitoreo de Sistemas, Actualizaciones de Software.
+
+
+graph TD
+    subgraph "Daily Operations"
+        Monitor[System Monitoring]
+        Logs[Log Analysis]
+        Backup[Daily Backups]
+    end
+
+    subgraph "Maintenance Tasks"
+        Updates[Software Updates]
+        Security[Security Patches]
+        Cleanup[System Cleanup]
+    end
+
+    subgraph "Performance Management"
+        Check[Health Checks]
+        Optimize[Performance Optimization]
+        Scale[Resource Scaling]
+    end
+
+    subgraph "Incident Response"
+        Alert[Alert Detection]
+        Analyze[Analysis]
+        Resolve[Resolution]
+    end
+
+    Monitor --> Check
+    Logs --> Alert
+    Alert --> Analyze --> Resolve
+    
+    Updates --> Security
+    Security --> Cleanup
+    Check --> Optimize --> Scale
+
+
+
+
+32. Diagramas de Optimización de Rendimiento
+32.1. Diagrama de Estrategias de Optimización (Performance Optimization Strategy Diagram)
+
+    Descripción: Muestra las estrategias implementadas para optimizar el rendimiento del sistema.
+    Componentes Incluidos: Caching, Minificación de Recursos, Optimización de Consultas, Uso de CDN.
+
+
+graph TD
+    subgraph "Frontend Optimization"
+        Minify[Resource Minification]
+        Compress[Compression]
+        CDN[Content Delivery Network]
+    end
+
+    subgraph "Caching Strategy"
+        Browser[Browser Cache]
+        App[Application Cache]
+        DB[Database Cache]
+    end
+
+    subgraph "Database Optimization"
+        Index[Database Indexing]
+        Query[Query Optimization]
+        Pool[Connection Pooling]
+    end
+
+    subgraph "Resource Management"
+        Load[Load Balancing]
+        Scale[Auto Scaling]
+        Monitor[Performance Monitoring]
+    end
+
+    Minify & Compress --> CDN
+    Browser --> App --> DB
+    Index --> Query --> Pool
+    Load --> Scale --> Monitor
+
+
+
+33. Diagramas de Gestión de Errores y Excepciones
+33.1. Diagrama de Manejo de Excepciones (Exception Handling Diagram)
+
+    Descripción: Representa cómo el sistema maneja errores y excepciones de manera estructurada.
+    Componentes Incluidos: Bloques Try-Catch, Páginas de Error Personalizadas, Registro de Errores.
+
+
+graph TD
+    subgraph "Exception Detection"
+        Try[Try Block]
+        Catch[Catch Block]
+        Finally[Finally Block]
+    end
+
+    subgraph "Error Classification"
+        Client[Client Errors]
+        Server[Server Errors]
+        DB[Database Errors]
+    end
+
+    subgraph "Error Handling"
+        Log[Error Logging]
+        Custom[Custom Error Pages]
+        Notify[Admin Notification]
+    end
+
+    subgraph "Recovery Actions"
+        Retry[Retry Operation]
+        Fallback[Fallback Logic]
+        Restore[System Restore]
+    end
+
+    Try --> Catch --> Finally
+    Catch --> Client & Server & DB
+    Client & Server & DB --> Log
+    Log --> Custom & Notify
+    Notify --> Retry & Fallback & Restore
+
+
+34. Diagramas de Internacionalización y Localización
+34.1. Diagrama de Internacionalización (Internationalization Diagram)
+
+    Descripción: Muestra cómo se implementan múltiples idiomas y adaptaciones culturales en el sistema.
+    Componentes Incluidos: Módulos de Traducción, Soporte Multilingüe, Adaptaciones de Contenido.
+
+graph TD
+    subgraph "Language Management"
+        Detect[Language Detection]
+        Select[Language Selection]
+        Default[Default Language]
+    end
+
+    subgraph "Translation System"
+        Files[Language Files]
+        Strings[String Resources]
+        Dynamic[Dynamic Content]
+    end
+
+    subgraph "Cultural Adaptation"
+        Date[Date Formats]
+        Currency[Currency Display]
+        Numbers[Number Formats]
+    end
+
+    subgraph "Content Management"
+        Templates[Content Templates]
+        Variables[Dynamic Variables]
+        Media[Media Assets]
+    end
+
+    Detect --> Select --> Default
+    Select --> Files --> Strings --> Dynamic
+    Select --> Date & Currency & Numbers
+    Dynamic --> Templates --> Variables --> Media
+
+
+35. Diagramas de Gestión de Usuarios y Roles Avanzada
+35.1. Diagrama de Administración de Roles (Role Administration Diagram)
+
+    Descripción: Representa cómo se gestionan los roles y permisos de los usuarios de manera avanzada.
+    Componentes Incluidos: Panel de Administración, Asignación Dinámica de Roles, Auditoría de Actividades.
+
+
+
+graph TD
+    subgraph "Admin Panel"
+        Dashboard[Admin Dashboard]
+        UserMgmt[User Management]
+        RoleMgmt[Role Management]
+    end
+
+    subgraph "Role Hierarchy"
+        SuperAdmin[Super Administrator]
+        DeptHead[Cap Departament]
+        Admin[Administrative]
+        IT[Informatic]
+        Design[Designer]
+    end
+
+    subgraph "Dynamic Assignment"
+        Assign[Role Assignment]
+        Validate[Permission Validation]
+        Update[Role Updates]
+    end
+
+    subgraph "Activity Audit"
+        Log[Activity Logging]
+        Review[Access Review]
+        Report[Audit Reports]
+    end
+
+    Dashboard --> UserMgmt & RoleMgmt
+    RoleMgmt --> SuperAdmin & DeptHead & Admin & IT & Design
+    UserMgmt --> Assign --> Validate --> Update
+    Update --> Log --> Review --> Report
+
+
+
+36. Diagramas de Optimización de Base de Datos
+36.1. Diagrama de Estrategias de Indexación (Indexing Strategies Diagram)
+
+    Descripción: Muestra las estrategias de indexación implementadas para optimizar las consultas de la base de datos.
+    Componentes Incluidos: Índices en Columnas Clave, Optimización de Consultas SQL, Uso de Índices Compuestos.
+
+graph TD
+    subgraph "Primary Indexes"
+        PK[Primary Keys]
+        UK[Unique Keys]
+        FK[Foreign Keys]
+    end
+
+    subgraph "Secondary Indexes"
+        CI[Composite Indexes]
+        CI1[username + role]
+        CI2[email + status]
+    end
+
+    subgraph "Query Optimization"
+        QP[Query Plans]
+        IS[Index Selection]
+        CS[Column Statistics]
+    end
+
+    subgraph "Index Maintenance"
+        IM[Index Monitoring]
+        IR[Index Rebuilding]
+        IS2[Index Statistics]
+    end
+
+    PK & UK & FK --> CI
+    CI --> CI1 & CI2
+    CI1 & CI2 --> QP
+    QP --> IS --> CS
+    CS --> IM --> IR --> IS2
+
+
+37. Diagramas de Gestión de Configuración y Despliegue
+37.1. Diagrama de Pipeline de Despliegue (Deployment Pipeline Diagram)
+
+    Descripción: Representa las etapas del pipeline de integración y despliegue continuo.
+    Componentes Incluidos: Etapas de Build, Test, Deploy, Monitor, Feedback.
+
+
+graph TD
+    subgraph "Source Control"
+        Code[Code Repository]
+        Branch[Branch Management]
+        Merge[Code Merge]
+    end
+
+    subgraph "Build Stage"
+        Build[Build Process]
+        Deps[Dependencies]
+        Artifact[Build Artifacts]
+    end
+
+    subgraph "Test Stage"
+        Unit[Unit Tests]
+        Int[Integration Tests]
+        Sec[Security Scans]
+    end
+
+    subgraph "Deploy Stage"
+        Stage[Staging Deploy]
+        Prod[Production Deploy]
+        Roll[Rollback Plan]
+    end
+
+    subgraph "Monitor & Feedback"
+        Metrics[Performance Metrics]
+        Logs[System Logs]
+        Alert[Alerts]
+    end
+
+    Code --> Branch --> Merge
+    Merge --> Build --> Deps --> Artifact
+    Artifact --> Unit --> Int --> Sec
+    Sec --> Stage --> Prod
+    Prod --> Roll
+    Prod --> Metrics --> Logs --> Alert
+
+
+
+
+
+38. Diagramas de Monitoreo y Alertas
+38.1. Diagrama de Flujo de Monitoreo (Monitoring Flow Diagram)
+
+    Descripción: Muestra cómo se monitorean los diferentes componentes del sistema y cómo se gestionan las alertas.
+    Componentes Incluidos: Herramientas de Monitoreo, Métricas, Alertas, Paneles de Control.
+
+
+graph TD
+    subgraph "System Metrics"
+        Server[Server Metrics]
+        App[Application Metrics]
+        DB[Database Metrics]
+        Net[Network Metrics]
+    end
+
+    subgraph "Monitoring Tools"
+        Prometheus[Prometheus]
+        Grafana[Grafana Dashboards]
+        ELK[ELK Stack]
+    end
+
+    subgraph "Alert Management"
+        Rules[Alert Rules]
+        Notify[Notifications]
+        Escalate[Escalation]
+    end
+
+    subgraph "Response Actions"
+        Auto[Automated Response]
+        Manual[Manual Intervention]
+        Report[Incident Reports]
+    end
+
+    Server & App & DB & Net --> Prometheus
+    Prometheus --> Grafana
+    Grafana --> Rules
+    Rules --> Notify --> Escalate
+    Escalate --> Auto & Manual
+    Manual --> Report
+
+
+
+
+39. Diagramas de Optimización para Dispositivos Móviles
+39.1. Diagrama de Optimización Móvil (Mobile Optimization Diagram)
+
+    Descripción: Representa las técnicas y estrategias utilizadas para optimizar el sitio web para dispositivos móviles.
+    Componentes Incluidos: Diseño Responsive, Lazy Loading, Minimización de Recursos.
+
+ graph TD
+    subgraph "Responsive Design"
+        Grid[Responsive Grid]
+        Media[Media Queries]
+        Layout[Flexible Layout]
+    end
+
+    subgraph "Resource Optimization"
+        Images[Image Optimization]
+        Lazy[Lazy Loading]
+        Minify[Resource Minification]
+    end
+
+    subgraph "Performance"
+        Cache[Mobile Cache]
+        Compress[Compression]
+        CDN[CDN Delivery]
+    end
+
+    subgraph "User Experience"
+        Touch[Touch Optimization]
+        Font[Font Scaling]
+        Nav[Mobile Navigation]
+    end
+
+    Grid & Media & Layout --> Images
+    Images --> Lazy --> Minify
+    Minify --> Cache --> Compress --> CDN
+    CDN --> Touch & Font & Nav   
+
+40. Diagramas de Integración de APIs y Servicios Externos
+40.1. Diagrama de Flujo de APIs (API Flow Diagram)
+
+    Descripción: Muestra cómo las APIs internas y externas interactúan con el sistema.
+    Componentes Incluidos: Endpoints, Solicitudes y Respuestas, Autenticación de APIs, Servicios Externos Integrados.
+
+graph TD
+    subgraph "API Gateway"
+        Entry[API Entry Point]
+        Auth[Authentication]
+        Route[Request Routing]
+    end
+
+    subgraph "Internal APIs"
+        User[User API]
+        Data[Data API]
+        Admin[Admin API]
+    end
+
+    subgraph "External Services"
+        Payment[Payment Gateway]
+        Email[Email Service]
+        Storage[Cloud Storage]
+    end
+
+    subgraph "Security Layer"
+        JWT[JWT Tokens]
+        OAuth[OAuth 2.0]
+        Rate[Rate Limiting]
+    end
+
+    Entry --> Auth --> Route
+    Route --> User & Data & Admin
+    Route --> Payment & Email & Storage
+    JWT & OAuth & Rate --> Auth
+
+

@@ -1,0 +1,200 @@
+7. Diagramas de Casos de Uso y Funcionalidades
+7.1. Diagrama de Casos de Uso (Use Case Diagram)
+
+    Descripción: Ilustra las interacciones entre los actores (usuarios) y el sistema, mostrando las funcionalidades principales.
+    Actores Incluidos: Clientes, Personal de la Empresa (SuperAdministrador, CapDepartament, etc.), Administradores del Sistema.
+    Casos de Uso Incluidos: Registro de Usuario, Inicio de Sesión, Gestión de Datos, Acceso a Intranet, Acceso al Portal de Clientes.
+
+
+
+graph TD
+    subgraph "Actors"
+        Client[Client]
+        SuperAdmin[Super Administrator]
+        DeptHead[Department Head]
+        SysAdmin[System Administrator]
+    end
+
+    subgraph "Authentication"
+        Login[Login]
+        Register[Register]
+        Logout[Logout]
+    end
+
+    subgraph "Intranet Access"
+        ViewIntranet[Access Intranet]
+        ManageUsers[Manage Users]
+        AssignRoles[Assign Roles]
+        ViewReports[View Reports]
+    end
+
+    subgraph "Client Portal"
+        AccessPortal[Access Client Portal]
+        ViewProfile[View Profile]
+        UpdateData[Update Personal Data]
+    end
+
+    Client --> Register
+    Client --> Login
+    Client --> Logout
+    Client --> AccessPortal
+    Client --> ViewProfile
+    Client --> UpdateData
+
+    SuperAdmin --> Login
+    SuperAdmin --> ManageUsers
+    SuperAdmin --> AssignRoles
+    SuperAdmin --> ViewReports
+    SuperAdmin --> ViewIntranet
+
+    DeptHead --> Login
+    DeptHead --> ViewIntranet
+    DeptHead --> ViewReports
+
+    SysAdmin --> Login
+    SysAdmin --> ManageUsers
+    SysAdmin --> ViewIntranet
+
+
+
+
++---------------------------+       +---------------------------+
+|          Actors           |       |      Authentication       |
++---------------------------+       +---------------------------+
+|  +---------+ +---------+  |       |  +---------+ +---------+  |
+|  | Client  | |SuperAdmin| |       |  | Login   | | Register |  |
+|  +---------+ +---------+  |       |  +---------+ +---------+  |
+|  | DeptHead| |SysAdmin  | |       |  | Logout  |             |
+|  +---------+ +---------+  |       |  +---------+             |
++---------------------------+       +---------------------------+
+           |                               |
+           v                               v
++---------------------------+       +---------------------------+
+|     Intranet Access       |       |      Client Portal        |
++---------------------------+       +---------------------------+
+|  +---------+ +---------+  |       |  +---------+ +---------+  |
+|  | View    | | Manage   | |       |  | Access  | | View     |  |
+|  | Intranet| | Users    | |       |  | Portal  | | Profile  |  |
+|  +---------+ +---------+  |       |  +---------+ +---------+  |
+|  | Assign  | | View     | |       |  | Update  |             |
+|  | Roles   | | Reports  | |       |  | Data    |             |
+|  +---------+ +---------+  |       |  +---------+             |
++---------------------------+       +---------------------------+
+           |                               |
+           |                               |
+           v                               v
++---------------------------+       +---------------------------+
+|        Client Actions     |       |    Admin Actions          |
++---------------------------+       +---------------------------+
+|  Client --> Register      |       |  SuperAdmin --> Login     |
+|  Client --> Login         |       |  SuperAdmin --> Manage    |
+|  Client --> Logout        |       |  Users                    |
+|  Client --> AccessPortal  |       |  SuperAdmin --> Assign    |
+|  Client --> ViewProfile   |       |  Roles                    |
+|  Client --> UpdateData    |       |  SuperAdmin --> View      |
+|                           |       |  Reports                  |
+|                           |       |                           |
+|  DeptHead --> Login       |       |  SysAdmin --> Login       |
+|  DeptHead --> ViewIntranet|       |  SysAdmin --> Manage      |
+|  DeptHead --> ViewReports |       |  Users                    |
++---------------------------+       +---------------------------+
+
+
+Descripción del Diagrama
+1. Actors (Actores)
+
+    Client (Cliente):
+        Descripción: Usuario registrado que interactúa principalmente con el portal de clientes para acceder a su perfil y actualizar su información personal.
+    SuperAdmin (Super Administrador):
+        Descripción: Administrador con permisos completos para gestionar usuarios, asignar roles y ver informes dentro de la intranet.
+    DeptHead (Jefe de Departamento):
+        Descripción: Usuario con permisos para acceder a la intranet y ver informes, pero sin control total sobre la gestión de usuarios.
+    SysAdmin (Administrador del Sistema):
+        Descripción: Responsable de la gestión técnica, con acceso a la intranet y permisos para gestionar usuarios.
+
+2. Authentication (Autenticación)
+
+    Login (Iniciar Sesión):
+        Descripción: Proceso donde el usuario ingresa sus credenciales para acceder a su cuenta.
+    Register (Registro):
+        Descripción: Proceso de creación de una cuenta nueva para un cliente.
+    Logout (Cerrar Sesión):
+        Descripción: Proceso donde el usuario cierra su sesión y se desconecta del sistema.
+
+3. Intranet Access (Acceso a la Intranet)
+
+    View Intranet (Ver Intranet):
+        Descripción: Permite a los usuarios acceder al panel de la intranet para realizar acciones administrativas.
+    Manage Users (Gestionar Usuarios):
+        Descripción: Permite al SuperAdmin y SysAdmin gestionar las cuentas de usuario.
+    Assign Roles (Asignar Roles):
+        Descripción: Permite al SuperAdmin asignar roles a los usuarios.
+    View Reports (Ver Informes):
+        Descripción: Permite a los administradores ver informes sobre el uso del sistema y las actividades de los usuarios.
+
+4. Client Portal (Portal del Cliente)
+
+    Access Client Portal (Acceder al Portal del Cliente):
+        Descripción: Permite a los clientes acceder a su portal para ver y gestionar su información.
+    View Profile (Ver Perfil):
+        Descripción: Permite a los clientes ver su información de perfil.
+    Update Personal Data (Actualizar Datos Personales):
+        Descripción: Permite a los clientes actualizar su información personal.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Interacción de Actores se integra en la topología general del sistema de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Flujo de Autenticación:
+        Los actores (Client, SuperAdmin, DeptHead, SysAdmin) inician sesión a través del módulo de autenticación, que valida sus credenciales y otorga acceso a las funcionalidades correspondientes según sus roles.
+
+    Acceso Diferenciado a la Intranet y Portal del Cliente:
+        Los usuarios con permisos administrativos (SuperAdmin, SysAdmin, DeptHead) acceden a la intranet para gestionar usuarios y ver informes.
+        Los clientes acceden al portal para ver su perfil y actualizar sus datos, teniendo un acceso limitado a funciones administrativas.
+
+    Gestión Centralizada de Roles y Permisos:
+        El SuperAdmin tiene la capacidad de gestionar usuarios y asignar roles, controlando el nivel de acceso de cada usuario.
+        La asignación de roles permite definir claramente qué acciones puede realizar cada tipo de usuario, mejorando la seguridad y la organización del sistema.
+
+    Seguridad y Control de Acceso:
+        El proceso de autenticación asegura que solo los usuarios autorizados puedan acceder a áreas sensibles del sistema.
+        La segmentación de accesos entre la intranet y el portal del cliente permite una separación clara de responsabilidades y funcionalidades.
+
+Ventajas de Este Enfoque de Interacción de Actores
+
+    Seguridad y Control:
+        Los diferentes niveles de acceso para cada actor aseguran que solo los usuarios autorizados puedan realizar acciones críticas, reduciendo el riesgo de accesos indebidos.
+
+    Gestión Eficiente:
+        La capacidad del SuperAdmin para gestionar usuarios y asignar roles facilita la administración del sistema, permitiendo ajustes rápidos y efectivos según las necesidades del negocio.
+
+    Experiencia de Usuario Optimizada:
+        Los clientes pueden acceder fácilmente a su información y actualizar sus datos, mejorando la satisfacción del usuario y la precisión de la información.
+
+    Escalabilidad:
+        El sistema permite la adición de nuevos roles y funcionalidades, adaptándose a futuros requisitos del negocio.
+
+Próximos Pasos
+
+    Implementar el Módulo de Autenticación:
+        Desarrollar el flujo de autenticación para validar las credenciales y gestionar las sesiones de los usuarios.
+
+    Configurar Accesos a la Intranet y Portal del Cliente:
+        Establecer permisos claros para cada tipo de usuario y configurar las rutas de acceso para la intranet y el portal del cliente.
+
+    Desarrollar Funcionalidades de Gestión de Usuarios:
+        Implementar el módulo de gestión de usuarios, permitiendo al SuperAdmin y SysAdmin crear, actualizar y eliminar cuentas de usuario.
+
+    Integrar Notificaciones y Mensajes:
+        Configurar notificaciones para informar a los usuarios sobre cambios en su cuenta y nuevas actualizaciones disponibles en el sistema.
+
+    Realizar Pruebas de Seguridad y Acceso:
+        Ejecutar pruebas exhaustivas para asegurar que los permisos y roles se aplican correctamente y que no existen vulnerabilidades de seguridad.
+
+    Documentar y Capacitar al Personal:
+        Crear documentación detallada para el equipo de administración y desarrollo, explicando los flujos de interacción y gestión de usuarios.
+
+Si necesitas más detalles sobre la implementación o ajustes en el diagrama, estaré encantado de ayudarte.
+
+
+

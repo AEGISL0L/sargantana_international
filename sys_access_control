@@ -1,0 +1,258 @@
+11.2. Diagrama de Control de Acceso (Access Control Diagram)
+
+    Descripción: Muestra cómo se gestionan y controlan los accesos a diferentes partes del sistema.
+    Componentes Incluidos: Roles de Usuario, Permisos, Recursos Protegidos.
+
+graph TD
+    subgraph "User Roles"
+        SuperAdmin[Super Administrator]
+        DeptHead[Department Head]
+        Staff[Staff]
+        Client[Client]
+    end
+
+    subgraph "Protected Resources"
+        Intranet[Intranet]
+        ClientPortal[Client Portal]
+        AdminPanel[Admin Panel]
+        Reports[Reports]
+    end
+
+    subgraph "Access Policies"
+        IPCheck[IP Verification]
+        RoleCheck[Role Verification]
+        PermCheck[Permission Check]
+        AuditLog[Access Logging]
+    end
+
+    SuperAdmin --> RoleCheck
+    DeptHead --> RoleCheck
+    Staff --> RoleCheck
+    Client --> IPCheck
+
+    IPCheck --> RoleCheck
+    RoleCheck --> PermCheck
+    PermCheck --> AuditLog
+
+    PermCheck --> |Allow/Deny| Intranet
+    PermCheck --> |Allow/Deny| ClientPortal
+    PermCheck --> |Allow/Deny| AdminPanel
+    PermCheck --> |Allow/Deny| Reports
+
+
+
++---------------------------+       
+|   Development Lifecycle   |       
+| +---------+ +---------+   |       
+| |  Plan   | | Design  |   |       
+| |Planning | | Design  |   |       
+| | Phase   | | Phase   |   |       
+| +---------+ +---------+   |       
+| |   Dev   | |  Test   |   |       
+| |Development| |Testing|   |       
+| | Phase    | | Phase  |   |       
+| +---------+ +---------+   |       
+| | Deploy  | |Maintain |   |       
+| |Deployment| |Phase   |   |       
+| | Phase    | |         |   |       
+| +---------+ +---------+   |       
++-----------+----------------+       
+        |               |             
+        |               |             
+        v               v             
++-------------------+ +-------------------+ 
+|  Phase Activities | |  Phase Activities | 
+| +---------+ +---+ | +---------+ +---+ | 
+| | P1      | |   | | | D1      | |   | | 
+| |Define   | |   | | |System   | |   | | 
+| |Scope    | |   | | |Architecture| |   | | 
+| +---------+ +---+ | +---------+ +---+ | 
+| | C1      | |   | | | T1      | |   | | 
+| |Implementation| | | |Quality | |   | | 
+| |             | | | | Assurance| |   | | 
+| +---------+ +---+ | +---------+ +---+ | 
+| | T1      | |   | | | R1      | |   | | 
+| | Quality | |   | | |Production| |   | | 
+| | Assurance| |   | | |Release | |   | | 
+| +---------+ +---+ | +---------+ +---+ | 
+| | R1      | |   | | | M1      | |   | | 
+| |Production| |   | | |System   | |   | | 
+| |Release  | |   | | |Updates  | |   | | 
+| +---------+ +---+ | +---------+ +---+ | 
+| | M1      | |   | | |         | |   | | 
+| | System  | |   | | |         | |   | | 
+| | Updates | |   | | |         | |   | | 
+| +---------+ +---+ | +---------+ +---+ | 
++-------------------+ +-------------------+ 
+        |               |             
+        +-------+-------+             
+                |                     
+                v                     
+        +-------------------+         
+        |  New Requirements |         
+        |      Feedback     |         
+        +-------------------+         
+                |                     
+                v                     
+        +-------------------+         
+        |      Plan Phase   |         
+        +-------------------+         
+
+
+
+Descripción del Diagrama
+1. Development Lifecycle (Ciclo de Vida de Desarrollo)
+
+Este subgrafo representa las fases principales del ciclo de vida del desarrollo de software, desde la planificación hasta el mantenimiento continuo.
+
+    Plan (Fase de Planificación):
+        Descripción: Definición de los objetivos, requisitos y alcance del proyecto.
+        Función: Establece las bases para el desarrollo, asegurando que todas las partes interesadas tengan una comprensión clara de lo que se va a lograr.
+
+    Design (Fase de Diseño):
+        Descripción: Creación de diagramas y arquitecturas del sistema.
+        Función: Define la estructura y componentes del sistema, asegurando que el diseño cumpla con los requisitos establecidos.
+
+    Dev (Fase de Desarrollo):
+        Descripción: Implementación del código y desarrollo de funcionalidades.
+        Función: Traduce el diseño en un producto funcional mediante la escritura de código y la integración de componentes.
+
+    Test (Fase de Pruebas):
+        Descripción: Ejecución de pruebas unitarias, de integración y de seguridad.
+        Función: Verifica que el código funcione correctamente y cumpla con los estándares de calidad y seguridad.
+
+    Deploy (Fase de Despliegue):
+        Descripción: Despliegue de la aplicación en entornos de staging y producción.
+        Función: Implementa la aplicación en entornos controlados para pruebas finales y luego en producción para uso por los usuarios finales.
+
+    Maintain (Fase de Mantenimiento):
+        Descripción: Monitorización y actualización del sistema en producción.
+        Función: Asegura la continuidad y mejora del sistema mediante actualizaciones, corrección de errores y adaptación a nuevos requisitos.
+
+2. Phase Activities (Actividades por Fase)
+
+Este subgrafo detalla las actividades específicas que se llevan a cabo en cada fase del ciclo de desarrollo.
+
+    Plan Phase:
+        P1: Define Scope (Definir Alcance):
+            Descripción: Establecimiento de los límites y alcance del proyecto.
+            Función: Asegura que todos los involucrados tengan una comprensión clara de lo que se incluirá y lo que no en el proyecto.
+
+    Design Phase:
+        D1: System Architecture (Arquitectura del Sistema):
+            Descripción: Diseño de la estructura y componentes del sistema.
+            Función: Define cómo se organizarán los componentes del sistema y cómo interactuarán entre sí.
+
+    Dev Phase:
+        C1: Implementation (Implementación):
+            Descripción: Desarrollo del código y funcionalidades según el diseño.
+            Función: Traduce los diseños en un producto funcional mediante la codificación y la integración de componentes.
+
+    Test Phase:
+        T1: Quality Assurance (Aseguramiento de Calidad):
+            Descripción: Ejecución de pruebas para garantizar la calidad del software.
+            Función: Detecta y corrige errores, asegurando que el producto final cumpla con los estándares de calidad.
+
+    Deploy Phase:
+        R1: Production Release (Liberación a Producción):
+            Descripción: Despliegue de la aplicación en el entorno de producción.
+            Función: Hace que la aplicación esté disponible para los usuarios finales, implementando las funcionalidades desarrolladas y probadas.
+
+    Maintain Phase:
+        M1: System Updates (Actualizaciones del Sistema):
+            Descripción: Actualización y mantenimiento continuo del sistema en producción.
+            Función: Implementa mejoras, corrige errores y adapta el sistema a nuevos requisitos y cambios en el entorno.
+
+3. Ciclo de Retroalimentación
+
+El ciclo de retroalimentación conecta la fase de mantenimiento con la fase de planificación, permitiendo que los nuevos requisitos derivados del mantenimiento se integren en la planificación inicial para futuras iteraciones del ciclo de desarrollo.
+Integración en la Topología General del Sistema
+
+Este Diagrama del Ciclo de Vida de Desarrollo y Actividades por Fase se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con el Sistema de Control de Versiones:
+        Git y GitFlow: Los desarrolladores trabajan en sus ramas siguiendo la metodología GitFlow, asegurando una gestión organizada de las versiones y facilitando las revisiones de código.
+
+    Pipeline de CI/CD:
+        Jenkins y Build Server: Jenkins automatiza el proceso de construcción del código, ejecuta pruebas y despliega la aplicación en diferentes entornos (Test, Staging, Production).
+        Integración Continua y Despliegue Continuo: Asegura que cada cambio en el código pase por un proceso de construcción, pruebas y despliegue automatizado, reduciendo el tiempo de entrega y aumentando la calidad del software.
+
+    Gestión de Configuraciones:
+        Archivos de Configuración (Apache, PHP, DB, Security): Gestionados de manera centralizada y versionados en el repositorio Git, asegurando que todas las configuraciones sean consistentes y reproducibles en todos los entornos.
+
+    Monitorización y Feedback:
+        Logs y Métricas: Después del despliegue en producción, se recopilan logs y métricas de rendimiento para monitorizar el comportamiento del sistema, proporcionando información valiosa para el mantenimiento y futuras mejoras.
+
+    Ciclo de Mejora Continua:
+        Feedback Loop: La información obtenida durante la fase de mantenimiento y monitorización se retroalimenta al inicio del ciclo (Plan Phase), permitiendo ajustar y mejorar continuamente el proceso de desarrollo y el producto final.
+
+Ventajas de Este Enfoque de Ciclo de Vida de Desarrollo
+
+    Eficiencia y Automatización:
+        Reducción de Errores Manuales: La automatización del pipeline de CI/CD minimiza la intervención manual, reduciendo la posibilidad de errores y asegurando consistencia en cada despliegue.
+
+    Mejora de la Calidad del Software:
+        Pruebas Automatizadas: Aseguran que cada cambio en el código cumpla con los estándares de calidad y funcione correctamente antes de ser desplegado en producción.
+
+    Agilidad en el Desarrollo:
+        Despliegues Frecuentes: Permite liberar nuevas funcionalidades y correcciones de manera rápida y frecuente, adaptándose ágilmente a las necesidades del negocio y de los usuarios.
+
+    Visibilidad y Transparencia:
+        Monitorización Continua: Proporciona una visión clara del estado del sistema en cada etapa del ciclo de desarrollo, facilitando la identificación y resolución rápida de problemas.
+
+    Escalabilidad y Flexibilidad:
+        Adaptación a Crecimientos: La estructura modular permite escalar fácilmente el proceso de desarrollo y despliegue conforme crece el equipo y el proyecto.
+
+    Seguridad y Cumplimiento:
+        Escaneos de Seguridad y Revisión de Código: Integrados en el pipeline, garantizan que el software sea seguro y cumpla con las normativas aplicables antes de su despliegue.
+
+    Feedback Continuo:
+        Retroalimentación Proactiva: La integración de la monitorización y el feedback en cada fase permite mejoras continuas y adaptaciones rápidas a cambios y necesidades emergentes.
+
+Próximos Pasos
+
+    Implementación de GitFlow:
+        Configurar GitFlow en el Repositorio Git: Establecer las ramas principales (develop, feature, release, hotfix) y definir políticas de branching para el equipo de desarrollo.
+
+    Configuración de Jenkins:
+        Crear Jobs de Jenkins: Configurar trabajos específicos para cada etapa del pipeline (build, test, deploy) y definir triggers que inicien el pipeline automáticamente al detectar cambios en el repositorio.
+
+    Automatización de Pruebas:
+        Desarrollar Pruebas Unitarias e Integración: Implementar un conjunto robusto de pruebas que cubran la funcionalidad crítica de la aplicación.
+        Configurar Escaneos de Seguridad: Integrar herramientas como SonarQube o OWASP ZAP en el pipeline para realizar análisis de seguridad automatizados.
+
+    Gestión de Configuration Files:
+        Centralizar y Versionar Configuraciones: Utilizar herramientas como Ansible, Chef, o Puppet para gestionar y versionar los archivos de configuración, asegurando que estén sincronizados en todos los entornos.
+
+    Despliegue a Entornos de Staging y Producción:
+        Automatizar Despliegues: Configurar scripts de despliegue que automaticen el proceso de transferencia de artefactos desde el Build Server a los diferentes entornos.
+        Implementar Validaciones en Staging: Asegurar que todas las validaciones y pruebas en el entorno de staging sean exhaustivas antes de proceder al despliegue en producción.
+
+    Monitorización y Feedback:
+        Integrar Herramientas de Monitorización: Implementar sistemas de monitorización como Prometheus y Grafana para supervisar el rendimiento y la salud de la aplicación en producción.
+        Establecer Retroalimentación Continua: Utilizar la información de monitorización para realizar mejoras continuas en el pipeline y en la aplicación misma.
+
+    Capacitación del Equipo:
+        Entrenar a los Desarrolladores: Asegurar que todo el equipo de desarrollo esté familiarizado con GitFlow, Jenkins y las mejores prácticas de CI/CD.
+        Documentar el Pipeline: Crear documentación detallada sobre el funcionamiento del pipeline, incluyendo cómo añadir nuevas etapas, manejar fallos y realizar despliegues manuales si es necesario.
+
+    Pruebas y Validación del Pipeline:
+        Realizar Pruebas Piloto: Implementar el pipeline en un proyecto piloto para identificar y corregir posibles problemas antes de su despliegue completo.
+        Iterar y Mejorar: Basado en los resultados de las pruebas piloto, ajustar y optimizar el pipeline para mejorar su eficiencia y fiabilidad.
+
+    Implementación de Seguridad y Compliance:
+        Asegurar Cumplimiento Normativo: Verificar que todas las prácticas de CI/CD cumplan con las normativas de seguridad y protección de datos aplicables.
+        Implementar Auditorías de Seguridad: Realizar auditorías periódicas para asegurar que las configuraciones y prácticas de seguridad estén actualizadas y sean efectivas.
+
+    Optimización Continua:
+        Revisar el Desempeño del Pipeline: Analizar métricas de rendimiento del pipeline para identificar cuellos de botella y áreas de mejora.
+        Actualizar Herramientas y Tecnologías: Mantener el pipeline actualizado con las últimas versiones de herramientas y tecnologías para aprovechar nuevas funcionalidades y mejoras de seguridad.
+
+Conclusión
+
+El Diagrama del Ciclo de Vida de Desarrollo y Actividades por Fase proporciona una estructura clara y eficiente para gestionar el proceso de desarrollo de software en la web de la librería "Sargantana Mediterrània". Al definir cada fase del ciclo de desarrollo y detallar las actividades específicas dentro de cada una, se asegura una gestión organizada y coherente que abarca desde la planificación inicial hasta el mantenimiento continuo del sistema.
+
+Esta integración en la topología general del sistema garantiza que todas las etapas del desarrollo trabajen en conjunto de manera armoniosa, facilitando la colaboración entre equipos, mejorando la calidad del software y asegurando una entrega rápida y confiable de nuevas funcionalidades. Además, la implementación de monitorización y retroalimentación continua permite una mejora constante, adaptándose a las necesidades cambiantes del negocio y de los usuarios finales.
+
+Este enfoque integral no solo mejora la eficiencia operativa y la calidad del software, sino que también proporciona una base sólida para la escalabilidad y el crecimiento futuro, asegurando que la librería "Sargantana Mediterrània" pueda ofrecer un servicio continuo y de alta calidad a sus usuarios. Si necesitas más detalles sobre la implementación de alguno de estos componentes, ajustes en el diagrama o cualquier otra consulta relacionada con la arquitectura del sistema, no dudes en indicarlo.
+

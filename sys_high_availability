@@ -1,0 +1,178 @@
+Diagramas de Alta Disponibilidad y Redundancia: Esenciales para asegurar que el sistema permanezca operativo incluso ante fallos de componentes individuales.
+
+
+24. Diagramas de Alta Disponibilidad y Redundancia
+24.1. Diagrama de Alta Disponibilidad (High Availability Diagram)
+
+    Descripción: Representa las configuraciones para asegurar que el sistema esté siempre disponible.
+    Componentes Incluidos: Clústeres de Servidores, Replicación de Base de Datos, Balanceo de Carga, Failover Automatizado.
+
+graph TD
+    subgraph "Load Balancing"
+        LB1[Primary Load Balancer]
+        LB2[Backup Load Balancer]
+    end
+
+    subgraph "Web Servers"
+        WS1[Web Server 1]
+        WS2[Web Server 2]
+        WS3[Web Server 3]
+    end
+
+    subgraph "Application Servers"
+        AS1[App Server Primary]
+        AS2[App Server Secondary]
+        AS3[App Server Failover]
+    end
+
+    subgraph "Database Cluster"
+        DB1[MariaDB Master]
+        DB2[MariaDB Slave 1]
+        DB3[MariaDB Slave 2]
+    end
+
+    LB1 --> WS1 & WS2 & WS3
+    LB2 --> WS1 & WS2 & WS3
+    
+    WS1 & WS2 & WS3 --> AS1 & AS2 & AS3
+    
+    AS1 & AS2 & AS3 --> DB1
+    DB1 --> DB2 & DB3
+
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|      Load Balancing       |       |        Web Servers        |       |     Application Servers   |       |      Database Cluster     |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |  LB1    | |   LB2   |   |       | |  WS1    | |  WS2    |   |       | |  AS1    | |   AS2   |   |       | |  DB1    | |   DB2   |   |
+| |Primary  | | Backup  |   |       | |Web Sv1  | |Web Sv2  |   |       | |App Sv1  | |App Sv2  |   |       | |MariaDB  | |MariaDB  |   |
+| |Load Balancer| |Load Balancer| |       | |         | |         |   |       | |Primary  | |Secondary|   |       | |Master   | |Slave 1  |   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | |         | |         |   |       | |         | |         |   |
++-----------+----------------+       +-----------+---------------+       +-----------+---------------+       +-----------+---------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |   Primary LB      |             |     Web Server 1  |             |   App Server 1    |             |   MariaDB Master  |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |    Backup LB      |             |     Web Server 2  |             |   App Server 2    |             |  MariaDB Slave 1  |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |     Web Server 3  |             |   App Server 3    |             |                   |             |  MariaDB Slave 2  |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+
+
+
+
+Descripción del Diagrama
+1. Load Balancing (Balanceo de Carga)
+
+    Primary Load Balancer (LB1):
+        Descripción: Punto de entrada principal para todas las solicitudes entrantes al sitio web.
+        Función: Distribuye las solicitudes de los usuarios de manera equitativa entre los servidores web disponibles, asegurando una distribución eficiente de la carga.
+    Backup Load Balancer (LB2):
+        Descripción: Balanceador de carga de respaldo en caso de que el balanceador principal falle.
+        Función: Proporciona redundancia y alta disponibilidad, garantizando que el sitio web permanezca accesible incluso si el balanceador principal experimenta fallos.
+
+2. Web Servers (Servidores Web)
+
+    Web Server 1 (WS1), Web Server 2 (WS2), Web Server 3 (WS3):
+        Descripción: Servidores dedicados a manejar las solicitudes HTTP/S de los usuarios y servir contenido estático y dinámico.
+        Función: Procesan y responden a las solicitudes de los usuarios, interactuando con los servidores de aplicaciones para generar contenido dinámico.
+
+3. Application Servers (Servidores de Aplicaciones)
+
+    App Server Primary (AS1), App Server Secondary (AS2), App Server Failover (AS3):
+        Descripción: Servidores dedicados a ejecutar la lógica de la aplicación, manejar peticiones dinámicas y gestionar la interacción con la base de datos.
+        Función: Procesan las solicitudes de los servidores web, ejecutan la lógica del negocio, y gestionan las comunicaciones con el clúster de bases de datos.
+        Failover Server (AS3): Actúa como respaldo para asegurar la continuidad del servicio en caso de que los servidores primario y secundario fallen.
+
+4. Database Cluster (Clúster de Base de Datos)
+
+    MariaDB Master (DB1):
+        Descripción: Nodo principal de la base de datos MariaDB que maneja todas las operaciones de escritura y lectura.
+        Función: Gestiona las transacciones de datos y sincroniza la información con los nodos esclavos.
+    MariaDB Slave 1 (DB2) y MariaDB Slave 2 (DB3):
+        Descripción: Nodos secundarios que replican los datos del nodo maestro.
+        Función: Proporcionan redundancia y balanceo de carga para operaciones de lectura, mejorando el rendimiento y la disponibilidad de la base de datos.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Balanceo de Carga y Arquitectura de Servidores se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Entrada y Distribución de Tráfico:
+        Load Balancers (LB1 y LB2): Actúan como el punto de entrada para todas las solicitudes de los usuarios. Distribuyen el tráfico de manera equitativa entre los servidores web disponibles, optimizando el uso de recursos y mejorando la capacidad de respuesta del sitio.
+        Redundancia y Alta Disponibilidad: En caso de que el balanceador principal (LB1) falle, el balanceador de respaldo (LB2) asume el control, asegurando que el sitio web permanezca accesible sin interrupciones.
+
+    Manejo de Solicitudes Web:
+        Web Servers (WS1, WS2, WS3): Reciben y procesan las solicitudes de los usuarios, sirviendo contenido estático como imágenes, CSS y JavaScript, así como encaminando solicitudes dinámicas a los servidores de aplicaciones.
+        Escalabilidad: La presencia de múltiples servidores web permite manejar grandes volúmenes de tráfico, distribuyendo la carga y evitando la sobrecarga de un único servidor.
+
+    Procesamiento de Aplicaciones:
+        Application Servers (AS1, AS2, AS3): Ejecutan la lógica de la aplicación, procesan datos y gestionan la interacción con la base de datos. Esto incluye la generación de contenido dinámico, procesamiento de formularios y gestión de sesiones de usuario.
+        Failover y Redundancia: El servidor de aplicaciones de failover (AS3) asegura que, en caso de que los servidores primario (AS1) y secundario (AS2) fallen, la aplicación pueda continuar operando sin interrupciones significativas.
+
+    Gestión de Datos:
+        Database Cluster (DB1, DB2, DB3): El nodo maestro (DB1) maneja todas las operaciones de escritura y sincroniza los datos con los nodos esclavos (DB2 y DB3). Los nodos esclavos sirven para operaciones de lectura, distribuyendo la carga y mejorando el rendimiento general de las consultas a la base de datos.
+        Alta Disponibilidad y Replicación: La replicación de datos entre el maestro y los esclavos asegura que los datos estén disponibles incluso en caso de fallos de hardware o software en el nodo maestro.
+
+    Integración con Otros Componentes del Sistema:
+        Monitorización y Alertas: Herramientas como Prometheus y Grafana monitorizan el rendimiento de los balanceadores de carga, servidores web, servidores de aplicaciones y clúster de bases de datos, proporcionando alertas en tiempo real sobre cualquier anomalía o degradación del rendimiento.
+        Pipeline CI/CD: Los despliegues automatizados desde el Pipeline CI/CD actualizan los servidores de aplicaciones y web de manera controlada, asegurando que las nuevas versiones del software se implementen sin afectar la disponibilidad del sitio.
+        Seguridad: Implementaciones de SSL/TLS en los balanceadores de carga aseguran que todas las comunicaciones entre los usuarios y el servidor estén encriptadas y protegidas contra interceptaciones.
+
+Ventajas de Esta Arquitectura
+
+    Alta Disponibilidad:
+        La redundancia en los balanceadores de carga, servidores web, servidores de aplicaciones y nodos de base de datos asegura que el sitio web permanezca accesible incluso ante fallos en uno o más componentes.
+
+    Escalabilidad:
+        La capacidad de agregar más servidores web o de aplicaciones según sea necesario permite manejar incrementos en el tráfico sin degradar el rendimiento del sitio.
+
+    Balanceo de Carga Eficiente:
+        Los balanceadores de carga distribuyen las solicitudes de manera equitativa entre los servidores disponibles, optimizando el uso de recursos y evitando la sobrecarga de un único servidor.
+
+    Resiliencia de Datos:
+        El clúster de base de datos con nodos maestro y esclavos garantiza que los datos estén replicados y disponibles para operaciones de lectura, reduciendo el riesgo de pérdida de datos y mejorando la velocidad de acceso.
+
+    Mantenimiento Simplificado:
+        La separación de responsabilidades entre balanceadores de carga, servidores web, servidores de aplicaciones y clúster de bases de datos facilita el mantenimiento y la actualización de cada componente sin afectar al sistema en su conjunto.
+
+    Mejor Rendimiento:
+        La distribución de la carga de trabajo entre múltiples servidores y la optimización de las operaciones de lectura en el clúster de base de datos mejoran significativamente el rendimiento del sitio web.
+
+    Seguridad Mejorada:
+        La implementación de protocolos de seguridad como SSL/TLS en los balanceadores de carga asegura que todas las comunicaciones estén protegidas, reduciendo el riesgo de interceptaciones y ataques.
+
+Próximos Pasos
+
+    Implementación y Configuración de Balanceadores de Carga:
+        Configurar LB1 (Primary Load Balancer) y LB2 (Backup Load Balancer) para distribuir el tráfico entre los servidores web de manera eficiente.
+    Despliegue de Servidores Web y de Aplicaciones:
+        Implementar y configurar WS1, WS2, WS3 para manejar las solicitudes de los usuarios y AS1, AS2, AS3 para procesar la lógica de la aplicación.
+    Configuración del Clúster de Base de Datos:
+        Configurar DB1 (MariaDB Master) y DB2, DB3 (MariaDB Slaves) para establecer la replicación y asegurar la disponibilidad de datos.
+    Integración con Herramientas de Monitorización:
+        Configurar Prometheus y Grafana para monitorear el rendimiento y la salud de los balanceadores de carga, servidores web, servidores de aplicaciones y clúster de bases de datos.
+    Automatización de Despliegues:
+        Integrar el Pipeline CI/CD para automatizar la construcción, prueba y despliegue de aplicaciones en los servidores web y de aplicaciones, asegurando despliegues rápidos y sin errores.
+    Pruebas de Resiliencia y Escalabilidad:
+        Realizar pruebas de estrés y simulaciones de fallos para asegurar que la arquitectura responde adecuadamente ante picos de tráfico y fallos de componentes.
+    Optimización y Mantenimiento Continuo:
+        Monitorear continuamente el rendimiento del sistema, optimizar configuraciones y realizar mantenimientos preventivos para asegurar la operación eficiente y segura del sitio web.
+    Capacitación del Equipo:
+        Entrenar al equipo de operaciones y desarrollo sobre la gestión y mantenimiento de la arquitectura de balanceo de carga, servidores web, servidores de aplicaciones y clúster de bases de datos.
+
+Conclusión
+
+El Diagrama de Balanceo de Carga y Arquitectura de Servidores proporciona una estructura robusta y escalable para gestionar el tráfico y las operaciones del sitio web de la librería "Sargantana Mediterrània". Al integrar balanceadores de carga primarios y de respaldo, múltiples servidores web y de aplicaciones, y un clúster de base de datos replicado, se asegura una alta disponibilidad, resiliencia y rendimiento óptimo del sistema.
+
+Esta arquitectura no solo mejora la experiencia del usuario al garantizar tiempos de respuesta rápidos y una alta disponibilidad, sino que también facilita la escalabilidad y el mantenimiento del sistema a medida que el tráfico y las necesidades del negocio crecen. Además, la integración con herramientas de monitorización y pipelines CI/CD asegura que el sistema pueda adaptarse rápidamente a cambios y mantenerse operativo ante cualquier eventualidad.

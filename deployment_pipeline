@@ -1,0 +1,203 @@
+13.2. Diagrama de Pipeline de Despliegue (Deployment Pipeline Diagram)
+
+    Descripción: Representa las etapas del pipeline de CI/CD.
+    Etapas Incluidas: Commit, Build, Test, Deploy, Monitor.
+
+
+graph LR
+    subgraph "Source"
+        Commit[Code Commit]
+        Push[Push to Git]
+    end
+
+    subgraph "Build"
+        Build[Build Code]
+        Deps[Install Dependencies]
+        Package[Package Application]
+    end
+
+    subgraph "Test"
+        Unit[Unit Tests]
+        Integration[Integration Tests]
+        Security[Security Scan]
+    end
+
+    subgraph "Deploy"
+        Staging[Deploy to Staging]
+        Validate[Validation Tests]
+        Production[Deploy to Production]
+    end
+
+    subgraph "Monitor"
+        Logs[Log Collection]
+        Metrics[Performance Metrics]
+        Alerts[Alert System]
+    end
+
+    Commit --> Push
+    Push --> Build --> Deps --> Package
+    Package --> Unit --> Integration --> Security
+    Security --> Staging --> Validate --> Production
+    Production --> Logs --> Metrics --> Alerts
+
+
+
++-------------------+       +-------------------+       +-------------------+       +-------------------+       +-------------------+
+|      Source       |       |       Build       |       |       Test        |       |      Deploy       |       |      Monitor      |
+| +-------------+   |       | +-------------+   |       | +-------------+   |       | +-------------+   |       | +-------------+   |
+| | Commit      |   |       | | Build Code  |   |       | | Unit Tests  |   |       | | Deploy to    |   |       | | Log         |   |
+| | (Code Commit)|-->|       | |             |-->|       | |             |-->|       | | Staging      |-->|       | | Collection  |   |
+| +-------------+   |       | +-------------+   |       | +-------------+   |       | +-------------+   |       | +-------------+   |
+| | Push to Git |-->|       | | Install     |-->|       | | Integration |-->|       | | Validate     |-->|       | | Performance |   |
+| | (Push to Git)|-->|       | | Dependencies|   |       | | Tests       |   |       | | Tests        |   |       | | Metrics     |   |
+| +-------------+   |       | +-------------+   |       | +-------------+   |       | +-------------+   |       | +-------------+   |
+|                   |       | | Package     |   |       | | Security    |   |       | | Deploy to    |   |       | | Alert       |   |
+|                   |       | | Application |   |       | | Scan        |   |       | | Production   |   |       | | System      |   |
+|                   |       | +-------------+   |       | +-------------+   |       | +-------------+   |       | +-------------+   |
++-------------------+       +-------------------+       +-------------------+       +-------------------+       +-------------------+
+        |                           |                           |                           |                           |
+        +---------------------------+---------------------------+---------------------------+---------------------------+
+                                                                        |
+                                                                        v
+                                                             +-------------------+
+                                                             |    Production     |
+                                                             |    Environment    |
+                                                             +-------------------+
+
+
+Descripción del Diagrama
+1. Source (Fuente)
+
+    Commit (Code Commit):
+        Descripción: Punto de inicio del pipeline donde los desarrolladores realizan commits de código al repositorio.
+        Función: Captura los cambios realizados en el código fuente, asegurando que todas las modificaciones estén registradas y versionadas.
+    Push to Git (Push al Repositorio Git):
+        Descripción: Acción de subir los commits al repositorio centralizado en Git.
+        Función: Hace que los cambios sean accesibles para el pipeline de CI/CD y para otros miembros del equipo.
+
+2. Build (Construcción)
+
+    Build Code (Construir Código):
+        Descripción: Compilación del código fuente en artefactos ejecutables o paquetes.
+        Función: Asegura que el código se puede compilar correctamente, detectando errores de sintaxis y dependencias faltantes.
+    Install Dependencies (Instalar Dependencias):
+        Descripción: Instalación de las librerías y paquetes necesarios para ejecutar la aplicación.
+        Función: Garantiza que todas las dependencias estén disponibles para el correcto funcionamiento de la aplicación.
+    Package Application (Empaquetar Aplicación):
+        Descripción: Empaquetado del código compilado y dependencias en un formato desplegable.
+        Función: Prepara la aplicación para su despliegue en diferentes entornos, asegurando consistencia y reproducibilidad.
+
+3. Test (Pruebas)
+
+    Unit Tests (Pruebas Unitarias):
+        Descripción: Ejecución de pruebas unitarias para verificar la funcionalidad de componentes individuales del código.
+        Función: Detecta errores en etapas tempranas del desarrollo, asegurando que cada unidad de código funcione como se espera.
+    Integration Tests (Pruebas de Integración):
+        Descripción: Pruebas que verifican la interacción entre diferentes componentes de la aplicación.
+        Función: Asegura que los módulos interactúan correctamente, detectando problemas de integración y dependencias entre servicios.
+    Security Scan (Escaneo de Seguridad):
+        Descripción: Análisis de vulnerabilidades y riesgos de seguridad en el código y las dependencias.
+        Función: Identifica posibles vulnerabilidades que podrían ser explotadas, permitiendo su mitigación antes del despliegue.
+
+4. Deploy (Despliegue)
+
+    Deploy to Staging (Desplegar a Staging):
+        Descripción: Despliegue de la aplicación en un entorno de staging para pruebas finales.
+        Función: Permite realizar pruebas en un entorno que replica la producción, asegurando que todo funcione correctamente antes de la liberación definitiva.
+    Validate (Pruebas de Validación):
+        Descripción: Ejecución de pruebas adicionales en el entorno de staging para verificar la funcionalidad y el rendimiento.
+        Función: Confirma que la aplicación está lista para ser desplegada en producción, asegurando calidad y estabilidad.
+    Deploy to Production (Desplegar a Producción):
+        Descripción: Despliegue final de la aplicación en el entorno de producción para su uso por los usuarios finales.
+        Función: Hace que la nueva versión de la aplicación esté disponible para todos los usuarios, implementando los cambios y mejoras realizadas.
+
+5. Monitor (Monitorización)
+
+    Log Collection (Recopilación de Logs):
+        Descripción: Recolección y almacenamiento de registros de eventos y actividades de la aplicación.
+        Función: Facilita el monitoreo del comportamiento de la aplicación, permitiendo la identificación y resolución de problemas en tiempo real.
+    Performance Metrics (Métricas de Rendimiento):
+        Descripción: Monitoreo de indicadores clave de rendimiento como tiempo de respuesta, uso de recursos, tasa de errores, etc.
+        Función: Permite evaluar la salud y el rendimiento de la aplicación, identificando áreas que requieren optimización.
+    Alert System (Sistema de Alertas):
+        Descripción: Configuración de alertas para notificar al equipo de TI sobre anomalías o fallos detectados.
+        Función: Facilita una respuesta rápida ante problemas críticos, minimizando el impacto en los usuarios finales.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Pipeline de CI/CD se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con el Repositorio de Código:
+        Commit y Push to Git: Los desarrolladores realizan cambios en el código y los suben al repositorio Git, iniciando el pipeline de CI/CD. El API Gateway y otros servicios pueden interactuar con el código desplegado para funcionalidades específicas.
+
+    Automatización del Proceso de Construcción:
+        Build Stage: Los scripts de construcción automatizados compilan el código, instalan dependencias y empaquetan la aplicación, asegurando que cada despliegue sea consistente y reproducible.
+        Integración con Herramientas de Construcción: Utiliza herramientas como Jenkins, GitLab CI, Travis CI, o GitHub Actions para orquestar las tareas de construcción.
+
+    Garantía de Calidad a través de Pruebas:
+        Test Stage: Las pruebas unitarias, de integración y los escaneos de seguridad automatizados aseguran que el código cumpla con los estándares de calidad y seguridad antes de su despliegue.
+        Integración con Herramientas de Pruebas: Utiliza frameworks como JUnit, Selenium, SonarQube para ejecutar y analizar las pruebas.
+
+    Despliegue Automatizado:
+        Deploy Stage: El despliegue a staging permite realizar pruebas en un entorno similar al de producción, mientras que el despliegue a producción libera la nueva versión para los usuarios finales.
+        Integración con Herramientas de Despliegue: Utiliza herramientas como Docker, Kubernetes, Ansible, o Terraform para gestionar y automatizar los despliegues.
+
+    Monitorización y Retroalimentación Continua:
+        Monitor Stage: La recopilación de logs, métricas de rendimiento y alertas proporciona una visibilidad continua sobre el comportamiento de la aplicación en producción.
+        Integración con Herramientas de Monitoreo: Utiliza herramientas como Prometheus, Grafana, ELK Stack (Elasticsearch, Logstash, Kibana) para monitorizar y visualizar datos operativos.
+
+    Ciclo de Mejora Continua:
+        Feedback Loop: Los datos recopilados en la etapa de monitorización informan al equipo de desarrollo sobre el rendimiento y posibles áreas de mejora, cerrando el ciclo de CI/CD y facilitando la iteración continua.
+        Implementación de Cambios: Basado en la retroalimentación, se realizan ajustes y mejoras en el código, reiniciando el pipeline de CI/CD para implementar las actualizaciones necesarias.
+
+Ventajas de Este Pipeline de CI/CD
+
+    Automatización y Eficiencia:
+        Reducción de Errores Humanos: La automatización de tareas repetitivas minimiza la posibilidad de errores manuales, asegurando consistencia en cada despliegue.
+    Entrega Rápida y Frecuente:
+        Ciclo de Desarrollo Ágil: Permite liberar nuevas funcionalidades y correcciones de manera rápida y frecuente, respondiendo ágilmente a las necesidades del negocio y de los usuarios.
+    Mejora de la Calidad del Software:
+        Pruebas Automatizadas: Garantiza que el código cumpla con los estándares de calidad y seguridad antes de su despliegue, reduciendo la incidencia de fallos en producción.
+    Visibilidad y Transparencia:
+        Monitorización Continua: Proporciona una visión clara y actualizada del estado del sistema, facilitando la identificación y resolución de problemas en tiempo real.
+    Escalabilidad:
+        Adaptación a Crecimientos: El pipeline puede escalar fácilmente para manejar aumentos en el volumen de código, pruebas y despliegues conforme la aplicación crece.
+    Colaboración y Comunicación:
+        Integración de Equipos: Facilita la colaboración entre desarrolladores, equipos de pruebas y operaciones, mejorando la comunicación y la coordinación durante el ciclo de desarrollo.
+    Resiliencia y Recuperación:
+        Rollback Rápido: En caso de detectar problemas en producción, se puede realizar un rollback rápido a una versión anterior estable, minimizando el impacto en los usuarios finales.
+
+Próximos Pasos
+
+    Implementación de Herramientas de CI/CD:
+        Seleccionar una Plataforma de CI/CD: Elegir entre herramientas como Jenkins, GitLab CI, Travis CI, CircleCI, o GitHub Actions según las necesidades y preferencias del equipo.
+    Configuración del Pipeline:
+        Definir Jobs y Stages: Configurar las etapas de construcción, pruebas, despliegue y monitorización dentro del pipeline.
+        Integración con Repositorios: Asegurar que el pipeline esté correctamente integrado con el repositorio Git para detectar y reaccionar a los cambios de código.
+    Automatización de Pruebas:
+        Desarrollar Pruebas Unitarias e Integración: Crear y mantener un conjunto robusto de pruebas que cubran la funcionalidad crítica de la aplicación.
+    Configuración de Despliegues Automatizados:
+        Definir Estrategias de Despliegue: Implementar estrategias como blue-green deployment, canary releases, o rolling updates para minimizar el impacto en los usuarios durante los despliegues.
+    Implementación de Monitorización y Alertas:
+        Configurar Herramientas de Monitoreo: Integrar Prometheus, Grafana, y otros servicios de monitorización para obtener una visibilidad completa del rendimiento del sistema.
+        Definir Reglas de Alertas: Establecer umbrales y condiciones para alertas que notifiquen al equipo sobre anomalías o problemas críticos.
+    Documentación y Capacitación:
+        Crear Guías de Uso: Documentar el pipeline de CI/CD, incluyendo cómo añadir nuevas etapas, manejar fallos y realizar despliegues manuales si es necesario.
+        Capacitar al Equipo: Entrenar a los desarrolladores y al equipo de operaciones sobre cómo interactuar con el pipeline, interpretar los resultados de las pruebas y responder a alertas.
+    Pruebas y Validación del Pipeline:
+        Realizar Pruebas Piloto: Implementar el pipeline en un entorno de prueba para identificar y corregir posibles problemas antes de desplegarlo en producción.
+        Iterar y Mejorar: Basado en los resultados de las pruebas piloto, ajustar y optimizar el pipeline para mejorar su eficiencia y fiabilidad.
+    Integración con Seguridad:
+        Incorporar Escaneos de Seguridad: Integrar herramientas de análisis estático de código y escaneos de vulnerabilidades dentro del pipeline para asegurar que el código cumpla con las políticas de seguridad.
+    Optimización Continua:
+        Revisar y Mejorar: Monitorizar el desempeño del pipeline y realizar ajustes continuos para optimizar tiempos de construcción, pruebas y despliegue.
+    Implementación de Feedback Loops:
+        Recopilar Retroalimentación: Establecer mecanismos para que los usuarios y el equipo de desarrollo proporcionen retroalimentación sobre el proceso de CI/CD, utilizando esta información para realizar mejoras continuas.
+
+Conclusión
+
+El Diagrama de Pipeline de CI/CD proporciona una estructura clara y eficiente para gestionar el ciclo de vida del desarrollo de software en la web de la librería "Sargantana Mediterrània". Al automatizar las etapas de construcción, pruebas, despliegue y monitorización, se asegura una entrega continua de software de alta calidad, reduciendo el tiempo de comercialización y mejorando la estabilidad y el rendimiento del sistema.
+
+Esta integración en la topología general del sistema garantiza que todos los cambios en el código se gestionen de manera coherente y segura, facilitando la colaboración entre equipos y permitiendo una respuesta rápida a las necesidades del negocio y de los usuarios. Además, la implementación de monitorización y alertas continuas fortalece la capacidad de detectar y resolver problemas proactivamente, manteniendo una experiencia de usuario óptima y una infraestructura robusta.
+
+

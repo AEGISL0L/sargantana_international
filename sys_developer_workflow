@@ -1,0 +1,221 @@
+26. Diagramas de Gestión de Proyectos y Colaboración
+26.1. Diagrama de Flujo de Trabajo de Desarrollo (Development Workflow Diagram)
+
+    Descripción: Representa los flujos de trabajo dentro del equipo de desarrollo.
+    Componentes Incluidos: Repositorios de Código, Integración Continua, Despliegue Continuo, Revisión de Código.
+
+
+graph TD
+    subgraph "Code Management"
+        Feature[Feature Branch]
+        Dev[Development Branch]
+        Main[Main Branch]
+        Release[Release Branch]
+    end
+
+    subgraph "Code Quality"
+        Review[Code Review]
+        Testing[Automated Tests]
+        Quality[Quality Gates]
+    end
+
+    subgraph "CI/CD Pipeline"
+        Build[Build Process]
+        Test[Test Execution]
+        Deploy[Deployment]
+    end
+
+    subgraph "Team Collaboration"
+        Planning[Sprint Planning]
+        Daily[Daily Standups]
+        Retro[Sprint Retrospective]
+    end
+
+    Feature --> Review
+    Review --> Dev
+    Dev --> Testing
+    Testing --> Quality
+    Quality --> Main
+    Main --> Release
+    
+    Planning --> Feature
+    Daily --> Review
+    Release --> Retro
+
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|      Code Management      |       |        Code Quality       |       |        CI/CD Pipeline     |       |      Team Collaboration    |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| | Feature | |   Dev   |   |       | | Review | | Testing |   |       | | Build   | | Test    |   |       | | Planning| |  Daily  |   |
+| | Branch  | |Branch   |   |       | | Code   | | Automated|   |       | | Process | |Execution|   |       | | Sprint  | | Standups|   |
+| |         | |         |   |       | | Review | | Tests   |   |       | |         | |         |   |       | | Planning| |         |   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |  Main   | | Release |   |       | | Quality| | Gates   |   |       | | Deploy  | |         |   |       | | Retro   | | Sprint  |   |
+| | Branch  | | Branch  |   |       | | Gates  | |         |   |       | |         | |         |   |       | | Sprint  | | Retros. |   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
++-----------+----------------+       +-----------+---------------+       +-----------+---------------+       +-----------+---------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | Feature Branch    |             | Code Review       |             | Build Process     |             | Sprint Planning   |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | Development Branch|             | Quality Gates     |             | Test Execution    |             | Daily Standups    |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | Release Branch    |             | Automated Tests   |             | Deployment        |             | Sprint Retro       |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            +--------------------------------+---------------------------------+---------------------------------+
+                                                |
+                                                v
+                                       +-----------------------+
+                                       |      Main Branch      |
+                                       +-----------------------+
+
+
+
+Descripción del Diagrama
+1. Code Management (Gestión de Código)
+
+    Feature Branch (Rama de Funcionalidad):
+        Descripción: Rama utilizada para desarrollar nuevas características o funcionalidades de manera aislada.
+        Función: Permite a los desarrolladores trabajar en nuevas ideas sin afectar la estabilidad del código principal.
+
+    Dev Branch (Rama de Desarrollo):
+        Descripción: Rama donde se integran las ramas de funcionalidad después de la revisión.
+        Función: Actúa como una rama intermedia para pruebas y validación antes de fusionarse con la rama principal.
+
+    Main Branch (Rama Principal):
+        Descripción: Rama estable que contiene el código listo para producción.
+        Función: Sirve como la base para despliegues y refleja el estado actual del producto.
+
+    Release Branch (Rama de Lanzamiento):
+        Descripción: Rama creada para preparar nuevas versiones de producción.
+        Función: Facilita la implementación de correcciones finales y ajustes antes del despliegue.
+
+2. Code Quality (Calidad de Código)
+
+    Review (Revisión de Código):
+        Descripción: Proceso de revisión por pares para garantizar la calidad y consistencia del código.
+        Función: Identifica y corrige errores, mejora la mantenibilidad y asegura el cumplimiento de estándares.
+
+    Testing (Pruebas Automatizadas):
+        Descripción: Ejecución de pruebas automatizadas para verificar la funcionalidad y detectar errores.
+        Función: Garantiza que el código cumple con los requisitos y no introduce regresiones.
+
+    Quality Gates (Puertas de Calidad):
+        Descripción: Criterios que el código debe cumplir antes de avanzar a la siguiente etapa.
+        Función: Asegura que solo el código de alta calidad se integra en las ramas principales.
+
+3. CI/CD Pipeline (Pipeline de CI/CD)
+
+    Build (Proceso de Construcción):
+        Descripción: Compilación y empaquetado del código fuente.
+        Función: Transforma el código en artefactos ejecutables listos para pruebas y despliegues.
+
+    Test (Ejecución de Pruebas):
+        Descripción: Ejecución de pruebas unitarias, de integración y de sistema.
+        Función: Verifica la funcionalidad y estabilidad del código antes de su despliegue.
+
+    Deploy (Despliegue):
+        Descripción: Implementación automática del código en entornos de desarrollo, pruebas o producción.
+        Función: Facilita despliegues rápidos y consistentes, reduciendo el tiempo de entrega.
+
+4. Team Collaboration (Colaboración del Equipo)
+
+    Planning (Planificación del Sprint):
+        Descripción: Reunión para definir las tareas y objetivos del próximo sprint.
+        Función: Coordina al equipo y establece prioridades para el desarrollo.
+
+    Daily (Standups Diarios):
+        Descripción: Reuniones breves diarias para sincronizar al equipo y discutir progresos.
+        Función: Identifica y resuelve obstáculos rápidamente, manteniendo al equipo alineado.
+
+    Retro (Retrospectiva del Sprint):
+        Descripción: Reunión al final del sprint para evaluar el desempeño y mejorar procesos.
+        Función: Fomenta la mejora continua y la adaptación de las prácticas del equipo.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Gestión de Código y Pipeline CI/CD se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con Repositorio de Código:
+        Code Management: Las ramas de código (Feature, Dev, Main, Release) se gestionan en el Code Repository (como GitHub, GitLab o Bitbucket).
+        Pipeline CI/CD: Cada cambio en las ramas desencadena el Pipeline CI/CD para construir, probar y desplegar el código automáticamente.
+
+    Proceso de Revisión y Calidad de Código:
+        Code Quality: Antes de fusionar una rama de funcionalidad con la rama de desarrollo, se realiza una Code Review para asegurar la calidad.
+        Quality Gates: Las ramas deben pasar los Quality Gates basados en resultados de pruebas automatizadas antes de avanzar a la rama principal.
+
+    Automatización del Pipeline CI/CD:
+        Build Process: Al fusionarse cambios en la rama de desarrollo, se inicia el proceso de construcción automática.
+        Test Execution: Se ejecutan pruebas automatizadas para validar los cambios.
+        Deployment: Si las pruebas son exitosas, el código se despliega automáticamente a entornos de desarrollo o producción según la rama de destino (Dev o Release).
+
+    Colaboración del Equipo:
+        Team Collaboration: Las actividades de planificación, standups diarios y retrospectivas aseguran una comunicación fluida y una coordinación efectiva del equipo de desarrollo.
+        Feedback Loop: Los resultados de las pruebas y despliegues proporcionan retroalimentación continua al equipo, facilitando la mejora continua.
+
+    Monitorización y Feedback:
+        Performance Monitoring: Herramientas como Prometheus y Grafana monitorean el rendimiento de las aplicaciones desplegadas, proporcionando métricas clave para optimizar el sistema.
+        Incident Detection: Alertas configuradas en el Monitoring and Alerting System notifican al equipo sobre cualquier problema en el pipeline o en las aplicaciones desplegadas.
+
+    Gestión de Incidentes:
+        Incident Response: En caso de fallos durante el despliegue o en producción, se activan procedimientos de Rollback o Recovery para minimizar el impacto y restaurar la estabilidad del sistema.
+
+Ventajas de Este Enfoque de Gestión de Código y CI/CD
+
+    Automatización y Eficiencia:
+        La automatización del pipeline CI/CD reduce errores manuales y acelera el proceso de desarrollo y despliegue.
+
+    Mejora de la Calidad del Código:
+        Las revisiones de código y las pruebas automatizadas aseguran que solo el código de alta calidad se integra en las ramas principales, mejorando la estabilidad del sistema.
+
+    Rapidez en los Despliegues:
+        El despliegue automático permite lanzar nuevas características y correcciones rápidamente, respondiendo de manera ágil a las necesidades del negocio y de los usuarios.
+
+    Colaboración Efectiva:
+        Las prácticas de colaboración como las reuniones de planificación y retrospectivas fomentan una comunicación abierta y una cultura de mejora continua dentro del equipo.
+
+    Escalabilidad y Flexibilidad:
+        La estructura de ramas permite gestionar múltiples desarrollos simultáneamente, facilitando la escalabilidad del proyecto conforme crece el equipo y las funcionalidades.
+
+    Visibilidad y Transparencia:
+        Las herramientas de monitorización y los informes de calidad proporcionan una visión clara del estado del código y del rendimiento del sistema, permitiendo tomar decisiones informadas.
+
+Próximos Pasos
+
+    Implementación del Pipeline CI/CD:
+        Configurar herramientas de CI/CD (como Jenkins, GitLab CI/CD, CircleCI) para automatizar los procesos de construcción, prueba y despliegue.
+
+    Establecimiento de Políticas de Revisión de Código:
+        Definir y aplicar estándares de código y procedimientos de revisión para asegurar la consistencia y calidad del código.
+
+    Automatización de Pruebas:
+        Desarrollar y mantener un conjunto robusto de pruebas automatizadas para cubrir pruebas unitarias, de integración y de sistema.
+
+    Integración con Herramientas de Monitorización:
+        Configurar herramientas como Prometheus y Grafana para monitorear el rendimiento y la salud de las aplicaciones desplegadas.
+
+    Capacitación del Equipo:
+        Entrenar al equipo de desarrollo sobre las mejores prácticas de gestión de ramas, revisiones de código y uso eficiente del pipeline CI/CD.
+
+    Mejora Continua:
+        Realizar retrospectivas periódicas para identificar áreas de mejora en el proceso de desarrollo y ajustar las prácticas según sea necesario.
+
+Conclusión
+
+El Diagrama de Gestión de Código y Pipeline CI/CD proporciona una estructura clara y eficiente para gestionar el ciclo de vida del desarrollo del software en la web de la librería "Sargantana Mediterrània". Al integrar prácticas sólidas de gestión de ramas, revisiones de código, pruebas automatizadas y despliegues continuos, se asegura que el sistema mantenga altos estándares de calidad, se despliegue de manera ágil y se mantenga escalable conforme crecen las necesidades del negocio.
+
+Esta integración con la topología general del sistema garantiza que todas las fases del desarrollo y despliegue trabajen en conjunto de manera armoniosa, proporcionando una base sólida para la entrega continua de valor a los usuarios. Además, la colaboración efectiva del equipo facilita una comunicación fluida y una cultura de mejora continua, clave para el éxito a largo plazo del proyecto.

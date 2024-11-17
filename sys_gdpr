@@ -1,0 +1,229 @@
+Diagramas de Cumplimiento Normativo y Legal: Importantes para asegurar que el sistema cumple con todas las normativas y leyes aplicables, evitando sanciones y protegiendo a los usuarios.
+
+
+27. Diagramas de Cumplimiento Normativo y Legal
+27.1. Diagrama de Cumplimiento de GDPR (GDPR Compliance Diagram)
+
+    Descripción: Muestra cómo el sistema cumple con las normativas de protección de datos.
+    Componentes Incluidos: Consentimiento del Usuario, Gestión de Derechos de Datos, Seguridad de Datos.
+
+graph TD
+    subgraph "User Rights Management"
+        Consent[User Consent]
+        Access[Data Access Rights]
+        Delete[Right to be Forgotten]
+        Export[Data Portability]
+    end
+
+    subgraph "Data Protection"
+        Encrypt[Data Encryption]
+        Storage[Secure Storage]
+        Transfer[Secure Transfer]
+    end
+
+    subgraph "Data Processing"
+        Purpose[Purpose Definition]
+        Minimize[Data Minimization]
+        Retention[Retention Policy]
+    end
+
+    subgraph "Compliance Monitoring"
+        Audit[Audit Trails]
+        Report[Compliance Reports]
+        Breach[Breach Detection]
+    end
+
+    Consent --> Purpose
+    Purpose --> Minimize
+    Minimize --> Storage
+    
+    Access & Delete & Export --> Audit
+    Encrypt --> Transfer
+    Transfer --> Report
+    
+    Retention --> Breach
+
+
+
++-------------------------------+       +-------------------------------+       +-------------------------------+       +-------------------------------+
+|   User Rights Management      |       |         Data Protection       |       |        Data Processing        |       |      Compliance Monitoring    |
+| +---------+ +---------+       |       | +---------+ +---------+       |       | +---------+ +---------+       |       | +---------+ +---------+       |
+| | Consent | | Access  |       |       | | Encrypt | | Storage |       |       | | Purpose | | Minimize|       |       | | Audit   | | Report  |       |
+| | User    | | Data    |       |       | | Data    | | Secure  |       |       | | Purpose | | Data    |       |       | | Audit   | | Compliance|     |
+| | Consent | | Access  |       |       | | Encryption| | Storage |       |       | | Definition| | Minimization| |       | | Trails  | | Reports |       |
+| |         | | Rights  |       |       | |         | |         |       |       | |         | |         |       |       | |         | |         |       |
+| | Delete  | | Delete  |       |       | +---------+ +---------+       |       | +---------+ +---------+       |       | +---------+ +---------+       |
+| | Right to| | Export  |       |       | | Transfer| |         |       |       | | Retention| |         |       |       | | Breach  | |         |       |
+| | be      | | Export  |       |       | | Secure  | |         |       |       | | Policy  | |         |       |       | | Detection| |         |       |
+| | Forgotten| | Data   |       |       | | Transfer| |         |       |       | |         | |         |       |       | +---------+ +---------+       |
+| +---------+ +---------+       |       | +---------+ +---------+       |       | +---------+ +---------+       |       |                               |
++-----------+-------------------+       +-----------+-------------------+       +-----------+-------------------+       +-----------+-------------------+
+            |                                    |                                       |                                       |
+            |                                    |                                       |                                       |
+            v                                    v                                       v                                       v
++-------------------------------+       +-------------------------------+       +-------------------------------+       +-------------------------------+
+|        Consent                |       |          Purpose              |       |         Minimize              |       |          Retention            |
+|       User Consent            |       |      Purpose Definition       |       |      Data Minimization        |       |        Retention Policy       |
++-------------------------------+       +-------------------------------+       +-------------------------------+       +-------------------------------+
+            |                                    |                                       |                                       |
+            |                                    |                                       |                                       |
+            v                                    v                                       v                                       v
++-------------------------------+       +-------------------------------+       +-------------------------------+       +-------------------------------+
+|         Purpose               |       |          Minimize             |       |         Storage               |       |            Breach             |
+|       Purpose Definition      |       |       Data Minimization       |       |        Secure Storage          |       |        Breach Detection       |
++-------------------------------+       +-------------------------------+       +-------------------------------+       +-------------------------------+
+            |                                    |                                       |                                       |
+            |                                    |                                       |                                       |
+            v                                    v                                       v                                       v
++-------------------------------+       +-------------------------------+       +-------------------------------+       +-------------------------------+
+|        Storage                |       |          Audit                |       |         Transfer              |       |         Audit Trails          |
+|      Secure Storage           |       |         Audit Trails          |       |        Secure Transfer         |       |      Compliance Reports       |
++-------------------------------+       +-------------------------------+       +-------------------------------+       +-------------------------------+
+            |                                    |                                       |                                       |
+            +--------------+---------------------+                                       +---------------+-----------------------+
+                           |                                                                 |
+                           v                                                                 v
+                 +-----------------------+                                       +-----------------------+
+                 |      Audit Trails     |                                       |  Compliance Reports   |
+                 +-----------------------+                                       +-----------------------+
+                           |                                                                 |
+                           +----------------------------------------------------+------------+
+                                                                                |
+                                                                                v
+                                                                     +------------------------+
+                                                                     |    Breach Detection    |
+                                                                     +------------------------+
+
+
+
+Descripción del Diagrama
+1. User Rights Management (Gestión de Derechos de Usuario)
+
+    Consent (Consentimiento del Usuario):
+        Descripción: Proceso mediante el cual los usuarios otorgan su consentimiento para el procesamiento de sus datos personales.
+        Función: Garantiza que la recolección y uso de datos se realice con el permiso explícito del usuario, cumpliendo con las regulaciones de protección de datos.
+    Access (Derechos de Acceso a Datos):
+        Descripción: Derecho de los usuarios a acceder a sus datos personales almacenados en el sistema.
+        Función: Permite a los usuarios solicitar y recibir información sobre los datos que la empresa posee sobre ellos, promoviendo la transparencia.
+    Delete (Derecho al Olvido):
+        Descripción: Derecho de los usuarios a solicitar la eliminación de sus datos personales.
+        Función: Facilita la eliminación completa de los datos del usuario del sistema, asegurando que no queden rastros de su información personal.
+    Export (Portabilidad de Datos):
+        Descripción: Derecho de los usuarios a solicitar una copia de sus datos personales en un formato estructurado y legible por máquina.
+        Función: Permite a los usuarios transferir sus datos a otro proveedor de servicios si así lo desean.
+
+2. Data Protection (Protección de Datos)
+
+    Encrypt (Encriptación de Datos):
+        Descripción: Proceso de convertir datos sensibles en un formato ilegible para protegerlos contra accesos no autorizados.
+        Función: Asegura que los datos almacenados y transferidos estén protegidos mediante técnicas de encriptación robustas.
+    Storage (Almacenamiento Seguro):
+        Descripción: Almacenamiento de datos en entornos seguros con controles de acceso estrictos.
+        Función: Protege los datos contra pérdidas, robos y accesos no autorizados mediante infraestructura segura y redundante.
+    Transfer (Transferencia Segura):
+        Descripción: Proceso de mover datos entre sistemas o ubicaciones de manera segura.
+        Función: Utiliza protocolos seguros para garantizar que los datos no sean interceptados o alterados durante la transferencia.
+
+3. Data Processing (Procesamiento de Datos)
+
+    Purpose (Definición de Propósito):
+        Descripción: Determinación clara del propósito para el cual se recopilan y procesan los datos personales.
+        Función: Asegura que los datos solo se utilicen para fines específicos y legítimos, evitando el uso indebido.
+    Minimize (Minimización de Datos):
+        Descripción: Reducción de la cantidad de datos personales recopilados y procesados al mínimo necesario.
+        Función: Limita el riesgo asociado al procesamiento de datos y cumple con el principio de minimización de datos establecido en las normativas.
+    Retention (Política de Retención):
+        Descripción: Definición de períodos específicos durante los cuales se conservarán los datos personales.
+        Función: Garantiza que los datos no se almacenen más tiempo del necesario, facilitando la eliminación segura una vez cumplido el propósito.
+
+4. Compliance Monitoring (Monitoreo de Cumplimiento)
+
+    Audit (Registro de Auditorías):
+        Descripción: Mantenimiento de registros detallados de todas las actividades relacionadas con el procesamiento de datos.
+        Función: Facilita las auditorías internas y externas, asegurando el cumplimiento continuo con las normativas de protección de datos.
+    Report (Informes de Cumplimiento):
+        Descripción: Generación de informes periódicos que demuestran el cumplimiento con las regulaciones de protección de datos.
+        Función: Proporciona transparencia y evidencia de cumplimiento para autoridades regulatorias y stakeholders.
+    Breach (Detección de Brechas de Seguridad):
+        Descripción: Identificación y respuesta rápida a incidentes de seguridad que comprometan los datos personales.
+        Función: Minimiza el impacto de brechas de seguridad mediante la detección temprana y la implementación de medidas correctivas.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Gestión de Derechos de Usuario y Protección de Datos se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con la Base de Datos MariaDB:
+        Data Protection:
+            Encrypt (Encriptación de Datos): Los datos almacenados en MariaDB están encriptados para proteger la información sensible.
+            Storage (Almacenamiento Seguro): MariaDB utiliza configuraciones de almacenamiento seguro para asegurar la integridad y confidencialidad de los datos.
+        Data Processing:
+            Purpose (Definición de Propósito): Las aplicaciones que interactúan con MariaDB están diseñadas para procesar datos únicamente para los propósitos definidos.
+            Minimize (Minimización de Datos): Las consultas y operaciones en MariaDB están optimizadas para manejar solo la cantidad mínima de datos necesarios.
+            Retention (Política de Retención): Se implementan políticas de retención en MariaDB para eliminar datos una vez que ya no son necesarios.
+
+    Interacción con el Servidor Apache y las Máquinas Virtuales (Eivissa VM y Formentera VM):
+        User Rights Management:
+            Consent, Access, Delete, Export: Los servicios alojados en Eivissa VM y Formentera VM manejan las solicitudes de derechos de los usuarios, interactuando con MariaDB para acceder, eliminar o exportar datos según las peticiones.
+        Data Protection:
+            Transfer (Transferencia Segura): Las comunicaciones entre los servidores y los usuarios están protegidas mediante SSL/TLS, garantizando transferencias de datos seguras.
+
+    Sistema de Monitorización y Alertas:
+        Compliance Monitoring:
+            Audit Trails: Los registros de auditoría generados por las aplicaciones y MariaDB son recopilados y analizados para asegurar el cumplimiento continuo.
+            Breach Detection: El sistema de monitorización detecta posibles brechas de seguridad y activa alertas para una respuesta rápida.
+
+    Pipeline CI/CD:
+        Integración de Políticas de Protección de Datos:
+            Las actualizaciones de software y configuraciones que afectan la gestión de datos pasan por el Pipeline CI/CD, asegurando que las políticas de protección de datos se implementen correctamente.
+        Automatización de Auditorías:
+            Los procesos de auditoría y generación de informes se integran en el pipeline para mantener actualizados los informes de cumplimiento.
+
+    Panel de Administración:
+        Gestión Centralizada:
+            Los administradores utilizan el panel para gestionar los derechos de los usuarios, revisar registros de auditoría y generar informes de cumplimiento.
+        Respuesta a Incidentes:
+            En caso de detección de brechas, el panel permite activar procedimientos de Breach Detection y Disaster Recovery para mitigar el impacto.
+
+    Usuarios Finales:
+        Derechos de Usuario:
+            Los usuarios pueden ejercer sus derechos de consentimiento, acceso, eliminación y portabilidad de datos a través de interfaces amigables en el sitio web, que interactúan con los servicios backend gestionados por las VMs y MariaDB.
+
+Ventajas de Este Enfoque de Gestión de Derechos y Protección de Datos
+
+    Cumplimiento Legal:
+        Garantiza el cumplimiento de regulaciones de protección de datos como el GDPR, evitando sanciones y protegiendo la reputación de la empresa.
+    Confianza del Usuario:
+        Al respetar los derechos de los usuarios y proteger sus datos, se fomenta la confianza y lealtad de los clientes hacia la librería.
+    Seguridad Mejorada:
+        La encriptación de datos y las transferencias seguras protegen contra accesos no autorizados y brechas de seguridad.
+    Transparencia y Control:
+        Los usuarios tienen control sobre sus datos, lo que aumenta la transparencia y la percepción positiva de la gestión de datos por parte de la empresa.
+    Eficiencia Operativa:
+        Las políticas de minimización y retención optimizan el uso de recursos, reduciendo la carga en el sistema y mejorando el rendimiento general.
+    Respuesta Rápida a Incidentes:
+        La detección y respuesta rápida a brechas de seguridad minimizan el impacto y garantizan la continuidad del negocio.
+
+Próximos Pasos
+
+    Implementación de Consentimiento del Usuario:
+        Desarrollar interfaces que permitan a los usuarios otorgar y revocar su consentimiento para el procesamiento de sus datos.
+    Configuración de Políticas de Acceso y Retención:
+        Definir y aplicar políticas claras sobre quién puede acceder a qué datos y cuánto tiempo se almacenarán.
+    Encriptación y Almacenamiento Seguro:
+        Implementar soluciones de encriptación para datos en reposo y en tránsito, asegurando que todos los datos sensibles estén protegidos.
+    Desarrollo de Procedimientos de Derecho al Olvido y Portabilidad:
+        Crear mecanismos que permitan a los usuarios solicitar la eliminación de sus datos y obtener copias portátiles de los mismos.
+    Establecimiento de Monitoreo de Cumplimiento:
+        Configurar sistemas de monitorización para rastrear y auditar continuamente el cumplimiento de las políticas de protección de datos.
+    Capacitación del Equipo:
+        Entrenar al equipo de TI y al personal de administración sobre las mejores prácticas de protección de datos y gestión de derechos de usuario.
+    Pruebas y Validación:
+        Realizar pruebas regulares de los procedimientos de recuperación y asegurar que las políticas de protección de datos estén correctamente implementadas y funcionando.
+    Actualización Continua:
+        Mantenerse al día con las regulaciones de protección de datos y actualizar las políticas y procedimientos según sea necesario.
+
+Conclusión
+
+El Diagrama de Gestión de Derechos de Usuario y Protección de Datos proporciona una estructura sólida y eficiente para manejar los derechos de los usuarios y proteger sus datos personales dentro del sistema de la web de la librería "Sargantana Mediterrània". Al integrar componentes clave como la gestión de consentimiento, acceso, eliminación y portabilidad de datos, junto con robustas medidas de protección y monitoreo de cumplimiento, se asegura que la empresa no solo cumpla con las normativas legales, sino que también construya una relación de confianza con sus usuarios.
+
+Esta integración en la topología general del sistema garantiza que todos los aspectos del manejo de datos estén alineados con las mejores prácticas de seguridad y privacidad, permitiendo una operación segura y transparente. Además, la implementación de procedimientos de recuperación efectivos asegura que el sistema pueda responder rápidamente a incidentes, minimizando el impacto y manteniendo la integridad y disponibilidad de los servicios ofrecidos.

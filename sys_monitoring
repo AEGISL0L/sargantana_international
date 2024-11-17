@@ -1,0 +1,192 @@
+15. Diagramas de Monitoreo y Alertas
+15.1. Diagrama de Monitorización (Monitoring Diagram)
+
+    Descripción: Muestra cómo se monitorean los componentes del sistema.
+    Componentes Incluidos: Herramientas de Monitorización (Prometheus, Grafana), Métricas Monitorizadas, Alertas Configuradas.
+
+
+
+graph TD
+    subgraph "System Components"
+        Apache[Apache Servers]
+        VMs[Virtual Machines]
+        DB[MariaDB Database]
+        Network[Network Services]
+    end
+
+    subgraph "Metrics Collection"
+        Prometheus[Prometheus]
+        NodeExp[Node Exporter]
+        MySQLExp[MySQL Exporter]
+        CustomExp[Custom Exporters]
+    end
+
+    subgraph "Visualization"
+        Grafana[Grafana Dashboards]
+        Alerts[Alert Manager]
+        Reports[Reports Generator]
+    end
+
+    Apache & VMs & DB & Network --> NodeExp & MySQLExp & CustomExp
+    NodeExp & MySQLExp & CustomExp --> Prometheus
+    Prometheus --> Grafana & Alerts & Reports
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+
+|      System Components    |       |     Metrics Collection    |       |        Visualization      |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| | Apache  | |  VMs    |    |       | |Prometheus| |NodeExp |    |       | | Grafana | | Alerts  |    |
+| |Servers  | |Virtual  |    |       | |         | |         |    |       | |Dashboards| |Manager |    |
+| |         | |Machines |    |       | |         | |         |    |       | |         | |         |    |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| |  DB     | | Network |    |       | |MySQLExp | |CustomExp|    |       | | Reports | |         |    |
+| |MariaDB  | |Services |    |       | |         | |         |    |       | |Generator| |         |    |
+| |Database | |         |    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| +---------+ +---------+    |       +---------------------------+       +---------------------------+
++-----------+----------------+                   |                                   |
+            |                                |                                   |
+            |                                |                                   |
+            v                                v                                   v
+    +-------------------+             +-------------------+             +-------------------+
+    |  Apache Servers   |             |   Node Exporter   |             |   Grafana         |
+    +-------------------+             +-------------------+             |   Dashboards      |
+            |                                |                                   |
+            v                                v                                   v
+    +-------------------+             +-------------------+             +-------------------+
+    | Virtual Machines  |             | MySQL Exporter    |             |  Alerts Manager   |
+    +-------------------+             +-------------------+             +-------------------+
+            |                                |                                   |
+            v                                v                                   v
+    +-------------------+             +-------------------+             +-------------------+
+    | MariaDB Database  |             | Custom Exporters  |             |  Reports Generator|
+    +-------------------+             +-------------------+             +-------------------+
+            |                                |                                   |
+            v                                v                                   v
+    +-------------------+             +-------------------+             +-------------------+
+    | Network Services  |             |    Prometheus     |             |                   |
+    +-------------------+             +-------------------+             +-------------------+
+
+
+
+escripción del Diagrama
+1. System Components (Componentes del Sistema)
+
+    Apache Servers (Servidores Apache):
+        Descripción: Servidores web que manejan las solicitudes HTTP/S entrantes y sirven el contenido de la web.
+        Función: Gestionan la entrega de páginas web, recursos estáticos y dinámicos a los usuarios finales, asegurando la disponibilidad y rendimiento del sitio.
+    Virtual Machines (Máquinas Virtuales):
+        Descripción: Infraestructura virtualizada que aloja diversos servicios y aplicaciones necesarios para operar el sitio web.
+        Función: Proporcionan un entorno aislado y escalable para ejecutar aplicaciones, bases de datos y otros servicios esenciales.
+    MariaDB Database (Base de Datos MariaDB):
+        Descripción: Sistema de gestión de bases de datos relacional utilizado para almacenar y gestionar datos de la aplicación.
+        Función: Almacena información crítica como datos de usuarios, contenido, transacciones y otros datos necesarios para el funcionamiento del sitio web.
+    Network Services (Servicios de Red):
+        Descripción: Componentes encargados de la gestión de la red, incluyendo firewalls, balanceadores de carga y servicios de DNS.
+        Función: Aseguran la conectividad, seguridad y distribución eficiente del tráfico de red hacia y desde los servidores.
+
+2. Metrics Collection (Colección de Métricas)
+
+    Prometheus:
+        Descripción: Herramienta de monitoreo y alerta de código abierto.
+        Función: Recopila y almacena métricas de tiempo real de los componentes del sistema, permitiendo el monitoreo detallado del rendimiento y la salud del sistema.
+    Node Exporter:
+        Descripción: Exportador de métricas para Prometheus que recopila datos del sistema operativo.
+        Función: Proporciona métricas detalladas sobre el rendimiento de las máquinas virtuales, como uso de CPU, memoria, disco y red.
+    MySQL Exporter:
+        Descripción: Exportador de métricas para Prometheus especializado en bases de datos MySQL/MariaDB.
+        Función: Recopila métricas específicas de la base de datos, como tiempos de consulta, conexiones, rendimiento de tablas y otros indicadores clave.
+    Custom Exporters (Exportadores Personalizados):
+        Descripción: Exportadores desarrollados a medida para recopilar métricas específicas de aplicaciones o servicios particulares.
+        Función: Permiten la monitorización detallada de componentes únicos o personalizados que no están cubiertos por los exportadores estándar.
+
+3. Visualization (Visualización)
+
+    Grafana Dashboards (Tableros de Grafana):
+        Descripción: Herramienta de visualización de métricas y logs.
+        Función: Crea tableros interactivos que muestran gráficas y visualizaciones de las métricas recopiladas por Prometheus, facilitando el análisis y la toma de decisiones.
+    Alert Manager (Gestor de Alertas):
+        Descripción: Componente de Prometheus para gestionar alertas.
+        Función: Procesa las alertas generadas por Prometheus, enviándolas a canales específicos como correo electrónico, Slack, SMS, entre otros, para notificar al equipo sobre incidentes críticos.
+    Reports Generator (Generador de Informes):
+        Descripción: Herramienta para generar informes periódicos sobre el rendimiento y la salud del sistema.
+        Función: Automatiza la creación de informes detallados que pueden ser revisados por el equipo de administración para evaluar tendencias y planificar mejoras.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Monitoreo y Visualización de Métricas se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con Componentes del Sistema:
+        Apache Servers, VMs, DB y Network Services: Estos componentes del sistema generan métricas de rendimiento y salud que son recopiladas por los exportadores (Node Exporter, MySQL Exporter y Custom Exporters).
+    Colección de Métricas:
+        Exportadores: Los exportadores instalados en cada componente del sistema recopilan métricas específicas y las envían a Prometheus.
+        Prometheus: Almacena estas métricas y permite consultas flexibles para analizar el rendimiento del sistema en tiempo real.
+    Visualización y Alertas:
+        Grafana Dashboards: Se conectan a Prometheus para visualizar las métricas recopiladas en forma de gráficas y paneles interactivos, proporcionando una visión clara y accesible del estado del sistema.
+        Alert Manager: Gestiona las alertas definidas en Prometheus, enviando notificaciones al equipo de TI cuando se detectan anomalías o problemas críticos.
+        Reports Generator: Utiliza los datos almacenados en Prometheus para generar informes periódicos que ayudan en la evaluación continua y planificación de mejoras del sistema.
+    Monitorización Continua:
+        Prometheus y Grafana: Juntos permiten una monitorización continua y detallada del sistema, facilitando la identificación temprana de problemas y la toma de decisiones informadas para mantener la salud y el rendimiento óptimo del sitio web.
+    Optimización y Respuesta Proactiva:
+        Alertas y Reportes: Proporcionan al equipo de administración información clave para responder proactivamente a incidentes, optimizar recursos y mejorar continuamente la infraestructura del sistema.
+
+Ventajas de Este Enfoque de Monitoreo y Visualización
+
+    Visibilidad Completa del Sistema:
+        Permite al equipo de TI tener una visión integral de todos los componentes del sistema, identificando rápidamente áreas de mejora y posibles puntos de fallo.
+
+    Detección Temprana de Problemas:
+        La monitorización en tiempo real y las alertas proactivas facilitan la identificación y resolución rápida de problemas antes de que afecten a los usuarios finales.
+
+    Mejora Continua del Rendimiento:
+        Los informes periódicos y las visualizaciones detalladas ayudan a analizar tendencias y optimizar el rendimiento del sistema de manera constante.
+
+    Eficiencia Operativa:
+        Automatiza la recopilación y visualización de métricas, reduciendo la carga manual sobre el equipo de TI y permitiéndoles enfocarse en tareas más estratégicas.
+
+    Escalabilidad:
+        La arquitectura basada en Prometheus y Grafana es altamente escalable, permitiendo añadir nuevos exportadores y componentes de monitoreo conforme el sistema crece.
+
+    Cumplimiento y Auditoría:
+        La generación de informes y el registro detallado de métricas facilitan las auditorías y aseguran el cumplimiento con normativas de rendimiento y seguridad.
+
+    Toma de Decisiones Informada:
+        Las visualizaciones y métricas precisas proporcionan datos esenciales para tomar decisiones informadas sobre la infraestructura y las mejoras del sistema.
+
+Próximos Pasos
+
+    Implementación de Exportadores:
+        Instalar y configurar Node Exporter, MySQL Exporter y Custom Exporters en los componentes clave del sistema para comenzar la recopilación de métricas.
+
+    Configuración de Prometheus:
+        Establecer Prometheus como el recolector central de métricas, definiendo las fuentes de datos y las reglas de alerta necesarias para monitorear el rendimiento del sistema.
+
+    Desarrollo de Dashboards en Grafana:
+        Crear tableros de Grafana personalizados que muestren las métricas más relevantes para el equipo de TI, facilitando la visualización y el análisis del rendimiento del sistema.
+
+    Configuración de Alert Manager:
+        Definir y configurar alertas en Prometheus que se integren con Alert Manager para notificar al equipo de incidentes críticos a través de los canales preferidos.
+
+    Generación de Informes:
+        Implementar el Reports Generator para automatizar la creación de informes periódicos que resuman el estado del sistema y las tendencias de rendimiento.
+
+    Integración con Pipeline CI/CD:
+        Integrar las configuraciones de monitoreo en el pipeline de CI/CD para asegurar que las nuevas implementaciones mantengan las configuraciones de monitoreo y alertas consistentes.
+
+    Monitorización y Ajustes Continuos:
+        Revisar y ajustar las configuraciones de monitoreo y alertas según sea necesario, asegurando que las métricas capturadas sean las más relevantes y que las alertas respondan adecuadamente a los incidentes.
+
+    Capacitación del Equipo:
+        Entrenar al equipo de TI sobre el uso de Prometheus, Grafana y las mejores prácticas de monitoreo para maximizar el valor de las herramientas implementadas.
+
+    Pruebas de Rendimiento y Resiliencia:
+        Realizar pruebas para asegurar que el sistema de monitoreo puede manejar la carga esperada y responder adecuadamente a fallos simulados.
+
+    Documentación y Políticas Internas:
+        Crear documentación detallada sobre el sistema de monitoreo, incluyendo configuraciones de exportadores, reglas de alertas y procedimientos de respuesta a incidentes.
+
+Conclusión
+
+El Diagrama de Monitoreo y Visualización de Métricas proporciona una estructura sólida y eficiente para supervisar el rendimiento y la salud del sistema de la web de la librería "Sargantana Mediterrània". Al implementar una solución integral que abarca desde la recopilación de métricas hasta su visualización y generación de alertas, se asegura que el sistema se mantenga operativo, eficiente y capaz de responder rápidamente a cualquier problema que pueda surgir.
+
+Esta integración en la topología general del sistema garantiza que todos los componentes críticos estén bajo constante vigilancia, permitiendo al equipo de TI identificar y resolver problemas de manera proactiva, optimizar el rendimiento y mantener una experiencia de usuario de alta calidad. Además, la escalabilidad y flexibilidad de la arquitectura basada en Prometheus y Grafana facilitan la adaptación a futuras expansiones y cambios en la infraestructura del sistema.

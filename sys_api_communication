@@ -1,0 +1,201 @@
+29. Diagramas de Integración de APIs y Servicios Externos
+29.1. Diagrama de Comunicación API (API Communication Diagram)
+
+    Descripción: Muestra cómo las APIs internas y externas se comunican con el sistema.
+    Componentes Incluidos: Endpoints API, Autenticación de API, Servicios Externos Integrados.
+
+
+graph TD
+    subgraph "API Gateway"
+        Gateway[API Gateway]
+        Auth[API Authentication]
+        Rate[Rate Limiting]
+    end
+
+    subgraph "Internal APIs"
+        UserAPI[User Management API]
+        RoleAPI[Role Management API]
+        DataAPI[Data Access API]
+    end
+
+    subgraph "External APIs"
+        Payment[Payment Gateway API]
+        Email[Email Service API]
+        Social[Social Media API]
+    end
+
+    subgraph "Security Layer"
+        OAuth[OAuth 2.0]
+        JWT[JWT Tokens]
+        SSL[SSL/TLS]
+    end
+
+    Gateway --> Auth --> Rate
+    Rate --> UserAPI & RoleAPI & DataAPI
+    Rate --> Payment & Email & Social
+    
+    OAuth & JWT & SSL --> Gateway
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|        API Gateway        |       |        Internal APIs      |       |        External APIs      |       |        Security Layer     |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| | Gateway | |  Auth   |   |       | | UserAPI | | RoleAPI |   |       | | Payment | |  Email  |   |       | |  OAuth  | |   JWT   |   |
+| |  API    | | Authentication| |       | |         | |         |   |       | |Gateway | |Service  |   |       | | OAuth  | |  Tokens |   |
+| | Gateway | |         |   |       | |         | |         |   |       | |  API    | |  API    |   |       | |  OAuth  | |         |   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+|            |               |       |           |               |       |           |               |       |           |             |
+|            v               |       |           v               |       |           v               |       |           v             |
+|        +---------+         |       |       +---------+         |       |       +---------+         |       |       +---------+       |
+|        | Rate    |         |       |       | DataAPI |         |       |       | Social  |         |       |       |   SSL   |       |
+|        | Limiting|         |       |       |         |         |       |       | Media   |         |       |       |  SSL/TLS|       |
+|        +---------+         |       |       +---------+         |       |       +---------+         |       |       +---------+       |
++-----------|---------------+       +-----------|---------------+       +-----------|---------------+       +-----------|-------------+
+            |                               |                               |                               |
+            |                               |                               |                               |
+            v                               v                               v                               v
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|       API Requests        |       |      API Management       |       |      Third-Party APIs     |       |      Security Controls    |
+| (Usuarios, Aplicaciones)  |       | (Gestión de Usuarios,     |       | (Pagos, Emails, Redes     |       | (Autenticación, Tokens,   |
+|                           |       | Roles, Acceso a Datos)    |       | Sociales)                 |       | Encriptación)             |
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+
+
+
+Descripción del Diagrama
+1. API Gateway (Puerta de Enlace de APIs)
+
+    Gateway (API Gateway):
+        Descripción: Punto de entrada centralizado para todas las solicitudes de API entrantes.
+        Función: Gestiona y enruta las solicitudes a las APIs internas y externas apropiadas, actuando como intermediario entre los clientes y los servicios backend.
+
+    Auth (Autenticación de API):
+        Descripción: Mecanismo de autenticación para verificar la identidad de los clientes que acceden a las APIs.
+        Función: Asegura que solo los usuarios y aplicaciones autorizados puedan acceder a las APIs, protegiendo así los recursos del sistema.
+
+    Rate Limiting (Limitación de Tasa):
+        Descripción: Controla la cantidad de solicitudes que un cliente puede realizar en un período de tiempo específico.
+        Función: Previene abusos y sobrecargas en el sistema, garantizando una distribución equitativa de recursos y manteniendo la estabilidad del servicio.
+
+2. Internal APIs (APIs Internas)
+
+    UserAPI (API de Gestión de Usuarios):
+        Descripción: Gestiona las operaciones relacionadas con los usuarios, como creación, edición, eliminación y autenticación.
+        Función: Facilita la administración de usuarios dentro del sistema, integrándose con la base de datos y otros servicios internos.
+
+    RoleAPI (API de Gestión de Roles):
+        Descripción: Maneja la asignación y administración de roles y permisos de los usuarios.
+        Función: Permite una gestión granular de accesos y privilegios, asegurando que los usuarios tengan los permisos adecuados según sus roles.
+
+    DataAPI (API de Acceso a Datos):
+        Descripción: Proporciona acceso a los datos almacenados en la base de datos, permitiendo operaciones CRUD (Crear, Leer, Actualizar, Eliminar).
+        Función: Facilita la interacción segura y eficiente con los datos, optimizando las consultas y garantizando la integridad de la información.
+
+3. External APIs (APIs Externas)
+
+    Payment Gateway API (API de Pasarela de Pagos):
+        Descripción: Integra servicios de pago externos para procesar transacciones financieras.
+        Función: Permite a los usuarios realizar pagos de manera segura y eficiente, gestionando la comunicación con proveedores de servicios de pago.
+
+    Email Service API (API de Servicio de Emails):
+        Descripción: Gestiona el envío de correos electrónicos transaccionales y de marketing.
+        Función: Facilita la comunicación con los usuarios a través de correos electrónicos automatizados y personalizados.
+
+    Social Media API (API de Redes Sociales):
+        Descripción: Integra funcionalidades de redes sociales, como inicio de sesión social y compartición de contenido.
+        Función: Mejora la interacción del usuario permitiendo autenticarse y compartir contenido directamente desde la plataforma.
+
+4. Security Layer (Capa de Seguridad)
+
+    OAuth 2.0:
+        Descripción: Protocolo de autorización que permite a los usuarios conceder acceso a sus recursos sin compartir sus credenciales.
+        Función: Facilita la autenticación y autorización segura entre servicios, mejorando la seguridad y la experiencia del usuario.
+
+    JWT Tokens (Tokens JWT):
+        Descripción: Tokens JSON Web que se utilizan para transmitir información segura entre partes como objetos JSON.
+        Función: Permite la autenticación stateless, facilitando el manejo de sesiones y la autorización de solicitudes API.
+
+    SSL/TLS (Encriptación SSL/TLS):
+        Descripción: Protocolos de seguridad que encriptan la comunicación entre el cliente y el servidor.
+        Función: Asegura que los datos transmitidos estén protegidos contra interceptaciones y manipulaciones, garantizando la confidencialidad e integridad de la información.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Gestión de APIs se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con Clientes y Aplicaciones:
+        API Requests (Solicitudes de API): Usuarios, aplicaciones móviles y otros clientes externos realizan solicitudes a través del API Gateway.
+        Gateway: El API Gateway autentica y limita la tasa de las solicitudes antes de enrutar las peticiones a las APIs internas o externas correspondientes.
+
+    Gestión Interna de Usuarios y Roles:
+        UserAPI y RoleAPI: Gestionan las operaciones relacionadas con usuarios y roles, interactuando con la base de datos MariaDB para almacenar y recuperar información.
+        DataAPI: Proporciona acceso seguro a los datos almacenados, optimizando las consultas y asegurando la integridad de los datos.
+
+    Integración con Servicios Externos:
+        Payment Gateway API: Procesa transacciones financieras, interactuando con proveedores de servicios de pago externos.
+        Email Service API: Gestiona el envío de correos electrónicos transaccionales y de marketing a los usuarios.
+        Social Media API: Facilita la integración con plataformas de redes sociales, permitiendo funciones como el inicio de sesión social y la compartición de contenido.
+
+    Capa de Seguridad Robusta:
+        OAuth 2.0 y JWT Tokens: Implementan mecanismos de autenticación y autorización seguros, permitiendo el acceso controlado a las APIs.
+        SSL/TLS: Asegura que toda la comunicación entre clientes y servidores esté encriptada, protegiendo los datos sensibles durante la transmisión.
+
+    Sistema de Monitorización y Alertas:
+        Prometheus y Grafana Dashboards: Monitorizan el rendimiento y la disponibilidad de las APIs, proporcionando visualizaciones en tiempo real y alertas sobre posibles problemas.
+        ELK Stack: Analiza los logs de las APIs para identificar patrones, errores y comportamientos inusuales, facilitando la resolución de problemas.
+
+    Pipeline CI/CD:
+        Despliegue de APIs: Los cambios y actualizaciones en las APIs internas y externas se gestionan a través del Pipeline CI/CD, asegurando que las nuevas versiones sean testeadas y desplegadas de manera controlada.
+        Test Stage: Incluye pruebas unitarias, de integración y de seguridad para garantizar la calidad y seguridad de las APIs antes de su despliegue.
+
+    Panel de Administración:
+        Gestión Centralizada: Los administradores utilizan el panel de administración para supervisar las APIs, gestionar usuarios y roles, y configurar políticas de seguridad y limitación de tasas.
+        Reportes y Auditorías: Genera informes detallados sobre el uso de las APIs, incidencias y acciones de recuperación, facilitando la auditoría y el cumplimiento de normativas.
+
+Ventajas de Este Enfoque de Gestión de APIs
+
+    Seguridad Mejorada:
+        La capa de seguridad robusta con OAuth 2.0, JWT y SSL/TLS protege las APIs contra accesos no autorizados y garantiza la integridad de los datos.
+
+    Escalabilidad y Flexibilidad:
+        El API Gateway permite escalar las APIs de manera independiente, gestionando eficientemente el tráfico y asegurando una alta disponibilidad.
+
+    Gestión Centralizada:
+        Centralizar la autenticación, limitación de tasas y enrutamiento de solicitudes facilita la administración y el monitoreo de las APIs.
+
+    Integración Sencilla con Servicios Externos:
+        Las APIs externas permiten una fácil integración con servicios de pago, email y redes sociales, mejorando la funcionalidad y la experiencia del usuario.
+
+    Monitorización y Mantenimiento Proactivo:
+        Las herramientas de monitorización y análisis de logs permiten detectar y resolver problemas rápidamente, manteniendo la operatividad del sistema.
+
+    Mejora de la Experiencia del Usuario:
+        Las APIs bien gestionadas y optimizadas proporcionan tiempos de respuesta rápidos y servicios confiables, mejorando la satisfacción y retención de los usuarios.
+
+Próximos Pasos
+
+    Implementación del API Gateway:
+        Configurar el API Gateway para gestionar el enrutamiento, autenticación y limitación de tasas de las solicitudes API.
+
+    Desarrollo e Integración de APIs Internas y Externas:
+        Desarrollar las Internal APIs (UserAPI, RoleAPI, DataAPI) y configurar las External APIs (Payment Gateway API, Email Service API, Social Media API) para integrarse con servicios externos.
+
+    Configuración de la Capa de Seguridad:
+        Implementar OAuth 2.0, JWT Tokens y SSL/TLS para asegurar todas las comunicaciones y accesos a las APIs.
+
+    Establecimiento de Estrategias de Monitorización y Alertas:
+        Configurar Prometheus, Grafana y ELK Stack para monitorizar el rendimiento de las APIs y analizar los logs en busca de anomalías.
+
+    Integración con el Pipeline CI/CD:
+        Asegurar que las nuevas versiones de las APIs pasen por el pipeline de CI/CD para pruebas y despliegue automatizado, manteniendo la calidad y seguridad.
+
+    Capacitación del Equipo de Administración:
+        Entrenar al equipo de TI sobre cómo gestionar el API Gateway, supervisar las APIs y responder a incidentes de seguridad o rendimiento.
+
+    Pruebas de Seguridad y Rendimiento:
+        Realizar pruebas de penetración y de carga para asegurar que las APIs pueden manejar el tráfico esperado y están protegidas contra vulnerabilidades.
+
+Conclusión
+
+El Diagrama de Gestión de APIs proporciona una estructura clara y eficiente para gestionar las APIs internas y externas de la web de la librería "Sargantana Mediterrània". Al integrar un API Gateway robusto, una capa de seguridad sólida y estrategias de monitorización avanzadas, se asegura que las APIs sean seguras, escalables y eficientes. Esto no solo mejora la funcionalidad y la experiencia del usuario, sino que también garantiza la protección de los datos y la disponibilidad continua de los servicios.

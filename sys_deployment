@@ -1,0 +1,377 @@
+6.2. Diagrama de Despliegue (Deployment Diagram)
+
+    Descripción: Representa la distribución física de los componentes de software en el hardware.
+    Componentes Incluidos: Servidores Web, Máquinas Virtuales, Bases de Datos, Balanceadores de Carga.
+
+graph TD
+    subgraph "Production Environment"
+        LB[Load Balancer]
+        
+        subgraph "Web Servers"
+            WS1[Apache Server 1]
+            WS2[Apache Server 2]
+        end
+        
+        subgraph "Virtual Machines"
+            EVM1[Eivissa VM Primary]
+            EVM2[Eivissa VM Backup]
+            FVM1[Formentera VM Primary]
+            FVM2[Formentera VM Backup]
+        end
+        
+        subgraph "Database Cluster"
+            DBM[MariaDB Master]
+            DBS[MariaDB Slave]
+            DBBackup[Backup Storage]
+        end
+        
+        subgraph "Monitoring"
+            Monitor[Monitoring Server]
+            LogServer[Log Server]
+        end
+    end
+
+    LB --> WS1 & WS2
+    WS1 --> EVM1 & FVM1
+    WS2 --> EVM2 & FVM2
+    
+    EVM1 & EVM2 & FVM1 & FVM2 --> DBM
+    DBM --> DBS
+    DBM --> DBBackup
+    
+    WS1 & WS2 & EVM1 & EVM2 & FVM1 & FVM2 --> LogServer
+    LogServer --> Monitor
+
+
+
+
++-----------------------------+
+|  Production Environment     |
++-----------------------------+
+|       +-------------+       |
+|       | Load Balancer|      |
+|       +-------------+       |
+|             |               |
+|     +-------+-------+       |
+|     |               |       |
+| +---------+   +---------+   |
+| |Apache   |   |Apache   |   |
+| |Server 1 |   |Server 2 |   |
+| +---------+   +---------+   |
+|     |               |       |
+|     v               v       |
+| +-------------+ +-------------+
+| | Eivissa VM  | | Eivissa VM  |
+| | Primary     | | Backup      |
+| +-------------+ +-------------+
+|     |               |       |
+| +-------------+ +-------------+
+| | Formentera  | | Formentera  |
+| | VM Primary  | | VM Backup   |
+| +-------------+ +-------------+
+|             |               |
+|             v               v
+|       +-------------+       |
+|       | MariaDB     |       |
+|       | Master      |       |
+|       +-------------+       |
+|             |               |
+|     +-------+-------+       |
+|     |               |       |
+| +-------------+   +-------------+
+| | MariaDB     |   | Backup      |
+| | Slave       |   | Storage     |
+| +-------------+   +-------------+
+|             |               |
+|             v               v
+|       +-------------+       |
+|       | Log Server  |       |
+|       +-------------+       |
+|             |               |
+|             v               |
+|       +-------------+       |
+|       | Monitoring  |       |
+|       | Server      |       |
+|       +-------------+       |
++-----------------------------+
+
+
+
+Descripción del Diagrama
+1. Load Balancer (Balanceador de Carga)
+
+    Descripción: El balanceador de carga distribuye las solicitudes entrantes entre los servidores web disponibles (Apache Server 1 y Apache Server 2).
+    Función: Mejora la disponibilidad y la tolerancia a fallos al distribuir el tráfico de manera equitativa y redirigir las solicitudes en caso de que un servidor esté inactivo.
+
+2. Web Servers (Servidores Web Apache)
+
+    Apache Server 1 y Apache Server 2:
+        Descripción: Servidores web que manejan las solicitudes HTTP/S, sirviendo contenido estático y dinámico.
+        Función: Procesan las solicitudes entrantes del balanceador de carga y se comunican con las máquinas virtuales para obtener datos o realizar operaciones.
+
+3. Virtual Machines (Máquinas Virtuales de Eivissa y Formentera)
+
+    Eivissa VM Primary y Backup:
+        Descripción: Máquinas virtuales dedicadas a la región de Eivissa, con una configuración primaria y una de respaldo para alta disponibilidad.
+        Función: Manejan las operaciones específicas de Eivissa, incluyendo el acceso a datos y la ejecución de procesos locales.
+
+    Formentera VM Primary y Backup:
+        Descripción: Máquinas virtuales dedicadas a la región de Formentera, con configuración primaria y de respaldo similar.
+        Función: Manejan las operaciones específicas de Formentera, asegurando continuidad en caso de fallos.
+
+4. Database Cluster (Clúster de Bases de Datos MariaDB)
+
+    MariaDB Master:
+        Descripción: Nodo principal del clúster de bases de datos, encargado de gestionar todas las escrituras y sincronizar los datos con los nodos esclavos.
+        Función: Proporciona acceso a datos centralizados para todas las máquinas virtuales y servidores web.
+
+    MariaDB Slave:
+        Descripción: Nodo esclavo que replica los datos del nodo maestro para distribuir la carga de lectura y proporcionar redundancia.
+        Función: Maneja las operaciones de lectura para reducir la carga del nodo maestro y mejorar el rendimiento del sistema.
+
+    Backup Storage:
+        Descripción: Almacenamiento dedicado para respaldos de la base de datos, garantizando la disponibilidad de los datos en caso de fallos.
+        Función: Permite la recuperación de datos en caso de pérdida o corrupción de la base de datos principal.
+
+5. Monitoring (Monitorización)
+
+    Log Server (Servidor de Logs):
+        Descripción: Centraliza los registros de todas las actividades de los servidores web y las máquinas virtuales.
+        Función: Proporciona trazabilidad y facilita la detección de problemas al registrar eventos y errores del sistema.
+
+    Monitoring Server (Servidor de Monitorización):
+        Descripción: Supervisa el rendimiento de todos los componentes del sistema, incluyendo servidores web, máquinas virtuales y bases de datos.
+        Función: Proporciona alertas en tiempo real sobre el estado del sistema y facilita la identificación de cuellos de botella o problemas de rendimiento.
+
+Integración en la Topología General del Sistema
+
+    Alta Disponibilidad y Escalabilidad:
+        Balanceador de Carga: Asegura que el tráfico se distribuya equitativamente entre los servidores web, proporcionando redundancia y mejorando la capacidad de respuesta.
+        Máquinas Virtuales de Respaldo: Proporcionan redundancia tanto para Eivissa como para Formentera, permitiendo una rápida recuperación en caso de fallos.
+
+    Optimización del Rendimiento:
+        Clúster de Bases de Datos: El uso de un nodo maestro y nodos esclavos permite distribuir la carga de lectura/escritura, mejorando el rendimiento y la escalabilidad del sistema.
+        Monitorización Continua: La supervisión constante de todos los componentes permite identificar problemas antes de que afecten al usuario final.
+
+    Seguridad y Recuperación:
+        Backup de Datos: El almacenamiento dedicado para respaldos garantiza que los datos puedan ser restaurados en caso de fallos o ataques.
+        Logs Centralizados: La centralización de logs permite una auditoría efectiva y una respuesta rápida a incidentes de seguridad.
+
+    Experiencia de Usuario Mejorada:
+        Baja Latencia: La distribución geográfica y el balanceo de carga reducen la latencia, mejorando la experiencia del usuario tanto en Eivissa como en Formentera.
+        Alta Disponibilidad: La redundancia y el monitoreo proactivo aseguran que el sistema esté disponible y operativo incluso durante picos de tráfico o fallos imprevistos.
+
+Ventajas de Esta Infraestructura
+
+    Escalabilidad Horizontal:
+        Permite añadir más servidores web y máquinas virtuales según crecen las necesidades del negocio sin afectar el rendimiento.
+
+    Alta Disponibilidad y Tolerancia a Fallos:
+        La redundancia en todos los niveles (balanceador de carga, máquinas virtuales, bases de datos) asegura la continuidad del servicio.
+
+    Seguridad Robusta:
+        Los respaldos regulares y la centralización de logs fortalecen la protección de datos y facilitan la respuesta a incidentes.
+
+    Monitorización Proactiva:
+        El monitoreo constante permite detectar problemas antes de que afecten al usuario final, facilitando una gestión eficiente del sistema.
+
+Próximos Pasos para la Implementación
+
+    Configuración del Balanceador de Carga:
+        Definir reglas de distribución de tráfico y configurar el balanceador para redirigir el tráfico automáticamente en caso de fallo de un servidor web.
+
+    Despliegue del Clúster de Bases de Datos:
+        Configurar la replicación entre el nodo maestro y los nodos esclavos, y establecer un plan de respaldo automatizado.
+
+    Implementación de Monitorización y Logs:
+        Configurar herramientas de monitorización como Prometheus y Grafana, y centralizar los logs utilizando ELK Stack (Elasticsearch, Logstash, Kibana).
+
+    Pruebas de Resiliencia y Recuperación:
+        Realizar simulaciones de fallos para validar la capacidad del sistema de recuperarse rápidamente sin interrupciones para el usuario final.
+
+    Documentación y Capacitación del Equipo:
+        Crear documentación detallada sobre la configuración y operación del entorno de producción, y capacitar al equipo en el manejo de incidentes y mantenimiento del sistema.
+
+Si necesitas más detalles o ajustes en el diagrama, o cualquier otra consulta relacionada con la infraestructura, estaré encantado de ayudarte.
+
+
+
++-----------------------------+
+|    Frontend Components      |
++-----------------------------+
+|  +---------+  +---------+   |
+|  |Skeleton |  |Bootstrap|   |
+|  +---------+  +---------+   |
+|  |Validation| | Styles  |   |
+|  |JS       | | CSS     |   |
+|  +---------+  +---------+   |
+|        |          |         |
+|        v          v         |
++-----------------------------+
+|       Backend Components    |
++-----------------------------+
+|  +---------+  +---------+   |
+|  |PHP      |  |Apache   |   |
+|  +---------+  +---------+   |
+|        |          |         |
+|        v          |         |
+|  +---------+      |         |
+|  |MariaDB  |      |         |
+|  +---------+      |         |
++-----------------------------+
+         |          |
+         v          v
++-----------------------------+
+|     Application Modules     |
++-----------------------------+
+|  +---------+  +---------+   |
+|  |Auth     |  |User     |   |
+|  |Module   |  |Module   |   |
+|  +---------+  +---------+   |
+|  |Role     |  |Session  |   |
+|  |Module   |  |Module   |   |
+|  +---------+  +---------+   |
+|        |          |         |
+|        v          v         |
+|  +---------+  +---------+   |
+|  |Log      |  |API      |   |
+|  |Module   |  |Service  |   |
+|  +---------+  +---------+   |
++-----------------------------+
+         |          |
+         v          v
++-----------------------------+
+|        Service Layer        |
++-----------------------------+
+|  +---------+  +---------+   |
+|  |Validation| |Security |   |
+|  |Service   | |Service  |   |
+|  +---------+  +---------+   |
+|        |          |         |
+|        v          v         |
+|  +---------+  +---------+   |
+|  | MariaDB  |  |Logging  |  |
+|  +---------+  +---------+   |
++-----------------------------+
+
+
+
+Descripción del Diagrama
+1. Frontend Components (Componentes del Frontend)
+
+    Skeleton Framework:
+        Descripción: Utilizado para proporcionar una estructura básica y diseño responsive para la aplicación.
+        Función: Facilita el diseño adaptativo y la experiencia de usuario consistente en diferentes dispositivos.
+
+    Bootstrap Framework:
+        Descripción: Framework CSS que ofrece componentes predefinidos para el diseño y la interfaz de usuario.
+        Función: Mejora la consistencia visual y permite crear interfaces modernas y responsivas.
+
+    JavaScript Validation:
+        Descripción: Validación de formularios y datos en el lado del cliente utilizando JavaScript.
+        Función: Proporciona retroalimentación inmediata al usuario, mejorando la experiencia de usuario al validar datos antes de enviarlos al servidor.
+
+    CSS Styles:
+        Descripción: Estilos personalizados para la apariencia de la aplicación.
+        Función: Define la presentación visual de la aplicación, ajustándose al branding de la librería.
+
+2. Backend Components (Componentes del Backend)
+
+    PHP Runtime:
+        Descripción: Entorno de ejecución para el código del backend, manejando la lógica de la aplicación.
+        Función: Procesa las solicitudes del cliente, ejecuta la lógica de negocio y se comunica con la base de datos.
+
+    Apache Server:
+        Descripción: Servidor web que maneja las solicitudes HTTP y sirve contenido estático y dinámico.
+        Función: Actúa como intermediario entre el cliente y el backend, gestionando las solicitudes y respuestas.
+
+    MariaDB Database:
+        Descripción: Sistema de gestión de bases de datos que almacena datos de usuarios, roles y registros de actividades.
+        Función: Proporciona almacenamiento persistente y acceso a datos estructurados para la aplicación.
+
+3. Application Modules (Módulos de Aplicación)
+
+    Authentication Module (AuthModule):
+        Descripción: Maneja el proceso de autenticación de usuarios.
+        Función: Valida credenciales y gestiona sesiones, asegurando que solo usuarios autenticados accedan al sistema.
+
+    User Management Module (UserModule):
+        Descripción: Gestiona la información de los usuarios.
+        Función: Permite crear, actualizar y eliminar usuarios, y maneja sus datos personales.
+
+    Role Management Module (RoleModule):
+        Descripción: Gestiona los roles y permisos de los usuarios.
+        Función: Define los permisos de acceso y gestiona la asignación de roles a los usuarios.
+
+    Session Handler Module (SessionModule):
+        Descripción: Gestiona las sesiones de usuario.
+        Función: Mantiene el estado de la sesión y maneja el inicio y cierre de sesión.
+
+    Logging System Module (LogModule):
+        Descripción: Registra eventos y actividades del sistema.
+        Función: Proporciona trazabilidad y facilita el monitoreo y la auditoría del sistema.
+
+4. Service Layer (Capa de Servicios)
+
+    API Services:
+        Descripción: Proporciona una interfaz para interactuar con los datos y funcionalidades del backend.
+        Función: Facilita la comunicación entre los módulos de la aplicación y la base de datos.
+
+    Validation Service:
+        Descripción: Maneja la validación de datos tanto en el frontend como en el backend.
+        Función: Asegura que los datos ingresados sean correctos y seguros antes de ser procesados o almacenados.
+
+    Security Service:
+        Descripción: Gestiona la seguridad de la aplicación, incluyendo autenticación y protección de datos.
+        Función: Implementa medidas de seguridad como hashing de contraseñas y validación de permisos.
+
+Integración en la Topología General del Sistema
+
+    Flujo de Datos:
+        Los datos ingresados en el frontend pasan por la validación en el cliente (JavaScript) antes de ser enviados al backend.
+        El backend utiliza servicios de validación y seguridad para procesar los datos, interactuando con los módulos de autenticación, usuarios y roles.
+
+    Manejo de Sesiones y Autenticación:
+        El Authentication Module verifica las credenciales y utiliza el Session Module para manejar el estado de la sesión.
+        El Security Service se comunica con el módulo de autenticación para validar permisos y proteger el acceso a datos sensibles.
+
+    Interacción con la Base de Datos:
+        Los módulos de la aplicación interactúan con MariaDB para almacenar y recuperar datos de usuarios, roles y actividades del sistema.
+        El Log Module registra eventos importantes en la base de datos para facilitar la auditoría.
+
+    Monitorización y Trazabilidad:
+        El sistema de logs proporciona trazabilidad de eventos y se integra con herramientas de monitoreo para supervisar el rendimiento y la seguridad de la aplicación.
+
+Ventajas de Esta Arquitectura
+
+    Modularidad y Escalabilidad:
+        La separación de frontend, backend y capa de servicios facilita la escalabilidad y permite actualizar o añadir nuevas funcionalidades sin afectar al sistema completo.
+
+    Seguridad Mejorada:
+        La integración de servicios de validación y seguridad reduce el riesgo de ataques y asegura la integridad de los datos.
+
+    Experiencia de Usuario Optimizada:
+        La validación en el cliente mejora la experiencia del usuario al proporcionar retroalimentación inmediata, mientras que la validación en el servidor asegura la seguridad de los datos.
+
+    Mantenimiento Simplificado:
+        La modularidad permite un mantenimiento más eficiente, ya que los componentes pueden actualizarse y depurarse de forma independiente.
+
+Próximos Pasos
+
+    Implementar la Capa de Servicios:
+        Desarrollar e integrar los servicios de API, validación y seguridad para conectar los módulos de la aplicación con el backend y la base de datos.
+
+    Desarrollar Módulos de Aplicación:
+        Completar el desarrollo de los módulos de autenticación, gestión de usuarios y roles, y manejo de sesiones.
+
+    Configurar la Base de Datos:
+        Crear y optimizar las tablas en MariaDB para soportar los datos de usuarios, roles y actividades.
+
+    Realizar Pruebas de Integración:
+        Ejecutar pruebas exhaustivas para asegurar que los componentes interactúan correctamente y que el flujo de datos es seguro y eficiente.
+
+    Documentar el Sistema:
+        Crear documentación detallada para el equipo de desarrollo y administración, explicando la arquitectura y el flujo de datos del sistema.
+
+Si necesitas más detalles sobre la implementación o ajustes en el diagrama, estaré encantado de ayudarte.
+

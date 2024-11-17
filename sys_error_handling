@@ -1,0 +1,194 @@
+20. Diagramas de Gestión de Errores y Excepciones
+20.1. Diagrama de Manejo de Errores (Error Handling Diagram)
+
+    Descripción: Muestra cómo se gestionan los errores y excepciones en el sistema.
+    Componentes Incluidos: Páginas de Error Personalizadas, Registro de Errores, Notificación al Usuario.
+
+
+graph TD
+    subgraph "Error Detection"
+        ClientError[Client-Side Errors]
+        ServerError[Server-Side Errors]
+        DBError[Database Errors]
+        NetworkError[Network Errors]
+    end
+
+    subgraph "Error Processing"
+        Logger[Error Logger]
+        Handler[Error Handler]
+        Formatter[Error Formatter]
+    end
+
+    subgraph "User Notification"
+        ErrorPage[Custom Error Pages]
+        UserMessage[User Messages]
+        AdminAlert[Admin Alerts]
+    end
+
+    subgraph "Recovery Actions"
+        Retry[Retry Logic]
+        Fallback[Fallback Systems]
+        AutoRecover[Auto Recovery]
+    end
+
+    ClientError & ServerError & DBError & NetworkError --> Logger
+    Logger --> Handler
+    Handler --> Formatter
+    Formatter --> ErrorPage & UserMessage & AdminAlert
+    Handler --> Retry & Fallback & AutoRecover
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|     Error Detection       |       |      Error Processing     |       |      User Notification    |       |      Recovery Actions     |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |ClientErr| |ServerErr|   |       | | Logger | | Handler |   |       | |ErrorPg | |UserMsg |   |       | | Retry  | |Fallback|   |
+| |Client-  | |Server-  |   |       | |Error   | |Error    |   |       | |Pages   | |Messages|   |       | |Logic   | |Systems |   |
+| |Side Err | |Side Err |   |       | |Logger  | |Handler  |   |       | |Custom  | |UserMsg |   |       | |Retry   | |Fallback|   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |DBError | |NetwErr |   |       | |Formatter|                 |       | |AdminAl |                 |       | |AutoRec |                 |
+| |DB Error | |Network |   |       | |ErrorFmt |                 |       | |Alerts  |                 |       | |AutoRec |                 |
+| |         | |Error   |   |       | +---------+                 |       | +---------+                 |       | +---------+                 |
+| +---------+ +---------+   |       +-------------------------------+       +-------------------------------+       +-------------------------------+
++-----------+----------------+                                                     |
+            |                                                              +-----+------+
+            |                                                              |  AuditLog  |
+            v                                                              +------------+
++-------------------+                                                            
+| Client-Side Errors|
++-------------------+
+
+
+
+
+Descripción del Diagrama
+1. Error Detection (Detección de Errores)
+
+    Client-Side Errors (Errores del Lado del Cliente):
+        Descripción: Errores que ocurren en el navegador o dispositivo del usuario, como fallos en scripts de JavaScript, problemas de carga de recursos, etc.
+        Función: Detectar y reportar problemas que afectan la experiencia del usuario directamente desde su dispositivo.
+    Server-Side Errors (Errores del Lado del Servidor):
+        Descripción: Errores que ocurren en el servidor, como fallos en la lógica de la aplicación, problemas de configuración, etc.
+        Función: Identificar y gestionar errores que afectan la funcionalidad del backend y la disponibilidad del servicio.
+    Database Errors (Errores de Base de Datos):
+        Descripción: Errores relacionados con las operaciones de la base de datos, como fallos en consultas, problemas de conexión, etc.
+        Función: Detectar y gestionar fallos que impactan la integridad y disponibilidad de los datos.
+    Network Errors (Errores de Red):
+        Descripción: Problemas de conectividad, como tiempos de espera agotados, fallos de DNS, interrupciones en la red, etc.
+        Función: Identificar y resolver problemas de comunicación entre clientes y servidores, así como entre servicios internos.
+
+2. Error Processing (Procesamiento de Errores)
+
+    Error Logger (Logger de Errores):
+        Descripción: Sistema encargado de registrar todos los errores detectados.
+        Función: Almacenar detalles de los errores para análisis y resolución posterior, facilitando el seguimiento y la auditoría.
+    Error Handler (Manejador de Errores):
+        Descripción: Componente que procesa los errores registrados.
+        Función: Determinar la naturaleza del error, priorizar su resolución y activar acciones correctivas necesarias.
+    Error Formatter (Formateador de Errores):
+        Descripción: Herramienta que organiza y estructura la información de los errores.
+        Función: Preparar los datos de los errores para su presentación en reportes y notificaciones, asegurando claridad y coherencia.
+
+3. User Notification (Notificación al Usuario)
+
+    Custom Error Pages (Páginas de Error Personalizadas):
+        Descripción: Páginas diseñadas para informar al usuario sobre errores de manera amigable y útil.
+        Función: Mejorar la experiencia del usuario al ofrecer información clara y opciones para continuar o reportar el problema.
+    User Messages (Mensajes para el Usuario):
+        Descripción: Notificaciones o alertas que informan al usuario sobre el estado de la aplicación o errores específicos.
+        Función: Mantener al usuario informado y reducir la frustración al interactuar con el sistema.
+    Admin Alerts (Alertas para Administradores):
+        Descripción: Notificaciones automáticas enviadas a los administradores cuando ocurren errores críticos.
+        Función: Facilitar una respuesta rápida y eficiente para resolver problemas que afectan la operatividad del sistema.
+
+4. Recovery Actions (Acciones de Recuperación)
+
+    Retry Logic (Lógica de Reintento):
+        Descripción: Mecanismo que intenta volver a ejecutar operaciones fallidas.
+        Función: Reducir la incidencia de errores temporales reintentando automáticamente acciones que podrían haber fallado por motivos transitorios.
+    Fallback Systems (Sistemas de Respaldo):
+        Descripción: Sistemas alternativos que se activan cuando los principales fallan.
+        Función: Garantizar la continuidad del servicio mediante la utilización de recursos secundarios en caso de fallos en los principales.
+    Auto Recovery (Recuperación Automática):
+        Descripción: Procedimientos automatizados que restauran el sistema a un estado funcional después de un fallo.
+        Función: Minimizar el tiempo de inactividad y asegurar la estabilidad del sistema sin intervención manual.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Gestión de Errores se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con Componentes Existentes:
+        API Gateway: Detecta errores en las solicitudes API entrantes y las redirige al sistema de detección de errores.
+        Load Balancers y Servidores Web: Capturan errores relacionados con la distribución de carga y la disponibilidad de los servidores, reportándolos al sistema de errores.
+        Servidores de Aplicaciones y Clúster de Base de Datos: Monitorean y reportan errores internos y de base de datos para su procesamiento.
+
+    Proceso de Detección y Registro de Errores:
+        Detección de Errores: Los diferentes tipos de errores (cliente, servidor, base de datos, red) son identificados en tiempo real durante las operaciones del sistema.
+        Registro de Errores: Todos los errores detectados son enviados al Error Logger, donde se almacenan para su posterior análisis y auditoría.
+
+    Procesamiento y Análisis de Errores:
+        Manejador de Errores: Evalúa la gravedad y el tipo de error, determinando las acciones a seguir.
+        Formateador de Errores: Estructura la información de los errores para facilitar su comprensión y manejo.
+
+    Notificación y Comunicación:
+        Notificaciones al Usuario: Se informan a los usuarios sobre los errores a través de Páginas de Error Personalizadas y Mensajes para el Usuario, mejorando su experiencia y reduciendo la frustración.
+        Alertas a Administradores: Se envían alertas automáticas a los administradores para que puedan intervenir rápidamente en caso de errores críticos.
+
+    Acciones de Recuperación y Continuidad:
+        Lógica de Reintento: Implementada en componentes clave para manejar errores temporales sin interrumpir el servicio.
+        Sistemas de Respaldo y Recuperación Automática: Aseguran que el sistema pueda continuar operando incluso ante fallos significativos, manteniendo la disponibilidad y estabilidad del sitio web.
+
+    Monitorización y Mejora Continua:
+        Monitorización Continua: Herramientas como Prometheus y Grafana monitorizan el rendimiento y la salud del sistema, proporcionando métricas y visualizaciones sobre la incidencia y resolución de errores.
+        Análisis de Tendencias: El análisis de los logs de errores permite identificar patrones recurrentes y áreas de mejora en la infraestructura y el código.
+
+Ventajas de Este Enfoque de Gestión de Errores
+
+    Mejora de la Experiencia del Usuario:
+        Informar a los usuarios de manera clara y amigable sobre los errores mejora su confianza y satisfacción al interactuar con el sitio web.
+
+    Alta Disponibilidad y Resiliencia:
+        La implementación de acciones de recuperación garantiza que el sistema pueda mantenerse operativo incluso ante fallos, reduciendo el tiempo de inactividad.
+
+    Eficiencia en la Resolución de Problemas:
+        Las alertas y los logs detallados permiten una identificación rápida de errores, facilitando su resolución eficiente y minimizando el impacto en los usuarios.
+
+    Cumplimiento y Auditoría:
+        El registro detallado de errores y acciones de recuperación facilita el cumplimiento de normativas y permite realizar auditorías exhaustivas del sistema.
+
+    Reducción de Riesgos:
+        La detección temprana y el manejo adecuado de errores minimizan el riesgo de incidentes mayores y protegen la integridad del sistema y de los datos de los usuarios.
+
+    Mejora Continua:
+        El análisis de errores recurrentes permite identificar y abordar vulnerabilidades en la infraestructura y el código, mejorando continuamente la robustez y el rendimiento del sistema.
+
+Próximos Pasos
+
+    Implementación de Herramientas de Logging y Monitoreo:
+        Configurar Error Logger, Error Handler y Error Formatter para capturar y procesar errores de manera eficiente.
+
+    Desarrollo de Páginas de Error Personalizadas:
+        Crear y diseñar páginas de error amigables que informen a los usuarios sobre los problemas de manera clara y proporcionen opciones para continuar o reportar el error.
+
+    Configuración de Alertas y Notificaciones:
+        Establecer alertas automáticas para notificar a los administradores sobre errores críticos y establecer procedimientos de respuesta rápida.
+
+    Implementación de Acciones de Recuperación:
+        Desarrollar y probar la lógica de reintento, sistemas de respaldo y procedimientos de recuperación automática para garantizar la continuidad del servicio.
+
+    Integración con el Pipeline CI/CD:
+        Asegurar que el pipeline de CI/CD incluya pasos para desplegar y actualizar las configuraciones de manejo de errores, manteniendo la consistencia en todos los entornos.
+
+    Capacitación del Equipo de TI:
+        Entrenar al equipo sobre el uso de las herramientas de logging, manejo de errores y procedimientos de recuperación para asegurar una respuesta eficiente ante incidentes.
+
+    Pruebas y Validación:
+        Realizar pruebas exhaustivas para validar que el sistema de detección y manejo de errores funciona correctamente y que las acciones de recuperación son efectivas.
+
+    Revisión y Optimización Continua:
+        Monitorear continuamente el desempeño del sistema de gestión de errores y realizar ajustes según sea necesario para mejorar la eficiencia y la eficacia del manejo de errores.
+
+Conclusión
+
+El Diagrama de Gestión de Errores proporciona una estructura sólida y eficiente para detectar, procesar, notificar y recuperar errores en la web de la librería "Sargantana Mediterrània". Al implementar un sistema robusto de detección y manejo de errores, se asegura que el sitio web pueda mantener una alta disponibilidad y ofrecer una experiencia de usuario óptima incluso ante fallos imprevistos.
+
+Esta integración en la topología general del sistema garantiza que todos los tipos de errores sean gestionados de manera coherente y eficiente, permitiendo una respuesta rápida y efectiva ante incidentes. Además, la implementación de acciones de recuperación y notificaciones automáticas mejora la resiliencia del sistema y minimiza el impacto de los errores en los usuarios finales.

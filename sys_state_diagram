@@ -1,0 +1,198 @@
+8. Diagramas de Estados y Ciclos de Vida
+8.1. Diagrama de Estados (State Diagram)
+
+    Descripción: Representa los diferentes estados por los que pasa un objeto (por ejemplo, sesión de usuario) y las transiciones entre ellos.
+    Escenarios Incluidos: Estados de una sesión (Inactiva, Activa, Expirada), Ciclo de vida de un usuario (Registrado, Verificado, Activo).
+
+
+
+stateDiagram-v2
+    %% Session States
+    state SessionStates {
+        [*] --> Inactive
+        Inactive --> Active: Login
+        Active --> Expired: Timeout
+        Active --> Inactive: Logout
+        Expired --> Inactive: Reset
+    }
+
+    %% User Account States
+    state UserStates {
+        [*] --> Registered
+        Registered --> Verified: Email Verification
+        Verified --> Active: Admin Approval
+        Active --> Suspended: Admin Action
+        Suspended --> Active: Admin Restore
+        Active --> [*]: Account Deletion
+    }
+
+    %% State Descriptions
+    state Inactive: Initial Session State
+    state Active: User Logged In
+    state Expired: Session Timeout
+    state Registered: Account Created
+    state Verified: Email Verified
+    state Active: Account Enabled
+
+
++----------------------------+
+|        Session States      |
++----------------------------+
+|   [*] --> Inactive         |
+|   Inactive --> Active      |
+|     : Login                |
+|   Active --> Expired       |
+|     : Timeout              |
+|   Active --> Inactive      |
+|     : Logout               |
+|   Expired --> Inactive     |
+|     : Reset                |
++----------------------------+
+
++----------------------------+
+|    User Account States     |
++----------------------------+
+|   [*] --> Registered       |
+|   Registered --> Verified  |
+|     : Email Verification   |
+|   Verified --> Active      |
+|     : Admin Approval       |
+|   Active --> Suspended     |
+|     : Admin Action         |
+|   Suspended --> Active     |
+|     : Admin Restore        |
+|   Active --> [*]           |
+|     : Account Deletion     |
++----------------------------+
+
++----------------------------+
+|     State Descriptions     |
++----------------------------+
+| Inactive  : Initial Session|
+| Active    : User Logged In |
+| Expired   : Session Timeout|
+| Registered: Account Created|
+| Verified  : Email Verified |
+| Active    : Account Enabled|
+| Suspended : Admin Action   |
+| Deleted   : Account Removed|
++----------------------------+
+
+
+
+Descripción del Diagrama
+1. Session States (Estados de Sesión)
+
+    Inactive (Inactivo):
+        Descripción: Estado inicial de una sesión donde el usuario no ha iniciado sesión.
+        Transiciones:
+            Login: El usuario ingresa sus credenciales y la sesión pasa a Active.
+        Función: Espera a que el usuario inicie sesión.
+
+    Active (Activo):
+        Descripción: El usuario ha iniciado sesión y tiene acceso al sistema.
+        Transiciones:
+            Timeout: La sesión expira por inactividad, pasando a Expired.
+            Logout: El usuario cierra la sesión manualmente, volviendo a Inactive.
+        Función: Permite al usuario interactuar con las funcionalidades del sistema.
+
+    Expired (Expirada):
+        Descripción: La sesión ha expirado por inactividad.
+        Transiciones:
+            Reset: La sesión se reinicia, volviendo a Inactive.
+        Función: Bloquea el acceso hasta que el usuario vuelva a iniciar sesión.
+
+2. User Account States (Estados de Cuenta de Usuario)
+
+    Registered (Registrado):
+        Descripción: El usuario ha creado una cuenta pero aún no ha sido verificada.
+        Transiciones:
+            Email Verification: El usuario verifica su correo electrónico, pasando a Verified.
+        Función: Indica que el registro está pendiente de verificación por parte del usuario.
+
+    Verified (Verificado):
+        Descripción: El correo electrónico del usuario ha sido verificado.
+        Transiciones:
+            Admin Approval: Un administrador revisa y aprueba la cuenta, activándola.
+        Función: Indica que el usuario ha completado la verificación inicial.
+
+    Active (Activo):
+        Descripción: La cuenta del usuario está habilitada y puede acceder al sistema.
+        Transiciones:
+            Admin Action (Suspended): Un administrador puede suspender la cuenta.
+            Account Deletion: El usuario o un administrador elimina la cuenta, finalizando el ciclo.
+        Función: Permite al usuario acceder a todas las funcionalidades de la plataforma.
+
+    Suspended (Suspendido):
+        Descripción: La cuenta ha sido suspendida por acción administrativa.
+        Transiciones:
+            Admin Restore: El administrador restablece la cuenta, volviendo a Active.
+        Función: Bloquea temporalmente el acceso del usuario al sistema.
+
+3. State Descriptions (Descripciones de Estados)
+
+    Inactive: Estado inicial de la sesión antes de iniciar sesión.
+    Active: El usuario ha iniciado sesión y está activo en el sistema.
+    Expired: La sesión ha expirado por inactividad y requiere reinicio.
+    Registered: El usuario ha creado una cuenta pero no está verificada.
+    Verified: El correo electrónico ha sido verificado, pendiente de aprobación administrativa.
+    Suspended: La cuenta del usuario está suspendida por decisión administrativa.
+    Deleted: La cuenta ha sido eliminada, finalizando el ciclo de vida del usuario.
+
+Integración en la Topología General del Sistema
+
+Este diagrama se integra en la topología general del sistema de la siguiente manera:
+
+    Gestión de Sesiones:
+        Session Manager: El módulo de gestión de sesiones controla los estados de sesión (Inactive, Active, Expired) y maneja el tiempo de inactividad para evitar accesos no autorizados.
+
+    Verificación de Cuentas:
+        Proceso de Registro y Verificación: Los usuarios pasan por un flujo de registro que incluye la creación de la cuenta, verificación de correo y aprobación administrativa antes de poder acceder al sistema.
+        Notificaciones al Usuario: Se envían correos de verificación y aprobaciones para guiar al usuario a través del proceso.
+
+    Control de Acceso y Seguridad:
+        Role Manager: Controla los estados de la cuenta (Active, Suspended) y se integra con el módulo de autenticación para validar el acceso del usuario según su estado.
+        Manejo de Suspensiones: Los administradores pueden suspender cuentas como medida de seguridad ante actividades sospechosas o violaciones de políticas.
+
+    Ciclo de Vida del Usuario:
+        Transiciones Claras: El ciclo de vida del usuario está claramente definido desde el registro hasta la eliminación de la cuenta, asegurando una gestión coherente y predecible.
+        Monitoreo y Auditoría: El estado de cada cuenta y sesión es monitoreado y registrado, permitiendo auditorías y análisis para garantizar el cumplimiento de normativas.
+
+Ventajas del Diagrama de Estados
+
+    Claridad en el Flujo de Sesiones y Cuentas:
+        Define claramente los posibles estados de una sesión y una cuenta de usuario, facilitando la implementación y el mantenimiento.
+
+    Seguridad Mejorada:
+        Incluye controles para manejar sesiones expiradas y cuentas suspendidas, reduciendo el riesgo de accesos no autorizados.
+
+    Experiencia de Usuario Optimizada:
+        Ofrece transiciones claras entre estados, guiando al usuario a través del proceso de registro, verificación y uso de la aplicación.
+
+    Cumplimiento Normativo:
+        La implementación de verificaciones de correo y aprobación administrativa cumple con normativas de protección de datos y seguridad.
+
+    Escalabilidad y Flexibilidad:
+        Permite la incorporación de nuevos estados o transiciones según evoluciona la aplicación, facilitando su adaptación a nuevas necesidades.
+
+Próximos Pasos
+
+    Implementar el Módulo de Gestión de Sesiones:
+        Configurar tiempos de expiración de sesión y mecanismos de reinicio para asegurar la integridad de las sesiones.
+
+    Desarrollar el Proceso de Verificación de Correo:
+        Implementar el envío de correos de verificación y el manejo de respuestas para actualizar el estado de la cuenta.
+
+    Integrar el Control de Acceso:
+        Configurar el Role Manager para manejar los estados de la cuenta (Active, Suspended) y sus transiciones.
+
+    Monitorizar Estados y Transiciones:
+        Utilizar herramientas de monitoreo para supervisar el flujo de sesiones y cuentas, detectando posibles problemas o actividades inusuales.
+
+    Documentar el Proceso y Capacitar al Equipo:
+        Crear documentación detallada del flujo de estados y entrenar al equipo en su implementación y mantenimiento.
+
+Si necesitas más detalles sobre la implementación de estos componentes o ajustes en el diagrama, estaré encantado de ayudarte.
+
+
+

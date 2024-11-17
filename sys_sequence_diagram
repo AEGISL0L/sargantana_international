@@ -1,0 +1,153 @@
+Diagramas de Secuencia y Flujo de Trabajo: Permiten entender la interacción temporal entre componentes y cómo se ejecutan los procesos dentro del sistema.
+
+5. Diagramas de Secuencia y Flujo de Trabajo
+5.1. Diagrama de Secuencia (Sequence Diagram)
+
+    Descripción: Muestra cómo los objetos o componentes interactúan en una secuencia temporal para realizar una funcionalidad específica.
+    Escenarios Incluidos: Proceso de inicio de sesión, registro de usuario, manejo de sesión, cierre de sesión.
+
+sequenceDiagram
+    participant User
+    participant Browser
+    participant Apache
+    participant AuthModule
+    participant SessionMgr
+    participant MariaDB
+
+    %% Login Flow
+    User->>Browser: Enter Credentials
+    Browser->>Apache: POST /login.php
+    Apache->>AuthModule: Validate Request
+    AuthModule->>MariaDB: Query User Data
+    MariaDB-->>AuthModule: Return User Info
+    AuthModule->>SessionMgr: Create Session
+    SessionMgr-->>AuthModule: Session Token
+    AuthModule-->>Browser: Set Session Cookie
+    Browser-->>User: Redirect to Dashboard
+
+    %% Session Check
+    Browser->>Apache: Request Protected Page
+    Apache->>SessionMgr: Verify Session
+    SessionMgr->>MariaDB: Validate Token
+    MariaDB-->>SessionMgr: Session Valid
+    SessionMgr-->>Apache: Allow Access
+    Apache-->>Browser: Return Protected Content
+
+    %% Logout Flow
+    User->>Browser: Click Logout
+    Browser->>Apache: GET /logout.php
+    Apache->>SessionMgr: Destroy Session
+    SessionMgr->>MariaDB: Remove Session
+    MariaDB-->>SessionMgr: Session Removed
+    SessionMgr-->>Browser: Clear Cookie
+    Browser-->>User: Redirect to Login
+
+
+
+Diagrama ASCII de Secuencia del Proceso de Autenticación
+
+User          --> Browser: Enter Credentials
+Browser       --> Apache: POST /login.php
+Apache        --> AuthModule: Validate Request
+AuthModule    --> MariaDB: Query User Data
+MariaDB       --> AuthModule: Return User Info
+AuthModule    --> SessionMgr: Create Session
+SessionMgr    --> AuthModule: Session Token
+AuthModule    --> Browser: Set Session Cookie
+Browser       --> User: Redirect to Dashboard
+
+Browser       --> Apache: Request Protected Page
+Apache        --> SessionMgr: Verify Session
+SessionMgr    --> MariaDB: Validate Token
+MariaDB       --> SessionMgr: Session Valid
+SessionMgr    --> Apache: Allow Access
+Apache        --> Browser: Return Protected Content
+
+User          --> Browser: Click Logout
+Browser       --> Apache: GET /logout.php
+Apache        --> SessionMgr: Destroy Session
+SessionMgr    --> MariaDB: Remove Session
+MariaDB       --> SessionMgr: Session Removed
+SessionMgr    --> Browser: Clear Cookie
+Browser       --> User: Redirect to Login
+
+Descripción del Diagrama de Secuencia
+1. Login Flow (Flujo de Inicio de Sesión)
+
+    Paso 1: El usuario ingresa sus credenciales en la página de login.
+    Paso 2: El navegador envía una solicitud POST a login.php en el servidor Apache.
+    Paso 3: Apache redirige la solicitud al módulo de autenticación (AuthModule) para validar las credenciales.
+    Paso 4: El AuthModule consulta a la base de datos MariaDB para obtener la información del usuario.
+    Paso 5: MariaDB devuelve la información del usuario al AuthModule.
+    Paso 6: El AuthModule solicita al SessionMgr la creación de una nueva sesión.
+    Paso 7: El SessionMgr devuelve un token de sesión al AuthModule.
+    Paso 8: El AuthModule establece una cookie de sesión en el navegador del usuario.
+    Paso 9: El navegador redirige al usuario al Dashboard o página de inicio.
+
+2. Session Check (Verificación de Sesión)
+
+    Paso 1: El navegador solicita una página protegida al servidor Apache.
+    Paso 2: Apache verifica la sesión del usuario a través del SessionMgr.
+    Paso 3: El SessionMgr consulta a MariaDB para validar el token de sesión.
+    Paso 4: MariaDB confirma que la sesión es válida.
+    Paso 5: El SessionMgr notifica a Apache que el acceso está permitido.
+    Paso 6: Apache devuelve el contenido protegido al navegador.
+
+3. Logout Flow (Flujo de Cierre de Sesión)
+
+    Paso 1: El usuario hace clic en el botón de logout.
+    Paso 2: El navegador envía una solicitud GET a logout.php en el servidor Apache.
+    Paso 3: Apache solicita al SessionMgr destruir la sesión activa.
+    Paso 4: El SessionMgr elimina la sesión de la base de datos MariaDB.
+    Paso 5: MariaDB confirma que la sesión ha sido eliminada.
+    Paso 6: El SessionMgr solicita al navegador que elimine la cookie de sesión.
+    Paso 7: El navegador redirige al usuario de vuelta a la página de login.
+
+Integración en la Topología General del Sistema
+
+    Gestión Centralizada de Sesiones:
+        El SessionMgr actúa como el componente central para manejar todas las sesiones de usuario, interactuando con Apache y MariaDB para validar y destruir sesiones.
+
+    Seguridad y Control de Acceso:
+        El proceso de validación del token de sesión garantiza que solo los usuarios autenticados puedan acceder a contenido protegido, mejorando la seguridad del sistema.
+        El flujo de cierre de sesión asegura que todas las sesiones se destruyan correctamente, eliminando posibles accesos no autorizados.
+
+    Uso de Cookies para Autenticación:
+        La cookie de sesión establecida en el navegador permite mantener el estado de autenticación del usuario, evitando la necesidad de iniciar sesión repetidamente.
+
+    Interacción con la Base de Datos:
+        MariaDB almacena y gestiona los datos de sesión, proporcionando persistencia y permitiendo validar la autenticidad de las sesiones en cada solicitud.
+
+Ventajas del Proceso de Autenticación Propuesto
+
+    Seguridad Mejorada:
+        La verificación de sesión mediante tokens y la destrucción de sesiones al hacer logout previenen accesos no autorizados.
+        El uso de cookies seguras ayuda a proteger el estado de autenticación del usuario.
+
+    Experiencia de Usuario Optimizada:
+        El usuario es redirigido automáticamente al dashboard después de iniciar sesión exitosamente, mejorando la usabilidad.
+        El flujo de logout asegura una desconexión limpia y notifica al usuario de manera clara.
+
+    Escalabilidad y Mantenimiento:
+        La separación de responsabilidades entre el AuthModule, SessionMgr y MariaDB permite escalar cada componente de forma independiente según las necesidades del sistema.
+        La gestión centralizada de sesiones facilita el monitoreo y depuración de problemas.
+
+Próximos Pasos para la Implementación
+
+    Desarrollar el Módulo de Autenticación:
+        Implementar la lógica de validación de credenciales en el AuthModule, incluyendo consultas a la base de datos y manejo de errores.
+
+    Configurar la Gestión de Sesiones:
+        Configurar el SessionMgr para crear, validar y destruir sesiones de usuario, utilizando tokens seguros.
+
+    Implementar la Persistencia de Sesiones en MariaDB:
+        Crear la tabla de sesiones en MariaDB y desarrollar las consultas necesarias para almacenar y recuperar datos de sesión.
+
+    Integrar el Módulo de Logout:
+        Implementar el flujo de logout para asegurar que las sesiones se destruyan correctamente y las cookies sean eliminadas.
+
+    Realizar Pruebas de Autenticación:
+        Ejecutar pruebas de inicio de sesión, verificación de sesión y logout para validar el correcto funcionamiento del flujo.
+
+    Documentar el Proceso:
+        Crear documentación para el equipo de desarrollo y administración, explicando el flujo de autenticación y cómo manejar posibles problemas.

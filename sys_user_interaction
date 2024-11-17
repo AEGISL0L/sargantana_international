@@ -1,0 +1,240 @@
+17. Diagramas de Interacción de Usuarios
+17.1. Diagrama de Interacción Usuario-Sistema (User-System Interaction Diagram)
+
+    Descripción: Ilustra cómo los usuarios interactúan con el sistema a través de la interfaz web.
+    Componentes Incluidos: Páginas Web, Formularios, Feedback al Usuario, Navegación entre Páginas.
+
+
+graph TD
+    subgraph "User Entry Points"
+        Home[Homepage]
+        Login[Login Page]
+        Register[Registration]
+    end
+
+    subgraph "Main Navigation"
+        Intranet[Intranet]
+        Portal[Client Portal]
+        Library[Library Section]
+        About[About Us]
+    end
+
+    subgraph "User Feedback"
+        Success[Success Messages]
+        Error[Error Messages]
+        Validation[Form Validation]
+    end
+
+    subgraph "Session Flow"
+        Active[Active Session]
+        Timeout[Session Timeout]
+        Logout[Logout]
+    end
+
+    Home --> Login & Register
+    Login --> |Success| Intranet & Portal
+    Login --> |Error| Error
+    Register --> Validation
+    Validation --> |Valid| Success
+    Validation --> |Invalid| Error
+    
+    Intranet & Portal --> Library & About
+    Active --> Timeout & Logout
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|      User Entry Points    |       |       Main Navigation     |       |       User Feedback       |       |        Session Flow       |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |  Home   | |  Login  |   |       | |Intranet | | Portal  |   |       | |Success | |  Error  |   |       | | Active | | Timeout |   |
+| |Homepage | |Page     |   |       | |         | | Client  |   |       | |Messages| |Messages |   |       | |Session | |         |   |
+| +---------+ +---------+   |       | |         | | Portal  |   |       | +---------+ +---------+   |       | |         | |         |   |
+| |Register | |         |   |       | | Library | |         |   |       | |Validation| |         |   |       | | Logout | |         |   |
+| |Registration| |         |   |       | |Section  | | About   |   |       | |Form     | |         |   |       | |         | |         |   |
+| +---------+ +---------+   |       | |         | | Us      |   |       | |Validation| |         |   |       | |         | |         |   |
++-----------+----------------+       +-----------+---------------+       +-----------+---------------+       +-----------+---------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |      Homepage     |             |      Intranet     |             |  Success Messages |             |   Active Session  |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |    Login Page     |             |   Client Portal   |             |  Form Validation  |             |   Session Timeout |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |  Registration     |             |  Library Section  |             |   Error Messages  |             |      Logout       |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            +--------------+-----------------+                                 |                                 |
+                           |                                               +-----+------+                          |
+                           v                                               | Validation |                          |
+            +-------------------------------+                          |             |                          |
+            |         Validation            |                          +-----+------+                          |
+            +-------------------------------+                                |                                 |
+                           |                                                v                                 |
+                           |                                   +---------------------+                       |
+                           +---------------------------------->|    Success Messages |                       |
+                                                                   +---------------------+                       |
+                                                                                                              |
+                                                                                                              v
+                                                                                                   +---------------------+
+                                                                                                   |  Error Messages     |
+                                                                                                   +---------------------+
+    ```
+
+### **Descripción del Diagrama**
+
+#### **1. User Entry Points (Puntos de Entrada del Usuario)**
+   - **Homepage (Página Principal):**
+     - **Descripción:** Página de inicio de la web de la librería, donde los usuarios pueden explorar el contenido y acceder a diferentes secciones.
+     - **Función:** Actúa como el punto de partida para los usuarios, proporcionando enlaces a la página de inicio de sesión y registro.
+
+   - **Login Page (Página de Inicio de Sesión):**
+     - **Descripción:** Página donde los usuarios pueden ingresar sus credenciales para acceder a sus cuentas.
+     - **Función:** Autentica a los usuarios y redirige a las secciones correspondientes según el resultado (éxito o error).
+
+   - **Registration (Registro):**
+     - **Descripción:** Página donde los nuevos usuarios pueden crear una cuenta.
+     - **Función:** Permite a los usuarios registrarse proporcionando información necesaria y gestionar la validación de los datos ingresados.
+
+#### **2. Main Navigation (Navegación Principal)**
+   - **Intranet (Intranet):**
+     - **Descripción:** Sección destinada a usuarios internos, como empleados o administradores.
+     - **Función:** Proporciona acceso a herramientas y recursos internos de la librería.
+
+   - **Client Portal (Portal de Clientes):**
+     - **Descripción:** Área reservada para clientes registrados, donde pueden gestionar sus cuentas, pedidos, y acceder a contenido exclusivo.
+     - **Función:** Facilita la interacción y gestión de servicios para los clientes de la librería.
+
+   - **Library Section (Sección de la Biblioteca):**
+     - **Descripción:** Área que contiene el catálogo de libros, información sobre autores, y recursos educativos.
+     - **Función:** Permite a los usuarios buscar y explorar el contenido disponible en la librería.
+
+   - **About Us (Sobre Nosotros):**
+     - **Descripción:** Página que brinda información sobre la librería, su historia, misión y equipo.
+     - **Función:** Ayuda a los usuarios a conocer mejor la entidad detrás de la web, fortaleciendo la confianza y conexión con la audiencia.
+
+#### **3. User Feedback (Retroalimentación del Usuario)**
+   - **Success Messages (Mensajes de Éxito):**
+     - **Descripción:** Notificaciones que informan a los usuarios sobre acciones completadas exitosamente, como un registro o inicio de sesión correcto.
+     - **Función:** Mejora la experiencia del usuario al proporcionar confirmaciones claras de sus acciones.
+
+   - **Error Messages (Mensajes de Error):**
+     - **Descripción:** Notificaciones que alertan a los usuarios sobre problemas o errores ocurridos, como credenciales incorrectas o fallos en el registro.
+     - **Función:** Informa a los usuarios sobre problemas y les guía para resolverlos, reduciendo la frustración y mejorando la usabilidad.
+
+   - **Form Validation (Validación de Formularios):**
+     - **Descripción:** Proceso que verifica la exactitud y completitud de los datos ingresados en formularios de registro y inicio de sesión.
+     - **Función:** Asegura que la información proporcionada por los usuarios sea válida y cumple con los requisitos establecidos, evitando errores y problemas posteriores.
+
+#### **4. Session Flow (Flujo de Sesión)**
+   - **Active Session (Sesión Activa):**
+     - **Descripción:** Estado donde el usuario está autenticado y tiene acceso a las funcionalidades del sistema.
+     - **Función:** Mantiene la sesión del usuario activa durante su interacción con la web, permitiendo acceso continuo a recursos protegidos.
+
+   - **Session Timeout (Expiración de Sesión):**
+     - **Descripción:** Evento que ocurre cuando una sesión activa ha estado inactiva durante un período definido y se expira.
+     - **Función:** Mejora la seguridad al cerrar automáticamente sesiones inactivas, protegiendo la información del usuario.
+
+   - **Logout (Cerrar Sesión):**
+     - **Descripción:** Acción que finaliza la sesión del usuario y lo redirige a una página pública o de confirmación.
+     - **Función:** Permite a los usuarios cerrar su sesión de manera segura, asegurando que no quede acceso abierto a su cuenta.
+
+### **Integración en la Topología General del Sistema**
+
+Este **Diagrama de Gestión de Usuarios y Navegación** se integra en la **topología general del sistema** de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+1. **Interacción con el Core System:**
+   - **API Gateway:** Gestiona las solicitudes entrantes desde los puntos de entrada del usuario (Homepage, Login, Register) y las dirige a los servicios internos correspondientes, como autenticación y gestión de usuarios.
+   - **Auth Service:** Procesa las solicitudes de inicio de sesión y registro, autentica a los usuarios y gestiona la creación y mantenimiento de sesiones activas.
+
+2. **Flujo de Autenticación y Navegación:**
+   - **Login y Registro:** Las páginas de inicio de sesión y registro interactúan con el **Auth Service** para autenticar usuarios y crear nuevas cuentas. Dependiendo del resultado, redirigen a los usuarios a las secciones apropiadas (Intranet, Client Portal) o muestran mensajes de error.
+   - **Navegación Principal:** Una vez autenticados, los usuarios acceden a las diferentes secciones de la web (Intranet, Client Portal, Library, About Us) según sus roles y permisos asignados.
+
+3. **Gestión de Sesiones:**
+   - **Active Session:** Mantiene la sesión del usuario activa durante su navegación, permitiendo acceso continuo a recursos protegidos.
+   - **Session Timeout y Logout:** Gestionan la expiración de sesiones inactivas y permiten a los usuarios cerrar sus sesiones de manera segura, integrándose con el **Auth Service** para invalidar tokens de acceso.
+
+4. **Retroalimentación y Validación:**
+   - **User Feedback:** Los servicios de autenticación y registro utilizan el **Error Handler** y el **Success Handler** para proporcionar retroalimentación inmediata a los usuarios, mejorando la interacción y la experiencia general.
+   - **Form Validation:** Se implementa en los formularios de registro y inicio de sesión para garantizar que los datos ingresados sean correctos y completos antes de enviarlos al servidor.
+
+5. **Integración con Otros Componentes del Sistema:**
+   - **Payment Services, Communication, Social Integration:** Aunque no están directamente conectados en este diagrama, la navegación principal puede incluir enlaces a servicios de pago, comunicaciones y funcionalidades sociales, integrándose con el **API Gateway** para acceder a estos servicios.
+   - **Caching Layers:** Para mejorar el rendimiento, las páginas y recursos frecuentes pueden ser cacheados a nivel del navegador o del servidor, integrándose con las estrategias de caching ya establecidas.
+
+6. **Monitorización y Seguridad:**
+   - **Monitoring Tools:** Herramientas como **Prometheus** y **Grafana** monitorean el rendimiento de las páginas de inicio de sesión, registro y navegación, asegurando que los tiempos de respuesta sean óptimos y detectando posibles problemas de seguridad.
+   - **Security Measures:** Implementaciones de HTTPS, protección contra ataques de fuerza bruta en login y validación estricta de datos para prevenir vulnerabilidades.
+
+### **Ventajas de Este Enfoque de Gestión de Usuarios y Navegación**
+
+1. **Mejora de la Experiencia del Usuario:**
+   - **Interfaz Clara y Accesible:** Facilita la navegación a través de puntos de entrada bien definidos y una estructura de navegación intuitiva.
+   - **Retroalimentación Instantánea:** Mensajes de éxito y error proporcionan a los usuarios información clara sobre sus acciones, mejorando la interacción.
+
+2. **Seguridad Robusta:**
+   - **Gestión Efectiva de Sesiones:** Implementación de tiempos de expiración y opciones de cierre de sesión aseguran que las sesiones no permanezcan abiertas innecesariamente, protegiendo la información del usuario.
+   - **Autenticación y Autorización:** Asegura que solo los usuarios autorizados accedan a las secciones correspondientes del sitio, manteniendo la integridad de los recursos internos.
+
+3. **Escalabilidad y Mantenibilidad:**
+   - **Modularidad:** La separación de componentes facilita la actualización y el mantenimiento de cada sección sin afectar al sistema en su totalidad.
+   - **Flexibilidad:** Permite la adición de nuevas secciones o funcionalidades en la navegación principal sin reestructurar completamente el sistema.
+
+4. **Eficiencia Operativa:**
+   - **Automatización de Procesos:** Validaciones automáticas y gestión de sesiones reducen la carga administrativa y minimizan errores manuales.
+   - **Optimización de Recursos:** Utilización de caching para mejorar tiempos de carga y reducir la carga en los servidores.
+
+5. **Cumplimiento y Auditoría:**
+   - **Registro de Actividades:** La implementación de **Audit Logging** permite rastrear todas las acciones relacionadas con la creación y gestión de usuarios, facilitando auditorías y el cumplimiento de normativas como el GDPR.
+
+6. **Personalización y Adaptabilidad:**
+   - **Form Validation y Feedback:** Adaptación de mensajes y validaciones según las necesidades del usuario mejora la usabilidad y la satisfacción.
+   - **Adaptación Regional:** Integración con estrategias de caching y localización asegura que la navegación sea relevante para diferentes audiencias.
+
+### **Próximos Pasos**
+
+1. **Implementación de Páginas de Inicio de Sesión y Registro:**
+   - Desarrollar interfaces de usuario amigables y seguras para el inicio de sesión y registro, integrando validaciones de formulario y manejo de mensajes de éxito y error.
+
+2. **Integración con el Auth Service:**
+   - Asegurar que las páginas de login y registro se comuniquen correctamente con el servicio de autenticación para gestionar credenciales y sesiones de usuario.
+
+3. **Desarrollo de la Navegación Principal:**
+   - Crear enlaces y secciones accesibles desde la navegación principal, asegurando que los usuarios puedan acceder fácilmente a Intranet, Client Portal, Library y About Us según sus roles.
+
+4. **Configuración de Gestión de Sesiones:**
+   - Implementar mecanismos para mantener sesiones activas y gestionar tiempos de expiración, asegurando la seguridad y continuidad de la experiencia del usuario.
+
+5. **Implementación de Feedback de Usuario:**
+   - Desarrollar sistemas de mensajes de éxito y error que informen a los usuarios sobre el estado de sus acciones, integrándose con los servicios de backend para obtener información precisa.
+
+6. **Optimización y Caching:**
+   - Integrar estrategias de caching para las páginas de inicio, login y registro, mejorando los tiempos de carga y reduciendo la carga en los servidores.
+
+7. **Monitorización y Alertas:**
+   - Configurar herramientas de monitorización para rastrear el rendimiento de las páginas de entrada y navegación, estableciendo alertas para detectar y resolver rápidamente cualquier problema.
+
+8. **Capacitación del Equipo:**
+   - Entrenar al equipo de desarrollo y soporte sobre las mejores prácticas de gestión de usuarios, seguridad y optimización de la experiencia de navegación.
+
+9. **Pruebas de Usabilidad y Seguridad:**
+   - Realizar pruebas exhaustivas para asegurar que las páginas de entrada y navegación sean intuitivas, seguras y libres de vulnerabilidades.
+
+10. **Documentación y Políticas Internas:**
+    - Crear documentación detallada sobre los flujos de usuario, estrategias de validación y gestión de sesiones, proporcionando guías claras para futuros desarrollos y mantenimientos.
+
+### **Conclusión**
+
+El **Diagrama de Gestión de Usuarios y Navegación** proporciona una estructura clara y eficiente para manejar los puntos de entrada de los usuarios, la navegación principal, la retroalimentación y el flujo de sesiones en la web de la librería "Sargantana Mediterrània". Al definir de manera estructurada cómo los usuarios interactúan con el sistema desde el inicio hasta la navegación interna, se garantiza una experiencia de usuario fluida, segura y personalizada.
+
+Esta integración en la **topología general del sistema** asegura que todas las fases de interacción del usuario estén bien gestionadas y optimizadas, mejorando la eficiencia operativa y la satisfacción del usuario. Además, la implementación de estrategias de seguridad y monitorización fortalece la resiliencia del sistema, permitiendo una respuesta rápida ante posibles incidentes y manteniendo la integridad y disponibilidad del sitio web.
+
+Este enfoque integral no solo mejora la usabilidad y seguridad del sistema, sino que también facilita la escalabilidad y el mantenimiento continuo, adaptándose a las necesidades cambiantes del negocio y de los usuarios finales. Si necesitas más detalles sobre la implementación de alguno de estos componentes, ajustes en el diagrama o cualquier otra consulta relacionada con la arquitectura del sistema, no dudes en indicarlo.
+

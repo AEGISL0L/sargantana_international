@@ -1,0 +1,213 @@
+18. Diagramas de Implementación de Servicios Externos
+18.1. Diagrama de Integración de Servicios Externos (External Services Integration Diagram)
+
+    Descripción: Muestra cómo se integran servicios externos con el sistema.
+    Componentes Incluidos: Pasarelas de Pago, APIs de Redes Sociales, Servicios de Envío de Correos Electrónicos.
+
+graph TD
+    subgraph "Core System"
+        API[API Gateway]
+        Auth[Auth Service]
+        Cache[Cache Layer]
+    end
+
+    subgraph "Payment Services"
+        Payment[Payment Gateway]
+        Stripe[Stripe API]
+        PayPal[PayPal API]
+    end
+
+    subgraph "Communication"
+        Email[Email Service]
+        SMS[SMS Gateway]
+        Push[Push Notifications]
+    end
+
+    subgraph "Social Integration"
+        Social[Social Media API]
+        Share[Share Service]
+        Login[Social Login]
+    end
+
+    API --> Auth
+    Auth --> Cache
+    
+    API --> Payment
+    Payment --> Stripe & PayPal
+    
+    API --> Email & SMS & Push
+    
+    API --> Social
+    Social --> Share & Login
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|        Core System        |       |     Payment Services      |       |       Communication       |       |    Social Integration     |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| |  API    | |  Auth   |    |       | |Payment  | | Stripe  |    |       | | Email   | | SMS     |    |       | | Social  | | Share   |    |
+| |Gateway  | |Service  |    |       | |Gateway  | | API     |    |       | |Service  | |Gateway  |    |       | | Media   | | Service |    |
+| |         | |         |    |       | |         | |         |    |       | |         | |         |    |       | | API     | |         |    |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
++-----------+----------------+       +-----------+---------------+       +-----------+---------------+       +-----------+---------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |    API Gateway    |             |  Payment Gateway  |             |   Email Service   |             | Social Media API  |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |    Auth Service   |             |     Stripe API    |             |   SMS Gateway     |             |    Share Service   |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |    Cache Layer    |             |    PayPal API     |             | Push Notifications|             |  Social Login     |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+
+
+
+Descripción del Diagrama
+1. Core System (Sistema Central)
+
+    API Gateway (API Gateway):
+        Descripción: Punto de entrada principal para todas las solicitudes entrantes al sistema.
+        Función: Gestiona y enruta las solicitudes a los servicios internos apropiados, actuando como un intermediario entre los clientes y los microservicios.
+    Auth Service (Servicio de Autenticación):
+        Descripción: Servicio dedicado a manejar la autenticación y autorización de usuarios.
+        Función: Verifica las credenciales de los usuarios, gestiona tokens de acceso y asegura que solo los usuarios autorizados puedan acceder a recursos protegidos.
+    Cache Layer (Capa de Caché):
+        Descripción: Sistema de almacenamiento en memoria para cachear datos frecuentemente accedidos.
+        Función: Mejora el rendimiento del sistema reduciendo la latencia y la carga en los servicios y bases de datos subyacentes.
+
+2. Payment Services (Servicios de Pago)
+
+    Payment Gateway (Gateway de Pago):
+        Descripción: Intermediario entre el sistema y las plataformas de pago externas.
+        Función: Procesa transacciones financieras, manejando la comunicación segura con proveedores de pago como Stripe y PayPal.
+    Stripe API (API de Stripe):
+        Descripción: Integración con la plataforma de pagos Stripe.
+        Función: Facilita la gestión de pagos, suscripciones y transacciones recurrentes de manera segura y eficiente.
+    PayPal API (API de PayPal):
+        Descripción: Integración con la plataforma de pagos PayPal.
+        Función: Permite a los usuarios realizar pagos utilizando sus cuentas de PayPal, ofreciendo una opción de pago adicional y ampliamente reconocida.
+
+3. Communication (Comunicación)
+
+    Email Service (Servicio de Email):
+        Descripción: Servicio encargado de enviar correos electrónicos a los usuarios.
+        Función: Gestiona el envío de notificaciones, confirmaciones de pedidos, restablecimiento de contraseñas y otros tipos de comunicaciones por email.
+    SMS Gateway (Gateway de SMS):
+        Descripción: Intermediario para el envío de mensajes de texto (SMS) a los usuarios.
+        Función: Envía notificaciones urgentes, códigos de verificación y alertas directamente a los dispositivos móviles de los usuarios.
+    Push Notifications (Notificaciones Push):
+        Descripción: Servicio para enviar notificaciones push a las aplicaciones móviles o web.
+        Función: Mantiene a los usuarios informados sobre actualizaciones, promociones y otras comunicaciones relevantes en tiempo real.
+
+4. Social Integration (Integración Social)
+
+    Social Media API (API de Redes Sociales):
+        Descripción: Integración con plataformas de redes sociales como Facebook, Twitter, etc.
+        Función: Permite funcionalidades como compartir contenido, iniciar sesión utilizando cuentas de redes sociales y sincronizar datos sociales.
+    Share Service (Servicio de Compartir):
+        Descripción: Servicio dedicado a gestionar las funcionalidades de compartir contenido en redes sociales.
+        Función: Facilita que los usuarios compartan productos, reseñas y otros contenidos directamente desde el sitio web a sus perfiles en redes sociales.
+    Social Login (Inicio de Sesión Social):
+        Descripción: Funcionalidad que permite a los usuarios iniciar sesión en el sitio web utilizando sus cuentas de redes sociales.
+        Función: Simplifica el proceso de autenticación, mejorando la experiencia del usuario al permitir un inicio de sesión rápido y seguro.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Arquitectura de Servicios se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con la Infraestructura Central:
+        Core System:
+            API Gateway: Actúa como el punto de entrada para todas las solicitudes externas, enruta tráfico hacia servicios internos como autenticación, pagos y comunicación.
+            Auth Service: Se comunica con la capa de caché para almacenar y recuperar tokens de sesión, mejorando la eficiencia de la autenticación.
+            Cache Layer: Optimiza el rendimiento general del sistema almacenando en caché datos frecuentes, reduciendo la latencia y la carga en otros servicios.
+
+    Procesamiento Seguro de Pagos:
+        Payment Services:
+            Payment Gateway: Gestiona las transacciones financieras de manera segura, interactuando con APIs de proveedores como Stripe y PayPal para procesar pagos.
+            Stripe API y PayPal API: Proporcionan integraciones robustas para manejar diferentes métodos de pago, ofreciendo flexibilidad a los usuarios y seguridad en las transacciones.
+
+    Gestión Eficiente de Comunicaciones:
+        Communication:
+            Email Service: Se integra con el sistema de autenticación para enviar correos de verificación y recuperación de contraseñas, y con el sistema de pagos para enviar confirmaciones de transacciones.
+            SMS Gateway y Push Notifications: Proporcionan canales adicionales para notificar a los usuarios sobre eventos importantes, mejorando la comunicación y la interacción con el usuario.
+
+    Integración y Extensión Social:
+        Social Integration:
+            Social Media API: Facilita la integración con plataformas de redes sociales, permitiendo funcionalidades de inicio de sesión social y compartir contenido, lo que amplía el alcance y la interacción de la audiencia.
+            Share Service y Social Login: Mejoran la experiencia del usuario al permitir interacciones sociales directas desde el sitio web, fomentando la participación y el engagement.
+
+    Seguridad y Rendimiento:
+        Cache Layer: Trabaja estrechamente con todos los servicios para asegurar que los datos frecuentes se entreguen rápidamente, reduciendo la carga en los servicios backend y mejorando el tiempo de respuesta.
+        Auth Service: Garantiza que solo los usuarios autenticados y autorizados accedan a ciertos recursos y funcionalidades, manteniendo la seguridad del sistema.
+
+    Integración con Otros Componentes del Sistema:
+        Database Cluster y Server Caching: Aunque no se muestran directamente en este diagrama, los servicios centrales y de pago interactúan con la base de datos y las capas de caching para almacenar y recuperar información de manera eficiente.
+        Monitoring and Alerting: Herramientas como Prometheus y Grafana monitorean el rendimiento de todos estos servicios, proporcionando alertas en tiempo real para cualquier anomalía o degradación del rendimiento.
+
+Ventajas de Esta Arquitectura de Servicios
+
+    Escalabilidad:
+        La separación de servicios en módulos distintos (Core System, Payment Services, Communication, Social Integration) permite escalar cada componente de manera independiente según la demanda.
+
+    Alta Disponibilidad y Resiliencia:
+        La utilización de un API Gateway y servicios redundantes (como múltiples integraciones de pagos y canales de comunicación) asegura que el sistema permanezca operativo incluso ante fallos parciales.
+
+    Mejora de la Experiencia del Usuario:
+        Funcionalidades como Social Login y Push Notifications ofrecen una interacción más fluida y personalizada, aumentando la satisfacción y retención de los usuarios.
+
+    Seguridad Robusta:
+        Auth Service y Payment Gateway garantizan que las transacciones y accesos sean seguros, protegiendo tanto los datos de los usuarios como las operaciones financieras.
+
+    Flexibilidad y Mantenibilidad:
+        La arquitectura modular facilita la actualización y mantenimiento de componentes individuales sin afectar al sistema en su totalidad, permitiendo una evolución continua y adaptativa.
+
+    Eficiencia en la Gestión de Recursos:
+        Cache Layer optimiza el uso de recursos al almacenar y servir datos frecuentemente accedidos, reduciendo la carga en los servicios backend y mejorando el rendimiento general del sistema.
+
+    Integración Social y Amplificación de Alcance:
+        La Integración Social permite que los usuarios compartan contenido y se autentiquen fácilmente, expandiendo el alcance de la librería y fomentando una comunidad más activa y comprometida.
+
+Próximos Pasos
+
+    Implementación del API Gateway:
+        Configurar y optimizar el API Gateway para gestionar eficientemente el tráfico entrante, asegurar la seguridad y facilitar el enrutamiento hacia los servicios internos.
+
+    Integración de Servicios de Pago:
+        Completar la integración con las APIs de Stripe y PayPal, asegurando que las transacciones sean seguras y cumplan con las normativas financieras pertinentes.
+
+    Desarrollo de Funcionalidades de Comunicación:
+        Implementar y configurar el Email Service, SMS Gateway y Push Notifications para manejar eficientemente todas las comunicaciones con los usuarios.
+
+    Extensión de Integración Social:
+        Integrar con más plataformas de redes sociales y mejorar las funcionalidades de Social Login y Share Service para aumentar el engagement y la facilidad de uso.
+
+    Optimización de la Capa de Caché:
+        Ajustar las configuraciones de la Cache Layer para maximizar el rendimiento y asegurar que los datos críticos estén disponibles rápidamente.
+
+    Monitorización y Alertas:
+        Configurar herramientas de monitorización para rastrear el rendimiento de todos los servicios, estableciendo alertas para cualquier comportamiento anómalo o degradación del rendimiento.
+
+    Pruebas de Seguridad y Rendimiento:
+        Realizar pruebas exhaustivas de seguridad para proteger contra vulnerabilidades y pruebas de rendimiento para asegurar que el sistema pueda manejar el tráfico esperado sin problemas.
+
+    Capacitación del Equipo:
+        Entrenar al equipo de desarrollo y operaciones sobre la gestión y mantenimiento de estos servicios, asegurando una administración eficiente y la capacidad de respuesta ante incidentes.
+
+    Automatización en el Pipeline CI/CD:
+        Integrar la configuración y despliegue de estos servicios en el Pipeline CI/CD para facilitar despliegues rápidos y consistentes, manteniendo la integridad del sistema durante las actualizaciones.
+
+    Documentación y Políticas Internas:
+        Crear documentación detallada sobre la arquitectura de servicios, flujos de trabajo y procedimientos operativos para facilitar la referencia y el cumplimiento de las políticas internas.
+
+Conclusión
+
+El Diagrama de Arquitectura de Servicios proporciona una estructura robusta y eficiente para gestionar los componentes centrales del sistema, procesamiento seguro de pagos, comunicaciones efectivas e integración social en la web de la librería "Sargantana Mediterrània". Al dividir el sistema en subcomponentes especializados, se logra una mayor escalabilidad, resiliencia y flexibilidad, permitiendo que cada servicio funcione de manera óptima y se mantenga de forma independiente.
+
+Esta integración en la topología general del sistema asegura que todos los servicios trabajen en conjunto de manera armoniosa, proporcionando una experiencia de usuario fluida y segura. Además, la implementación de estrategias de caché eficientes y la monitorización continua garantizan que el sistema pueda manejar altas cargas de tráfico mientras mantiene un rendimiento excepcional.

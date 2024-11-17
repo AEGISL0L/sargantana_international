@@ -1,0 +1,212 @@
+3.2. Diagrama de Integración de Sistemas (System Integration Diagram)
+
+    Descripción: Muestra cómo diferentes sistemas y servicios externos (por ejemplo, servicios de correo electrónico, APIs de terceros) se integran con la web.
+    Componentes Incluidos: APIs, Servicios de Terceros, Módulos Internos, Conexiones de Datos.
+
+
+graph TD
+    subgraph "Core System"
+        WebApp[Web Application]
+        AuthSystem[Authentication System]
+        DBSystem[Database System]
+    end
+
+    subgraph "External Services"
+        EmailService[Email Service]
+        PaymentGW[Payment Gateway]
+        Analytics[Analytics Service]
+        CDN[Content Delivery Network]
+    end
+
+    subgraph "Internal APIs"
+        UserAPI[User Management API]
+        RoleAPI[Role Management API]
+        LogAPI[Logging API]
+    end
+
+    subgraph "Integration Layer"
+        APIGateway[API Gateway]
+        MessageQueue[Message Queue]
+        Cache[Cache Layer]
+    end
+
+    WebApp -->|REST| APIGateway
+    APIGateway -->|Route| UserAPI & RoleAPI & LogAPI
+    
+    WebApp -->|Static Content| CDN
+    WebApp -->|Events| MessageQueue
+    
+    AuthSystem -->|Verify| UserAPI
+    DBSystem -->|Data| Cache
+    
+    MessageQueue -->|Notifications| EmailService
+    APIGateway -->|Transactions| PaymentGW
+    WebApp -->|Usage Data| Analytics
+
+
++-----------------------------+
+|         Core System         |
++-----------------------------+
+|  +---------+   +---------+  |
+|  | WebApp  |   | Auth    |  |
+|  |         |   | System  |  |
+|  +---------+   +---------+  |
+|        |           |         |
+|        v           v         |
+|  +---------+   +---------+  |
+|  | DB      |   | UserAPI |  |
+|  | System  |   +---------+  |
+|  +---------+                |
++-----------------------------+
+        |         |           
+
++-----------------------------+
+|     Internal APIs           |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | RoleAPI |  | LogAPI  |   |
+|  +---------+  +---------+   |
++-----------------------------+
+        |         |
+        v         v
++-----------------------------+
+|     Integration Layer       |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | API     |  | Message |   |
+|  | Gateway |  | Queue   |   |
+|  +---------+  +---------+   |
+|        |           |         |
+|  +---------+  +---------+   |
+|  | Cache   |  | CDN     |   |
+|  +---------+  +---------+   |
++-----------------------------+
+
++-----------------------------+
+|    External Services        |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | Email   |  | Payment |   |
+|  | Service |  | Gateway |   |
+|  +---------+  +---------+   |
+|  +---------+  +---------+   |
+|  | Analytics|  | CDN     |  |
+|  +---------+  +---------+   |
++-----------------------------+
+
+
+
+Descripción del Diagrama de Arquitectura
+1. Core System (Sistema Central)
+
+    Web Application (Aplicación Web):
+        Descripción: El frontend y backend principal de la aplicación, manejando la interfaz de usuario y lógica del negocio.
+        Función: Procesa solicitudes de los usuarios y gestiona la comunicación con los componentes internos y externos.
+
+    Authentication System (Sistema de Autenticación):
+        Descripción: Módulo encargado de verificar credenciales y manejar sesiones de usuario.
+        Función: Valida la identidad de los usuarios y gestiona el acceso a recursos protegidos.
+
+    Database System (Sistema de Base de Datos):
+        Descripción: Utiliza MariaDB para almacenar datos de usuarios, transacciones y registros de actividad.
+        Función: Proporciona persistencia de datos y permite consultas eficientes.
+
+2. Internal APIs (APIs Internas)
+
+    User Management API (UserAPI):
+        Descripción: Gestiona la creación, actualización y eliminación de usuarios.
+        Función: Proporciona endpoints para manejar operaciones relacionadas con los usuarios.
+
+    Role Management API (RoleAPI):
+        Descripción: Gestiona la asignación y verificación de roles de usuario.
+        Función: Define y aplica permisos basados en los roles de los usuarios.
+
+    Logging API (LogAPI):
+        Descripción: Centraliza los registros de actividades y errores del sistema.
+        Función: Proporciona trazabilidad y facilita la auditoría del sistema.
+
+3. Integration Layer (Capa de Integración)
+
+    API Gateway:
+        Descripción: Actúa como un punto de entrada centralizado para las solicitudes de la aplicación.
+        Función: Redirige las solicitudes a los servicios internos apropiados y aplica reglas de seguridad.
+
+    Message Queue:
+        Descripción: Maneja eventos asincrónicos y notificaciones.
+        Función: Facilita la comunicación entre componentes mediante colas de mensajes, mejorando la eficiencia y el rendimiento.
+
+    Cache Layer:
+        Descripción: Capa de almacenamiento temporal para mejorar el rendimiento.
+        Función: Almacena en caché datos frecuentemente consultados para reducir la carga en la base de datos.
+
+4. External Services (Servicios Externos)
+
+    Email Service (Servicio de Correo Electrónico):
+        Descripción: Servicio externo para enviar correos electrónicos de confirmación y notificaciones.
+        Función: Facilita la comunicación con los usuarios, informándoles sobre eventos importantes.
+
+    Payment Gateway (Pasarela de Pago):
+        Descripción: Servicio para procesar transacciones financieras.
+        Función: Gestiona pagos y transacciones, permitiendo compras seguras en la aplicación.
+
+    Analytics Service (Servicio de Análisis):
+        Descripción: Recolecta datos sobre el uso de la aplicación.
+        Función: Proporciona estadísticas e informes para ayudar a mejorar la experiencia del usuario.
+
+    CDN (Red de Entrega de Contenidos):
+        Descripción: Almacena y distribuye contenido estático como imágenes, hojas de estilo y scripts.
+        Función: Mejora la velocidad de carga al entregar recursos desde servidores cercanos al usuario.
+
+Flujo de Interacción entre Componentes
+
+    Solicitudes del Usuario:
+        El usuario interactúa con la aplicación web, que envía solicitudes al API Gateway para acceder a datos o realizar operaciones.
+
+    Verificación de Autenticación:
+        El Authentication System valida las credenciales del usuario a través del UserAPI y crea sesiones utilizando el SessionMgr.
+
+    Consulta y Persistencia de Datos:
+        El API Gateway redirige las solicitudes al UserAPI, RoleAPI o LogAPI, que interactúan con el Database System para almacenar o recuperar datos.
+
+    Notificaciones y Mensajería:
+        El Message Queue maneja eventos como actualizaciones de perfil o notificaciones de pago, enviando correos electrónicos a través del Email Service.
+
+    Procesamiento de Pagos:
+        El Payment Gateway gestiona transacciones financieras, permitiendo a los usuarios realizar pagos seguros.
+
+    Optimización del Rendimiento:
+        El Cache Layer almacena datos frecuentemente consultados, y el CDN entrega contenido estático para mejorar la velocidad de la aplicación.
+
+    Monitorización y Análisis:
+        El Analytics Service recolecta datos sobre el uso de la aplicación, proporcionando estadísticas e informes para análisis.
+
+Ventajas de Esta Arquitectura
+
+    Escalabilidad y Modularidad:
+        La separación de responsabilidades permite escalar cada componente de forma independiente según la demanda.
+
+    Seguridad Mejorada:
+        El API Gateway y el Authentication System aplican reglas de seguridad y validaciones estrictas para proteger los datos del usuario.
+
+    Rendimiento Optimizado:
+        El uso de caché y la entrega de contenido a través de CDN reducen la latencia y mejoran la experiencia del usuario.
+
+    Integración Flexible:
+        La capa de integración facilita la conexión con servicios externos como el Payment Gateway y el Email Service, mejorando la funcionalidad del sistema.
+
+Próximos Pasos para la Implementación
+
+    Desarrollar e Integrar el API Gateway:
+        Configurar el API Gateway para gestionar las solicitudes y aplicar políticas de seguridad.
+
+    Implementar el Sistema de Caché:
+        Configurar la Cache Layer para almacenar datos críticos y mejorar el rendimiento.
+
+    Configurar el Servicio de Mensajería:
+        Implementar el Message Queue para manejar eventos asincrónicos y notificaciones.
+
+    Integrar Servicios Externos:
+        Configurar la integración con el Payment Gateway y el Email Service para manejar transacciones y notificaciones.
+
+    Monitoreo y Pruebas:
+        Realizar pruebas exhaustivas para validar la interacción entre componentes y configurar el monitoreo del sistema.

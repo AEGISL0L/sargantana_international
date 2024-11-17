@@ -1,0 +1,252 @@
+2.3. Diagrama de Seguridad de Red (Network Security Diagram)
+
+    Descripción: Detalla las medidas de seguridad implementadas en la red.
+    Componentes Incluidos: Firewalls, WAF (Firewall de Aplicaciones Web), VPN, Sistemas de Detección de Intrusos (IDS), etc.
+
+graph TD
+    subgraph "External Security"
+        Internet((Internet))
+        DDOS[DDoS Protection]
+        EdgeFW[Edge Firewall]
+        IDS[Intrusion Detection]
+        WAF[Web App Firewall]
+    end
+
+    subgraph "Access Control"
+        IPFilter[IP Filtering]
+        GeoBlock[Geo Blocking]
+        VPN[VPN Gateway]
+    end
+
+    subgraph "Application Security"
+        AuthBasic[Basic Auth - Eivissa]
+        AuthDigest[Digest Auth - Formentera]
+        SSL[SSL/TLS]
+        SessionMgr[Session Manager]
+    end
+
+    subgraph "Monitoring & Response"
+        SIEM[Security Monitoring]
+        IPS[Intrusion Prevention]
+        Logger[Security Logs]
+    end
+
+    Internet --> DDOS
+    DDOS --> EdgeFW
+    EdgeFW --> IDS
+    IDS --> WAF
+    
+    EdgeFW --> IPFilter
+    IPFilter --> GeoBlock
+    EdgeFW --> VPN
+    
+    WAF --> AuthBasic & AuthDigest
+    AuthBasic & AuthDigest --> SSL
+    SSL --> SessionMgr
+    
+    IDS --> SIEM
+    SIEM --> IPS
+    IPS --> Logger
+
+
+
+
++-----------------------------+
+|      External Security      |
++-----------------------------+
+|  +---------+                |
+|  | Internet|                |
+|  +---------+                |
+|       |                     |
+|  +---------+                |
+|  | DDoS    |                |
+|  | Protection|              |
+|  +---------+                |
+|       |                     |
+|  +---------+                |
+|  | Edge     |               |
+|  | Firewall |               |
+|  +---------+                |
+|       |                     |
+|  +---------+                |
+|  | IDS      |               |
+|  | Intrusion|               |
+|  | Detection|               |
+|  +---------+                |
+|       |                     |
+|  +---------+                |
+|  | WAF      |               |
+|  | Web App  |               |
+|  | Firewall |               |
+|  +---------+                |
++-----------------------------+
+        |         |
+        v         v
++-----------------------------+
+|      Access Control         |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | IP      |  | Geo     |   |
+|  | Filtering| | Blocking|   |
+|  +---------+  +---------+   |
+|        |                   |
+|  +---------+              |
+|  | VPN     |              |
+|  | Gateway |              |
+|  +---------+              |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|   Application Security      |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | Basic   |  | Digest  |   |
+|  | Auth    |  | Auth    |   |
+|  | Eivissa |  | Formentera| |
+|  +---------+  +---------+   |
+|        |                   |
+|  +---------+              |
+|  | SSL/TLS |              |
+|  +---------+              |
+|        |                   |
+|  +---------+              |
+|  | Session |              |
+|  | Manager |              |
+|  +---------+              |
++-----------------------------+
+        |
+        v
++-----------------------------+
+| Monitoring & Response       |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | SIEM    |  | IPS     |   |
+|  | Monitoring| Prevention|  |
+|  +---------+  +---------+   |
+|        |                   |
+|  +---------+              |
+|  | Logger  |              |
+|  | Security|              |
+|  | Logs    |              |
+|  +---------+              |
++-----------------------------+
+
+
+
+
+Descripción del Diagrama de Seguridad
+1. External Security (Seguridad Externa)
+
+    DDoS Protection (Protección contra DDoS):
+        Descripción: Protege el sistema contra ataques de denegación de servicio distribuidos (DDoS).
+        Función: Filtra el tráfico malicioso para evitar que sature los recursos del servidor.
+
+    Edge Firewall (Cortafuegos Perimetral):
+        Descripción: Primera línea de defensa que controla el tráfico de entrada y salida.
+        Función: Filtra solicitudes basadas en reglas de seguridad predefinidas.
+
+    Intrusion Detection System (IDS):
+        Descripción: Monitorea el tráfico de red en busca de patrones sospechosos.
+        Función: Detecta actividades inusuales o intentos de intrusión.
+
+    Web Application Firewall (WAF):
+        Descripción: Protege la aplicación web de ataques comunes, como inyecciones SQL y Cross-Site Scripting (XSS).
+        Función: Inspecciona y filtra el tráfico HTTP/HTTPS.
+
+2. Access Control (Control de Acceso)
+
+    IP Filtering (Filtrado de IP):
+        Descripción: Permite o bloquea el acceso basado en la dirección IP del usuario.
+        Función: Restringe el acceso a ubicaciones geográficas permitidas (Eivissa y Formentera).
+
+    Geo Blocking (Bloqueo Geográfico):
+        Descripción: Restringe el acceso basado en la ubicación geográfica del usuario.
+        Función: Bloquea el tráfico proveniente de ubicaciones no autorizadas.
+
+    VPN Gateway:
+        Descripción: Permite el acceso seguro a la intranet mediante una conexión VPN.
+        Función: Proporciona un túnel seguro para administradores y empleados que acceden remotamente.
+
+3. Application Security (Seguridad de la Aplicación)
+
+    Basic Auth - Eivissa:
+        Descripción: Método de autenticación básico utilizado para usuarios de Eivissa.
+        Función: Solicita credenciales de usuario y contraseña para acceder a la aplicación.
+
+    Digest Auth - Formentera:
+        Descripción: Método de autenticación seguro utilizado para usuarios de Formentera.
+        Función: Utiliza un hash seguro para autenticar al usuario, evitando el envío de contraseñas en texto plano.
+
+    SSL/TLS:
+        Descripción: Protocolo de cifrado que asegura la comunicación entre el cliente y el servidor.
+        Función: Protege los datos en tránsito contra interceptaciones.
+
+    Session Manager (Gestor de Sesiones):
+        Descripción: Maneja la creación, validación y destrucción de sesiones de usuario.
+        Función: Asegura que solo los usuarios autenticados tengan acceso al sistema.
+
+4. Monitoring & Response (Monitoreo y Respuesta)
+
+    SIEM (Security Information and Event Management):
+        Descripción: Sistema de monitoreo que recolecta y analiza datos de seguridad.
+        Función: Proporciona alertas en tiempo real sobre actividades sospechosas.
+
+    Intrusion Prevention System (IPS):
+        Descripción: Bloquea automáticamente intentos de intrusión detectados por el IDS.
+        Función: Actúa de forma proactiva para evitar accesos no autorizados.
+
+    Security Logs (Registros de Seguridad):
+        Descripción: Almacena registros detallados de actividades y eventos de seguridad.
+        Función: Permite auditorías y facilita la detección de incidentes.
+
+Flujo de Seguridad e Interacción entre Componentes
+
+    Protección Externa:
+        El tráfico entrante pasa primero por la protección contra DDoS y el cortafuegos perimetral, donde se filtran las solicitudes maliciosas.
+
+    Control de Acceso:
+        El filtrado de IP y el bloqueo geográfico limitan el acceso a usuarios de Eivissa y Formentera.
+        Los administradores pueden acceder de forma segura mediante la puerta de enlace VPN.
+
+    Autenticación y Cifrado:
+        Los usuarios se autentican mediante Basic Auth (Eivissa) o Digest Auth (Formentera).
+        Toda la comunicación está protegida por SSL/TLS para evitar interceptaciones.
+
+    Monitoreo y Respuesta:
+        El IDS detecta actividades sospechosas y el IPS bloquea intentos de intrusión.
+        El SIEM analiza los datos de seguridad y genera alertas para los administradores.
+
+    Registro y Auditoría:
+        Todas las actividades y eventos se registran en los Security Logs, facilitando la trazabilidad y las auditorías.
+
+Ventajas de Esta Arquitectura de Seguridad
+
+    Protección Integral:
+        Combina múltiples capas de seguridad para proteger contra una amplia gama de amenazas.
+
+    Control de Acceso Robusto:
+        Restringe el acceso mediante filtrado de IP, bloqueo geográfico y autenticación segura.
+
+    Monitoreo Proactivo:
+        El SIEM y el IPS permiten una respuesta rápida a incidentes de seguridad.
+
+    Cifrado de Comunicación:
+        SSL/TLS asegura que todos los datos en tránsito estén protegidos contra interceptaciones.
+
+Próximos Pasos para la Implementación
+
+    Configurar el WAF y el IDS:
+        Implementar reglas personalizadas para proteger la aplicación web y detectar patrones de ataque.
+
+    Integrar el SIEM:
+        Configurar el SIEM para recolectar datos de seguridad y establecer alertas automatizadas.
+
+    Configurar Autenticación Segura:
+        Implementar Basic Auth y Digest Auth para usuarios de Eivissa y Formentera, respectivamente.
+
+    Realizar Pruebas de Seguridad:
+        Ejecutar pruebas de penetración para validar la efectividad de las medidas de seguridad.
+
+
+

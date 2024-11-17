@@ -1,0 +1,219 @@
+21. Diagramas de Internacionalización y Localización
+21.1. Diagrama de Estrategias de Internacionalización (Internationalization Strategy Diagram)
+
+    Descripción: Representa cómo se gestionan múltiples idiomas y adaptaciones culturales en el sistema.
+    Componentes Incluidos: Soporte Multilingüe, Traducción de Contenidos, Adaptación a Normas Locales.
+
+
+graph TD
+    subgraph "Language Management"
+        LangDetect[Language Detection]
+        LangSelect[Language Selection]
+        DefaultLang[Default Language]
+    end
+
+    subgraph "Content Translation"
+        StringRes[String Resources]
+        ContentDB[Content Database]
+        DynamicText[Dynamic Text]
+    end
+
+    subgraph "Regional Adaptation"
+        DateFormat[Date Formats]
+        Currency[Currency Display]
+        TimeZone[Time Zones]
+    end
+
+    subgraph "Translation Workflow"
+        Extract[Extract Strings]
+        Translate[Translation Process]
+        Import[Import Translations]
+    end
+
+    LangDetect --> LangSelect
+    LangSelect --> StringRes
+    StringRes --> ContentDB
+    ContentDB --> DynamicText
+    
+    Extract --> Translate --> Import
+    Import --> StringRes
+    
+    LangSelect --> DateFormat & Currency & TimeZone
+
+
+Diagrama ASCII de Gestión de Idiomas y Traducción de Contenido
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|      Language Management  |       |      Content Translation  |       |     Regional Adaptation   |       |      Translation Workflow  |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| | LangDetect| |LangSelect|  |       | | StringRes| |ContentDB|  |       | |DateFormat| |Currency |  |       | | Extract | |Translate|  |
+| |Language  | |Language |   |       | | String  | |Content  |  |       | | Date    | |Display  |  |       | | Extract | |Translate|  |
+| |Detection | |Selection|   |       | |Resources| |Database |  |       | | Formats | |         |  |       | | Extract | |Translate|  |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |DefaultLang|              |       | |DynamicText|             |       | |TimeZone |             |       | | Import  |                   |
+| |Default   |              |       | | Dynamic  |             |       | |         |             |       | | Import  |                   |
+| |Language  |              |       | | Text     |             |       | |         |             |       | +---------+                   |
+| +---------+                |       | +---------+               |       | +---------+               |       |                               |
++-----------+----------------+       +-----------+---------------+       +-----------+---------------+       +-----------+-------------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | Language Detection|             | String Resources  |             | Date Formats      |             | Extract Strings   |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | Language Selection|             | Content Database  |             | Currency Display  |             | Translation Process|
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | String Resources  |             | Dynamic Text      |             | Time Zones        |             | Import Translations|
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                |                                 |                                 |
+            +--------------+-----------------+                                 |                                 |
+                           |                                               +-----+------+                          |
+                           v                                               | Translate  |                          |
+            +-------------------------------+                          | Translate   |                          |
+            |      Content Database         |                          +-----+------+                          |
+            +-------------------------------+                                |                                 |
+                           |                                                v                                 |
+                           |                                   +---------------------+                       |
+                           +---------------------------------->|  Translation Process |                       |
+                                                                   +---------------------+                       |
+                                                                                                              |
+                                                                                                              v
+                                                                                                   +---------------------+
+                                                                                                   |  Import Translations|
+                                                                                                   +---------------------+
+
+Descripción del Diagrama
+1. Language Management (Gestión de Idiomas)
+
+    Language Detection (Detección de Idioma):
+        Descripción: Identifica automáticamente el idioma preferido del usuario a partir de su navegador o preferencias.
+        Función: Asegura que el contenido se muestre en el idioma adecuado sin intervención manual del usuario.
+
+    Language Selection (Selección de Idioma):
+        Descripción: Permite a los usuarios seleccionar manualmente su idioma preferido en caso de que la detección automática no sea precisa.
+        Función: Proporciona flexibilidad y mejora la experiencia del usuario al permitirle elegir el idioma que prefiera.
+
+    Default Language (Idioma Predeterminado):
+        Descripción: Define el idioma por defecto que se utilizará si no se detecta o selecciona ningún otro idioma.
+        Función: Garantiza que siempre haya un idioma disponible para mostrar el contenido, evitando situaciones donde el contenido no se presenta correctamente.
+
+2. Content Translation (Traducción de Contenido)
+
+    String Resources (Recursos de Cadenas):
+        Descripción: Almacena todas las cadenas de texto que necesitan ser traducidas, como mensajes de interfaz de usuario, etiquetas y textos dinámicos.
+        Función: Centraliza la gestión de texto multilingüe, facilitando las actualizaciones y mantenimientos de las traducciones.
+
+    Content Database (Base de Datos de Contenido):
+        Descripción: Almacena el contenido traducido y otros datos relacionados con las traducciones.
+        Función: Proporciona una estructura organizada para almacenar y acceder a las traducciones de manera eficiente.
+
+    Dynamic Text (Texto Dinámico):
+        Descripción: Maneja el texto que se genera dinámicamente en la aplicación, como mensajes personalizados y notificaciones.
+        Función: Asegura que el contenido generado en tiempo real también esté disponible en múltiples idiomas.
+
+3. Regional Adaptation (Adaptación Regional)
+
+    Date Formats (Formatos de Fecha):
+        Descripción: Adapta los formatos de fecha según la región del usuario (por ejemplo, DD/MM/YYYY vs. MM/DD/YYYY).
+        Función: Mejora la comprensión y legibilidad del contenido al presentar fechas en un formato familiar para el usuario.
+
+    Currency Display (Visualización de Moneda):
+        Descripción: Muestra las monedas locales de acuerdo con la ubicación geográfica del usuario.
+        Función: Facilita transacciones y entendimiento de precios, mejorando la experiencia de compra.
+
+    Time Zones (Zonas Horarias):
+        Descripción: Ajusta las zonas horarias para mostrar horarios y fechas relevantes según la ubicación del usuario.
+        Función: Asegura que la información de tiempo sea precisa y relevante para el usuario, evitando confusiones.
+
+4. Translation Workflow (Flujo de Trabajo de Traducción)
+
+    Extract Strings (Extraer Cadenas):
+        Descripción: Extrae todas las cadenas de texto que necesitan ser traducidas desde el código fuente y los archivos de configuración.
+        Función: Facilita la preparación de contenido para el proceso de traducción, asegurando que todas las cadenas relevantes sean identificadas.
+
+    Translation Process (Proceso de Traducción):
+        Descripción: Traduce las cadenas extraídas a los idiomas deseados utilizando traductores humanos o servicios de traducción automática.
+        Función: Genera versiones traducidas del contenido que luego serán importadas al sistema.
+
+    Import Translations (Importar Traducciones):
+        Descripción: Importa las traducciones completadas de vuelta al sistema, actualizando los recursos de cadenas y la base de datos de contenido.
+        Función: Integra las traducciones en el sistema, permitiendo que los usuarios accedan al contenido en su idioma preferido.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Gestión de Idiomas y Traducción de Contenido se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con el Servidor y la Aplicación:
+        Language Management: El servidor detecta automáticamente el idioma del usuario o permite la selección manual a través de la interfaz de usuario. Esto se integra con el backend para cargar los recursos de cadenas en el idioma correspondiente desde la Content Database.
+        Content Translation: Las cadenas de texto en diferentes idiomas se gestionan a través de String Resources y se almacenan en la Content Database, permitiendo que la aplicación recupere y muestre el contenido adecuado según el idioma seleccionado.
+
+    Adaptación Regional en la Presentación de Contenido:
+        Regional Adaptation: Los formatos de fecha, visualización de moneda y zonas horarias se ajustan dinámicamente según la región del usuario, mejorando la relevancia y la comprensión del contenido mostrado.
+
+    Flujo de Trabajo de Traducción Integrado:
+        Translation Workflow: El proceso automatizado de extracción, traducción e importación de cadenas asegura que el contenido siempre esté actualizado y disponible en los idiomas requeridos. Esto se integra con el Pipeline CI/CD para automatizar la actualización de traducciones durante los despliegues.
+
+    Colaboración con Otros Componentes del Sistema:
+        Pipeline CI/CD: Las traducciones se gestionan como parte del flujo de trabajo de desarrollo, permitiendo que las actualizaciones de contenido multilingüe se desplieguen automáticamente junto con otras actualizaciones de la aplicación.
+        Monitoring and Alerting: Se monitorea la integridad y disponibilidad de las traducciones, alertando al equipo de desarrollo si hay problemas con la carga de recursos de idiomas o la adaptación regional.
+
+    Experiencia del Usuario Final:
+        Interfaz de Usuario: Los usuarios experimentan una interfaz adaptada a su idioma y región, con fechas, monedas y zonas horarias presentadas de manera coherente y relevante. Esto mejora la usabilidad y la satisfacción del usuario al interactuar con el sitio web.
+
+    Seguridad y Cumplimiento:
+        Data Protection: Las traducciones y adaptaciones regionales se gestionan de manera segura, asegurando que el contenido sensible se maneje correctamente según las políticas de privacidad y protección de datos.
+
+Ventajas de Este Enfoque de Gestión de Idiomas y Traducción de Contenido
+
+    Experiencia de Usuario Mejorada:
+        Ofrecer contenido en múltiples idiomas y adaptaciones regionales mejora la accesibilidad y satisfacción del usuario, ampliando el alcance de la librería a audiencias globales.
+
+    Consistencia y Eficiencia:
+        Centralizar la gestión de cadenas de texto y automatizar el flujo de trabajo de traducción asegura que las actualizaciones de contenido sean consistentes y se implementen de manera eficiente.
+
+    Escalabilidad:
+        La arquitectura permite agregar fácilmente nuevos idiomas y adaptaciones regionales sin restructuraciones significativas del sistema.
+
+    Reducción de Errores:
+        Automatizar la extracción e importación de traducciones minimiza errores manuales y asegura que todas las cadenas relevantes estén correctamente traducidas y disponibles.
+
+    Flexibilidad:
+        Permitir tanto la detección automática de idioma como la selección manual ofrece flexibilidad a los usuarios, mejorando la experiencia general.
+
+    Cumplimiento Normativo:
+        Adaptar formatos de fecha, moneda y zonas horarias asegura el cumplimiento con las regulaciones locales y mejora la relevancia del contenido presentado a los usuarios.
+
+Próximos Pasos
+
+    Implementación de la Gestión de Idiomas:
+        Configurar Language Detection, Language Selection y establecer un Default Language para garantizar que el contenido se muestre correctamente en todos los escenarios.
+
+    Desarrollo del Flujo de Trabajo de Traducción:
+        Implementar herramientas y procesos para Extract Strings, Translate e Import Translations, integrándolos con el Pipeline CI/CD para automatizar actualizaciones de traducciones durante los despliegues.
+
+    Adaptación Regional de Contenido:
+        Definir y aplicar formatos regionales para fechas, monedas y zonas horarias, asegurando que el contenido se presente de manera coherente y relevante para cada usuario.
+
+    Integración con la Base de Datos de Contenido:
+        Asegurar que String Resources y Content Database estén correctamente sincronizados y optimizados para acceder rápidamente a las traducciones necesarias según el idioma y región del usuario.
+
+    Monitorización y Validación:
+        Configurar herramientas de monitorización para rastrear el rendimiento de la gestión de idiomas y traducciones, y realizar pruebas regulares para asegurar la precisión y disponibilidad del contenido multilingüe.
+
+    Capacitación del Equipo:
+        Entrenar al equipo de desarrollo y de contenido sobre las mejores prácticas de gestión de idiomas, traducción y adaptación regional para mantener la consistencia y calidad del contenido.
+
+    Mejora Continua:
+        Recopilar feedback de los usuarios sobre la precisión y relevancia de las traducciones y adaptaciones regionales, ajustando los procesos y herramientas según sea necesario para mejorar la experiencia del usuario.
+
+Conclusión
+
+El Diagrama de Gestión de Idiomas y Traducción de Contenido proporciona una estructura integral para manejar la localización y adaptación regional en la web de la librería "Sargantana Mediterrània". Al centralizar la gestión de idiomas, optimizar el flujo de trabajo de traducción y adaptar el contenido a las preferencias regionales, se asegura una experiencia de usuario coherente, accesible y personalizada para una audiencia global.
+
+Esta integración en la topología general del sistema garantiza que todos los aspectos de la localización trabajen en conjunto para ofrecer contenido relevante y preciso, mejorando la usabilidad y satisfacción del usuario. Además, la automatización del flujo de trabajo de traducción y la adaptación regional facilita el mantenimiento y la escalabilidad del sistema, permitiendo que la librería responda rápidamente a las necesidades cambiantes del mercado y de sus usuarios.

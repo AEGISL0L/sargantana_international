@@ -1,0 +1,216 @@
+Diagramas de Gestión de Usuarios y Roles Avanzada: Facilitan la planificación de cómo se gestionaráin los diferentes roles y permisos de los usuarios, mejorando la seguridad y la organización.
+
+
+22. Diagramas de Gestión de Usuarios y Roles
+22.1. Diagrama de Gestión de Roles (Role Management Diagram)
+
+    Descripción: Muestra cómo se gestionan y asignan los roles de usuario dentro del sistema.
+    Componentes Incluidos: Roles (SuperAdministrador, CapDepartament, etc.), Permisos, Asignación de Roles.
+
+
+
+graph TD
+    subgraph "Role Hierarchy"
+        SuperAdmin[Super Administrator]
+        DeptHead[Cap Departament]
+        Staff[Staff]
+        Client[Client]
+    end
+
+    subgraph "Permission Sets"
+        AdminPerms[Admin Permissions]
+        DeptPerms[Department Permissions]
+        StaffPerms[Staff Permissions]
+        ClientPerms[Client Permissions]
+    end
+
+    subgraph "Role Assignment"
+        UserCreate[User Creation]
+        RoleAssign[Role Assignment]
+        PermAssign[Permission Assignment]
+        AuditLog[Audit Logging]
+    end
+
+    SuperAdmin --> AdminPerms
+    DeptHead --> DeptPerms
+    Staff --> StaffPerms
+    Client --> ClientPerms
+
+    UserCreate --> RoleAssign
+    RoleAssign --> PermAssign
+    PermAssign --> AuditLog
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+
+|       Role Hierarchy      |       |       Permission Sets     |       |      Role Assignment      |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| |SuperAdmin| |DeptHead |   |       | |AdminPerm| |DeptPerm |   |       | |UserCreate| |RoleAssign|   |
+| |Super Administrator| |Cap Departament| |Admin Perms| |Dept Perms|   |       | |User Create| |Role Assign|   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
+| | Staff   | | Client  |   |       | |StaffPerm| |ClientPerm|   |       | |PermAssign| | AuditLog |   |
+| | Staff    | | Client  |   |       | |Staff Perms| |Client Perms| |       | |Perm Assign| | Audit Log |   |
+| +---------+ +---------+   |       | +---------+ +---------+   |       | +---------+ +---------+   |
++-----------+----------------+       +-----------+---------------+       +-----------+---------------+
+        |                                |                                 |
+        |                                |                                 |
+        v                                v                                 v
++-------------------+             +-------------------+             +-------------------+
+|  SuperAdmin       |             |  AdminPerms       |             |  UserCreate       |
++-------------------+             +-------------------+             +-------------------+
+        |                                |                                 |
+        v                                v                                 v
++-------------------+             +-------------------+             +-------------------+
+|  DeptHead         |             |  DeptPerms        |             |  RoleAssign       |
++-------------------+             +-------------------+             +-------------------+
+        |                                |                                 |
+        v                                v                                 v
++-------------------+             +-------------------+             +-------------------+
+|  Staff            |             |  StaffPerms       |             |  PermAssign       |
++-------------------+             +-------------------+             +-------------------+
+        |                                |                                 |
+        v                                v                                 v
++-------------------+             +-------------------+             +-------------------+
+|  Client           |             |  ClientPerms      |             |  AuditLog         |
++-------------------+             +-------------------+             +-------------------+
+
+
+
+
+Descripción del Diagrama
+1. Role Hierarchy (Jerarquía de Roles)
+
+    Super Administrator (SuperAdmin):
+        Descripción: Nivel más alto de administración con todos los permisos y acceso total al sistema.
+        Función: Gestiona todos los aspectos del sistema, incluyendo la creación y asignación de roles y permisos a otros usuarios.
+
+    Cap Departament (DeptHead):
+        Descripción: Jefe de departamento con permisos específicos relacionados con la gestión de su departamento.
+        Función: Administra los recursos y usuarios dentro de su departamento, asignando roles y permisos adecuados.
+
+    Staff:
+        Descripción: Personal con permisos limitados para realizar tareas específicas dentro del sistema.
+        Función: Acceden a funcionalidades necesarias para sus responsabilidades laborales, sin acceso a áreas críticas del sistema.
+
+    Client:
+        Descripción: Usuarios externos que interactúan con el sistema con permisos muy limitados.
+        Función: Acceden únicamente a las funcionalidades necesarias para utilizar los servicios ofrecidos por la web, como ver productos o realizar compras.
+
+2. Permission Sets (Conjuntos de Permisos)
+
+    Admin Permissions (AdminPerms):
+        Descripción: Permisos asignados a los SuperAdministradores.
+        Función: Incluyen acceso completo a todas las funcionalidades y configuraciones del sistema.
+
+    Department Permissions (DeptPerms):
+        Descripción: Permisos asignados a los Jefes de Departamento.
+        Función: Incluyen acceso a gestionar usuarios y recursos dentro de su departamento específico.
+
+    Staff Permissions (StaffPerms):
+        Descripción: Permisos asignados al personal.
+        Función: Incluyen acceso limitado a funcionalidades necesarias para realizar sus tareas diarias.
+
+    Client Permissions (ClientPerms):
+        Descripción: Permisos asignados a los clientes.
+        Función: Incluyen acceso restringido para interactuar con el sistema según sus necesidades, como visualizar productos y realizar compras.
+
+3. Role Assignment (Asignación de Roles)
+
+    User Creation (UserCreate):
+        Descripción: Proceso de creación de nuevos usuarios en el sistema.
+        Función: Permite a los administradores crear cuentas de usuario y asignarles roles específicos.
+
+    Role Assignment (RoleAssign):
+        Descripción: Proceso de asignación de roles a los usuarios creados.
+        Función: Asegura que cada usuario tiene los permisos adecuados según su rol en la jerarquía.
+
+    Permission Assignment (PermAssign):
+        Descripción: Proceso de asignación de conjuntos de permisos a los roles.
+        Función: Define qué acciones y funcionalidades están permitidas para cada rol.
+
+    Audit Logging (AuditLog):
+        Descripción: Registro de todas las acciones relacionadas con la creación de usuarios, asignación de roles y permisos.
+        Función: Proporciona trazabilidad y auditoría para garantizar la seguridad y el cumplimiento de las políticas internas y regulaciones externas.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Jerarquía de Roles y Gestión de Permisos se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con la Base de Datos MariaDB:
+        Tables Involucradas:
+            Users Table: Almacena información de los usuarios, incluyendo sus roles y permisos asignados.
+            Roles Table: Define los diferentes roles disponibles en el sistema y sus correspondientes conjuntos de permisos.
+            Permissions Table: Especifica los permisos individuales que pueden asignarse a los roles.
+            Sessions Table: Gestiona las sesiones activas de los usuarios, asegurando que los permisos se apliquen correctamente durante la interacción con el sistema.
+
+    Gestión de Roles y Permisos:
+        User Rights Management: Los SuperAdministradores utilizan las funcionalidades del sistema para crear usuarios, asignarles roles y permisos adecuados a través de interfaces administrativas.
+        Role Assignment: A través de módulos de gestión, los administradores pueden asignar roles a los usuarios y definir qué permisos están asociados a cada rol, asegurando que cada usuario tiene el nivel de acceso correcto.
+
+    Seguridad y Cumplimiento:
+        Audit Logging: Todas las acciones de creación de usuarios, asignación de roles y permisos son registradas en los audit trails, permitiendo una revisión y auditoría detallada para cumplir con normativas de seguridad y protección de datos.
+        Compliance Monitoring: Los informes de cumplimiento se generan a partir de los logs de auditoría, asegurando que la gestión de roles y permisos cumple con las regulaciones vigentes como el GDPR.
+
+    Integración con el Sistema de Autenticación y Autorización:
+        Security Layer: Utiliza OAuth 2.0 y JWT Tokens para gestionar la autenticación y autorización de los usuarios basándose en sus roles y permisos asignados.
+        API Gateway: Controla el acceso a las APIs internas y externas, asegurando que solo los usuarios con los permisos adecuados puedan acceder a determinadas funcionalidades y datos.
+
+    Colaboración con Otros Componentes del Sistema:
+        Pipeline CI/CD: Durante los despliegues, las configuraciones de roles y permisos pueden actualizarse automáticamente mediante scripts de infraestructura como código (IaC), asegurando que las nuevas versiones del sistema mantienen las políticas de seguridad establecidas.
+        Monitoring and Alerting: Herramientas de monitorización supervisan las actividades relacionadas con la gestión de roles y permisos, alertando al equipo de administración sobre cualquier actividad sospechosa o cambios no autorizados.
+
+    Interfaces de Usuario:
+        Panel de Administración: Los administradores utilizan un panel centralizado para gestionar usuarios, roles y permisos, facilitando una administración eficiente y coherente de los accesos.
+        Interfaces de Usuario Final: Los usuarios finales interactúan con el sistema de acuerdo con los permisos asignados, garantizando una experiencia personalizada y segura.
+
+Ventajas de Este Enfoque de Gestión de Roles y Permisos
+
+    Seguridad Mejorada:
+        La asignación precisa de roles y permisos minimiza el riesgo de accesos no autorizados y asegura que los usuarios solo puedan realizar acciones permitidas.
+
+    Cumplimiento de Normativas:
+        El registro detallado de todas las acciones de gestión de usuarios y permisos facilita el cumplimiento de regulaciones de protección de datos y auditorías internas y externas.
+
+    Flexibilidad y Escalabilidad:
+        La estructura jerárquica de roles permite adaptarse fácilmente a cambios en la organización, permitiendo la creación de nuevos roles y la modificación de permisos según sea necesario.
+
+    Eficiencia Operativa:
+        La automatización de procesos de creación de usuarios y asignación de roles reduce la carga administrativa y acelera la incorporación de nuevos empleados o usuarios.
+
+    Transparencia y Trazabilidad:
+        Los audit logs proporcionan una trazabilidad completa de las acciones realizadas, permitiendo identificar rápidamente quién realizó qué cambios y cuándo.
+
+    Mejora de la Experiencia del Usuario:
+        Los usuarios tienen acceso a las funcionalidades que necesitan para realizar sus tareas, sin exponerse a partes del sistema que no son relevantes para sus roles.
+
+Próximos Pasos
+
+    Implementación de la Jerarquía de Roles:
+        Definir claramente los roles existentes (SuperAdministrator, Cap Departament, Staff, Client) y sus respectivos permisos en el sistema.
+
+    Configuración de Conjuntos de Permisos:
+        Asignar los permisos adecuados a cada conjunto (AdminPerms, DeptPerms, StaffPerms, ClientPerms) y asegurarse de que reflejen las necesidades operativas y de seguridad.
+
+    Desarrollo de Módulos de Asignación de Roles:
+        Implementar interfaces y funcionalidades que permitan a los administradores crear usuarios, asignar roles y permisos de manera eficiente y segura.
+
+    Integración con el Sistema de Autenticación:
+        Asegurar que el sistema de autenticación (OAuth 2.0, JWT Tokens) utilice correctamente los roles y permisos para controlar el acceso a las funcionalidades del sistema.
+
+    Implementación de Auditorías y Monitoreo:
+        Configurar herramientas de monitorización para rastrear y auditar todas las acciones relacionadas con la gestión de roles y permisos, generando alertas en caso de actividades sospechosas o no autorizadas.
+
+    Capacitación del Equipo:
+        Entrenar al equipo de TI y a los administradores sobre las mejores prácticas de gestión de roles y permisos, asegurando una administración coherente y segura.
+
+    Pruebas de Seguridad y Cumplimiento:
+        Realizar pruebas periódicas para verificar que la asignación de roles y permisos cumple con las políticas de seguridad y las regulaciones de protección de datos.
+
+    Documentación y Políticas Internas:
+        Documentar detalladamente las políticas de gestión de roles y permisos, proporcionando guías claras para los administradores y el equipo de TI.
+
+Conclusión
+
+El Diagrama de Jerarquía de Roles y Gestión de Permisos proporciona una estructura clara y eficiente para gestionar los accesos y privilegios de los usuarios dentro del sistema de la web de la librería "Sargantana Mediterrània". Al definir una jerarquía de roles bien estructurada, asignar conjuntos de permisos específicos y establecer procesos de asignación y auditoría robustos, se garantiza que el sistema sea seguro, escalable y conforme con las normativas de protección de datos.
+
+Esta integración en la topología general del sistema asegura que todos los usuarios tengan los niveles de acceso adecuados para realizar sus tareas, protegiendo los recursos críticos y manteniendo la integridad y confidencialidad de los datos. Además, la implementación de mecanismos de auditoría y monitoreo continuo fortalece la seguridad del sistema y facilita el cumplimiento de las regulaciones, construyendo una relación de confianza con los usuarios y protegiendo la reputación de la empresa.

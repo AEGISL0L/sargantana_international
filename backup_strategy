@@ -1,0 +1,227 @@
+14. Diagramas de Backup y Recuperación
+14.1. Diagrama de Estrategia de Backup (Backup Strategy Diagram)
+
+    Descripción: Detalla cómo se realizan los respaldos de datos y configuraciones.
+    Componentes Incluidos: Servidores de Backup, Frecuencia de Respaldo, Almacenamiento de Respaldo, Procedimientos de Recuperación.
+
+
+
+graph TD
+    subgraph "Data Sources"
+        MariaDB[MariaDB Database]
+        Config[Configuration Files]
+        UserFiles[User Files]
+        Logs[System Logs]
+    end
+
+    subgraph "Backup Schedule"
+        Daily[Daily Incremental]
+        Weekly[Weekly Full Backup]
+        Monthly[Monthly Archive]
+    end
+
+    subgraph "Backup Storage"
+        Primary[Primary Storage]
+        Secondary[Secondary Storage]
+        OffSite[Off-site Storage]
+    end
+
+    subgraph "Recovery Procedures"
+        Point[Point-in-Time Recovery]
+        Full[Full System Recovery]
+        Disaster[Disaster Recovery]
+    end
+
+    MariaDB & Config & UserFiles & Logs --> Daily
+    Daily --> Primary
+    Weekly --> Secondary
+    Monthly --> OffSite
+
+    Primary --> Point
+    Secondary --> Full
+    OffSite --> Disaster
+
+
+
++---------------------------+       +---------------------------+       +---------------------------+       +---------------------------+
+|        Data Sources       |       |      Backup Schedule      |       |      Backup Storage       |       |    Recovery Procedures    |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| |MariaDB  | | Config  |    |       | | Daily   | | Weekly  |    |       | |Primary  | |Secondary|    |       | |Point-in-| | Full    |    |
+| |Database | | Files   |    |       | |Increment| | Full    |    |       | |Storage  | |Storage  |    |       | |Time     | |System   |    |
+| |         | |         |    |       | |al      | | Backup  |    |       | |         | |         |    |       | |Recovery | |Recovery |    |
+| +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |       | +---------+ +---------+    |
+| |UserFiles| | Logs    |    |       | |Monthly |                     |       | |Off-site |                     |       | |Disaster |                     |
+| |         | |         |    |       | |Archive |                     |       | |Storage  |                     |       | |Recovery |                     |
+| +---------+ +---------+    |       | +---------+                     |       | +---------+                     |       | +---------+                     |
++-----------+----------------+       +-----------+---------------------+       +-----------+---------------------+       +-----------+---------------------+
+            |                                |                                 |                                 |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    |  MariaDB Database |             |  Daily Increment  |             |  Primary Storage  |             | Point-in-Time     |
+    +-------------------+             +-------------------+             +-------------------+             | Recovery          |
+            |                                |                                 |                                 |
+            v                                v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | Configuration     |             | Weekly Full Backup|             | Secondary Storage |             | Full System       |
+    | Files             |             +-------------------+             +-------------------+             | Recovery          |
+    +-------------------+                     |                                 |                                 |
+            |                                 v                                 v                                 v
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+    | User Files        |             | Monthly Archive   |             | Off-site Storage  |             | Disaster Recovery |
+    +-------------------+             +-------------------+             +-------------------+             +-------------------+
+            |                                                                        |
+            |                                                                        |
+            +------------------------------------------------------------------------+
+                                 |
+                                 v
+                       +-------------------+
+                       | Point-in-Time     |
+                       | Recovery          |
+                       +-------------------+
+
+
+
+Descripción del Diagrama
+1. Data Sources (Fuentes de Datos)
+
+    MariaDB Database (Base de Datos MariaDB):
+        Descripción: Sistema de gestión de bases de datos relacional utilizado para almacenar y gestionar datos críticos de la aplicación.
+        Función: Almacena información esencial como datos de usuarios, contenido, transacciones y otros datos necesarios para el funcionamiento del sitio web.
+    Configuration Files (Archivos de Configuración):
+        Descripción: Archivos que contienen configuraciones y parámetros necesarios para el funcionamiento de la aplicación y sus servicios.
+        Función: Almacenan configuraciones del sistema, parámetros de aplicaciones, y otros datos necesarios para mantener el entorno operativo.
+    User Files (Archivos de Usuarios):
+        Descripción: Archivos generados y gestionados por los usuarios, como documentos subidos, imágenes de perfil, etc.
+        Función: Almacenan datos creados y gestionados por los usuarios, asegurando que estén disponibles y protegidos.
+    Logs (Registros del Sistema):
+        Descripción: Archivos que registran eventos y actividades del sistema, incluyendo accesos, errores, transacciones, etc.
+        Función: Facilitan el monitoreo, auditoría y resolución de problemas al proporcionar un historial detallado de las operaciones del sistema.
+
+2. Backup Schedule (Programación de Backups)
+
+    Daily Incremental (Backup Incremental Diario):
+        Descripción: Copias de seguridad que almacenan solo los cambios realizados desde el último backup completo.
+        Función: Reduce el tiempo y espacio necesario para realizar backups diarios, permitiendo una recuperación rápida de datos recientes.
+    Weekly Full Backup (Backup Completo Semanal):
+        Descripción: Copias de seguridad completas que incluyen todos los datos del sistema.
+        Función: Proporciona una base sólida para la recuperación completa del sistema en caso de fallos severos.
+    Monthly Archive (Archivo Mensual):
+        Descripción: Copias de seguridad archivadas que se almacenan por períodos prolongados.
+        Función: Preserva datos históricos para cumplimiento normativo, auditorías y referencias futuras.
+
+3. Backup Storage (Almacenamiento de Backups)
+
+    Primary Storage (Almacenamiento Primario):
+        Descripción: Almacenamiento local o en el sitio para mantener las copias de seguridad recientes.
+        Función: Facilita un acceso rápido a los backups diarios para una recuperación inmediata.
+    Secondary Storage (Almacenamiento Secundario):
+        Descripción: Almacenamiento adicional para mantener las copias de seguridad semanales.
+        Función: Proporciona una capa extra de seguridad y redundancia, asegurando que los datos completos estén disponibles en caso de fallos en el almacenamiento primario.
+    Off-site Storage (Almacenamiento Fuera del Sitio):
+        Descripción: Almacenamiento ubicado en una ubicación física diferente al sitio principal.
+        Función: Protege los datos contra desastres locales, asegurando la disponibilidad de backups incluso en caso de eventos catastróficos que afecten al sitio principal.
+
+4. Recovery Procedures (Procedimientos de Recuperación)
+
+    Point-in-Time Recovery (Recuperación en un Punto en el Tiempo):
+        Descripción: Método de recuperación que permite restaurar la base de datos a un estado específico en el pasado.
+        Función: Facilita la recuperación de datos precisos hasta el momento exacto antes de un incidente, minimizando la pérdida de información.
+    Full System Recovery (Recuperación Completa del Sistema):
+        Descripción: Proceso de restauración total del sistema utilizando un backup completo.
+        Función: Permite una recuperación integral del sistema en caso de fallos graves, asegurando que todas las funcionalidades y datos se restauren.
+    Disaster Recovery (Recuperación ante Desastres):
+        Descripción: Planes y procedimientos para recuperar el sistema en caso de desastres mayores que afecten la infraestructura principal.
+        Función: Garantiza la continuidad del negocio mediante la recuperación rápida y eficiente de los sistemas críticos, minimizando el tiempo de inactividad.
+
+Integración en la Topología General del Sistema
+
+Este Diagrama de Estrategias de Backup y Recuperación se integra en la topología general del sistema de la web de la librería "Sargantana Mediterrània" de la siguiente manera:
+
+    Interacción con Componentes de Datos:
+        Data Sources: Los componentes críticos del sistema (MariaDB Database, Configuration Files, User Files, Logs) generan datos que necesitan ser respaldados regularmente para proteger la integridad y disponibilidad de la información.
+
+    Programación de Backups:
+        Backup Schedule: Define la frecuencia y el tipo de backups que se realizarán, asegurando que los datos estén protegidos contra pérdidas accidentales y fallos del sistema.
+            Daily Incremental: Se ejecuta diariamente para capturar cambios recientes sin sobrecargar el almacenamiento.
+            Weekly Full Backup: Se realiza semanalmente para asegurar que siempre haya una copia completa del sistema.
+            Monthly Archive: Se almacena mensualmente para cumplir con requisitos de retención de datos a largo plazo.
+
+    Almacenamiento de Backups:
+        Backup Storage: Los backups se almacenan en diferentes niveles para garantizar la redundancia y la seguridad.
+            Primary Storage: Almacena los backups incrementales diarios, facilitando una recuperación rápida.
+            Secondary Storage: Guarda los backups completos semanales, proporcionando una capa adicional de seguridad.
+            Off-site Storage: Archiva los backups mensuales en una ubicación separada para proteger los datos ante desastres locales.
+
+    Procedimientos de Recuperación:
+        Recovery Procedures: Define cómo se deben restaurar los datos en diferentes escenarios.
+            Point-in-Time Recovery: Utiliza los backups incrementales diarios para restaurar datos hasta un punto específico en el tiempo.
+            Full System Recovery: Emplea los backups completos semanales para una restauración integral del sistema.
+            Disaster Recovery: Se basa en los backups mensuales almacenados fuera del sitio para recuperar el sistema completo en caso de desastres mayores.
+
+    Integración con el Pipeline CI/CD:
+        Automatización de Backups: Integrar la ejecución de backups en el pipeline de CI/CD para asegurar que los backups se realicen de manera consistente y automática con cada despliegue o actualización del sistema.
+        Verificación de Backups: Implementar pasos en el pipeline para verificar la integridad y disponibilidad de los backups, asegurando que sean utilizables en caso de necesidad de recuperación.
+
+    Monitorización y Alertas:
+        Herramientas de Monitorización: Utilizar herramientas como Prometheus y Grafana para monitorear el estado de los procesos de backup, detectando fallos o retrasos en tiempo real.
+        Alert Manager: Configurar alertas para notificar al equipo de TI sobre cualquier problema en los procesos de backup, permitiendo una intervención rápida y evitando la pérdida de datos.
+
+    Seguridad y Cumplimiento:
+        Encriptación de Backups: Asegurar que todos los backups estén encriptados tanto en tránsito como en reposo para proteger la información sensible contra accesos no autorizados.
+        Control de Accesos: Implementar políticas estrictas de control de accesos para los sistemas de almacenamiento de backups, garantizando que solo personal autorizado pueda acceder y gestionar los backups.
+        Cumplimiento Normativo: Asegurar que las estrategias de backup y recuperación cumplan con las normativas y regulaciones de protección de datos aplicables, como el GDPR.
+
+Ventajas de Este Enfoque de Backup y Recuperación
+
+    Protección Integral de Datos:
+        Redundancia: Almacenar backups en múltiples niveles (primario, secundario, fuera del sitio) asegura que los datos estén protegidos contra diversos tipos de fallos y desastres.
+    Flexibilidad en la Recuperación:
+        Variedad de Procedimientos: Ofrecer diferentes métodos de recuperación (Point-in-Time, Full System, Disaster Recovery) permite adaptarse a distintos escenarios y necesidades de restauración.
+    Minimización de la Pérdida de Datos:
+        Backups Incrementales Diarios: Reducen la cantidad de datos perdidos en caso de una falla reciente al capturar cambios frecuentes.
+    Cumplimiento Normativo:
+        Retención de Datos: La programación de backups mensuales archivados ayuda a cumplir con requisitos de retención de datos y normativas legales.
+    Alta Disponibilidad y Resiliencia:
+        Recuperación Rápida: La disponibilidad de backups incrementales y completos facilita una recuperación rápida, minimizando el tiempo de inactividad.
+    Eficiencia en el Uso de Recursos:
+        Backups Incrementales: Optimiza el uso del almacenamiento al almacenar solo los cambios realizados desde el último backup completo.
+    Seguridad de Datos:
+        Encriptación y Control de Accesos: Protege los datos respaldados contra accesos no autorizados y garantiza su integridad y confidencialidad.
+    Escalabilidad:
+        Capacidad de Almacenamiento: La estructura de almacenamiento jerárquico permite escalar fácilmente el almacenamiento de backups conforme crecen los datos del sistema.
+    Automatización y Consistencia:
+        Pipeline CI/CD: Automatizar los procesos de backup asegura que se realicen de manera consistente y sin intervención manual, reduciendo el riesgo de errores humanos.
+
+Próximos Pasos
+
+    Configuración de Herramientas de Backup:
+        Implementar Software de Backup: Seleccionar e implementar herramientas de backup que soporten estrategias incrementales, completas y archivadas.
+        Automatización de Backups: Configurar scripts y tareas programadas para ejecutar backups diarios, semanales y mensuales automáticamente.
+    Configuración de Almacenamiento:
+        Provisionar Almacenamiento Primario, Secundario y Fuera del Sitio: Asegurar que los diferentes niveles de almacenamiento estén configurados y sean accesibles para almacenar los backups según la programación establecida.
+    Desarrollo de Procedimientos de Recuperación:
+        Crear Guías Detalladas: Documentar los pasos necesarios para realizar Point-in-Time Recovery, Full System Recovery y Disaster Recovery.
+        Pruebas de Recuperación: Realizar pruebas periódicas de los procedimientos de recuperación para asegurar que funcionen correctamente y que el equipo esté familiarizado con ellos.
+    Integración con el Pipeline CI/CD:
+        Automatizar Backups en Despliegues: Incorporar la ejecución de backups en el pipeline de CI/CD para garantizar que cada actualización del sistema esté respaldada adecuadamente.
+    Monitorización y Alertas:
+        Implementar Herramientas de Monitoreo: Configurar Prometheus y Grafana para monitorear los procesos de backup, almacenamientos y procedimientos de recuperación.
+        Configurar Alertas: Establecer alertas para notificar al equipo de TI sobre fallos en los procesos de backup o problemas con el almacenamiento.
+    Seguridad y Encriptación:
+        Encriptar Backups: Asegurar que todos los backups estén encriptados tanto en tránsito como en reposo.
+        Gestión de Claves: Implementar una gestión segura de claves para la encriptación, asegurando que solo personal autorizado pueda acceder a ellas.
+    Capacitación del Equipo:
+        Entrenamiento en Procedimientos de Backup y Recuperación: Capacitar al equipo de TI sobre cómo ejecutar y gestionar los procesos de backup y recuperación.
+    Documentación y Políticas:
+        Crear Documentación Completa: Documentar todas las estrategias, procedimientos y configuraciones de backup para referencia y cumplimiento.
+        Establecer Políticas de Retención: Definir y documentar políticas claras sobre cuánto tiempo se deben conservar los diferentes tipos de backups.
+    Revisión y Mejora Continua:
+        Auditorías Regulares: Realizar auditorías periódicas para asegurar que los procesos de backup y recuperación estén funcionando correctamente y cumplan con las políticas establecidas.
+        Optimización de Estrategias: Ajustar las estrategias de backup y almacenamiento según las necesidades cambiantes del sistema y el crecimiento de los datos.
+
+Conclusión
+
+El Diagrama de Estrategias de Backup y Recuperación proporciona una estructura sólida y eficiente para proteger los datos críticos de la web de la librería "Sargantana Mediterrània". Al implementar una programación de backups jerarquizada y utilizar múltiples niveles de almacenamiento, se asegura la disponibilidad y la integridad de los datos ante cualquier eventualidad, desde fallos menores hasta desastres catastróficos.
+
+Esta integración en la topología general del sistema garantiza que todos los componentes esenciales del sistema estén respaldados de manera adecuada y que existan procedimientos claros y efectivos para la recuperación de datos. Además, la automatización y monitorización continua de los procesos de backup y recuperación mejoran la eficiencia operativa y reducen el riesgo de pérdida de datos, fortaleciendo la resiliencia y la confianza en la infraestructura tecnológica de la librería.

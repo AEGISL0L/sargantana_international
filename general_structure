@@ -1,0 +1,254 @@
+
+1.2. Diagrama de Arquitectura de Software
+
+    Descripción: Detalla la estructura interna del software, incluyendo módulos, componentes y sus relaciones.
+    Componentes Incluidos: Módulos PHP, Frameworks (Skeleton y Bootstrap), Scripts de Validación, etc.
+
+
+graph TD
+    subgraph "Frontend Layer"
+        EivissaUI[Eivissa UI - Skeleton]
+        FormenteraUI[Formentera UI - Bootstrap]
+        JS[JavaScript Validation]
+        CSS[CSS Styles]
+    end
+
+    subgraph "Application Layer"
+        Auth[Authentication Module]
+        Session[Session Management]
+        UserMgmt[User Management]
+        RoleMgmt[Role Management]
+        Validation[PHP Validation]
+        Logger[Logging Module]
+    end
+
+    subgraph "Data Access Layer"
+        DBAccess[Database Access]
+        QueryBuilder[SQL Query Builder]
+    end
+
+    subgraph "Security Layer"
+        BasicAuth[Basic Authentication]
+        DigestAuth[Digest Authentication]
+        IPFilter[IP Filtering]
+        SSL[SSL/TLS Handler]
+    end
+
+    EivissaUI -->|Requests| Auth
+    FormenteraUI -->|Requests| Auth
+    JS -->|Client Validation| Validation
+    
+    Auth -->|Verify| Session
+    Auth -->|Check| RoleMgmt
+    UserMgmt -->|CRUD| DBAccess
+    RoleMgmt -->|Permissions| DBAccess
+    
+    DBAccess -->|Execute| QueryBuilder
+    Logger -->|Write| DBAccess
+
+    BasicAuth -->|Intranet| Auth
+    DigestAuth -->|Portal| Auth
+    IPFilter -->|Restrict| Auth
+
++-----------------------------+
+|        Frontend Layer       |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | Eivissa |  | Formentera| |
+|  | UI -    |  | UI -     |  |
+|  | Skeleton|  | Bootstrap|  |
+|  +---------+  +---------+   |
+|        |           |         |
+|  +---------+  +---------+   |
+|  | JavaScript|  | CSS     |  |
+|  | Validation|  | Styles  |  |
+|  +---------+  +---------+   |
++-----------------------------+
+        |           |
+        v           v
++-----------------------------+
+|      Application Layer      |
++-----------------------------+
+|  +---------+                |
+|  | Auth    |                |
+|  | Module  |                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Session |                |
+|  | Mgmt    |                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | User    |                |
+|  | Mgmt    |                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Role    |                |
+|  | Mgmt    |                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | PHP     |                |
+|  | Validation|             |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | Logger  |                |
+|  | Module  |                |
+|  +---------+                |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|     Data Access Layer       |
++-----------------------------+
+|  +---------+                |
+|  | DB      |                |
+|  | Access  |                |
+|  +---------+                |
+|        |                    |
+|  +---------+                |
+|  | SQL     |                |
+|  | Query   |                |
+|  | Builder |                |
+|  +---------+                |
++-----------------------------+
+        |
+        v
++-----------------------------+
+|       Security Layer        |
++-----------------------------+
+|  +---------+  +---------+   |
+|  | Basic   |  | Digest   |  |
+|  | Auth    |  | Auth     |  |
+|  +---------+  +---------+   |
+|        |         |           |
+|  +---------+  +---------+   |
+|  | IP      |  | SSL/TLS  |  |
+|  | Filter  |  | Handler  |  |
+|  +---------+  +---------+   |
++-----------------------------+
+
+
+Descripción de la Arquitectura del Sistema
+1. Frontend Layer (Capa de Frontend)
+
+    Eivissa UI - Skeleton:
+        Descripción: Interfaz de usuario basada en el framework Skeleton para los usuarios de Eivissa.
+        Función: Proporciona una interfaz ligera y responsive.
+
+    Formentera UI - Bootstrap:
+        Descripción: Interfaz de usuario basada en el framework Bootstrap para los usuarios de Formentera.
+        Función: Ofrece una interfaz estilizada y responsive con componentes predefinidos.
+
+    JavaScript Validation:
+        Descripción: Validaciones realizadas en el cliente para verificar la entrada de datos.
+        Función: Asegura que los datos ingresados por el usuario cumplan con los requisitos antes de enviarlos al servidor.
+
+    CSS Styles:
+        Descripción: Hojas de estilo CSS que definen el diseño visual de las interfaces de usuario.
+        Función: Mejora la apariencia y la experiencia del usuario.
+
+2. Application Layer (Capa de Aplicación)
+
+    Authentication Module:
+        Descripción: Módulo encargado de manejar el proceso de autenticación de usuarios.
+        Función: Verifica credenciales y gestiona el acceso al sistema.
+
+    Session Management (Gestión de Sesiones):
+        Descripción: Módulo que maneja la creación y destrucción de sesiones.
+        Función: Mantiene el estado del usuario autenticado.
+
+    User Management (Gestión de Usuarios):
+        Descripción: Módulo encargado de las operaciones CRUD para usuarios.
+        Función: Permite a los administradores crear, leer, actualizar y eliminar usuarios.
+
+    Role Management (Gestión de Roles):
+        Descripción: Módulo que gestiona la asignación de roles y permisos a los usuarios.
+        Función: Define y aplica permisos basados en los roles asignados.
+
+    PHP Validation:
+        Descripción: Validaciones adicionales realizadas en el servidor utilizando PHP.
+        Función: Asegura que los datos recibidos sean seguros y cumplan con los requisitos.
+
+    Logging Module:
+        Descripción: Módulo que registra eventos y actividades del sistema.
+        Función: Proporciona trazabilidad y facilita auditorías.
+
+3. Data Access Layer (Capa de Acceso a Datos)
+
+    Database Access (Acceso a Base de Datos):
+        Descripción: Módulo encargado de interactuar con la base de datos.
+        Función: Realiza operaciones de lectura y escritura en la base de datos.
+
+    SQL Query Builder:
+        Descripción: Generador de consultas SQL para interactuar con la base de datos.
+        Función: Construye consultas SQL de forma segura y eficiente.
+
+4. Security Layer (Capa de Seguridad)
+
+    Basic Authentication (Autenticación Básica):
+        Descripción: Autenticación utilizada para la intranet de Eivissa.
+        Función: Solicita usuario y contraseña en texto plano (cifrado con SSL/TLS).
+
+    Digest Authentication (Autenticación Digest):
+        Descripción: Autenticación utilizada para el portal de clientes de Formentera.
+        Función: Utiliza un hash seguro para autenticar al usuario.
+
+    IP Filtering (Filtrado de IP):
+        Descripción: Filtra el acceso basado en la dirección IP del usuario.
+        Función: Restringe el acceso a usuarios de Eivissa y Formentera.
+
+    SSL/TLS Handler:
+        Descripción: Manejador de conexiones seguras utilizando SSL/TLS.
+        Función: Protege la comunicación entre el cliente y el servidor.
+
+Flujo de Datos e Interacción entre Componentes
+
+    Interacción del Usuario:
+        El usuario interactúa con la interfaz de usuario de Eivissa (Skeleton) o Formentera (Bootstrap), y los datos son validados con JavaScript.
+
+    Autenticación y Gestión de Sesiones:
+        El módulo de autenticación verifica las credenciales, crea una sesión y asigna los permisos correspondientes utilizando el módulo de gestión de roles.
+
+    Acceso a Datos:
+        Las operaciones de gestión de usuarios y roles se realizan a través del módulo de acceso a la base de datos, utilizando el generador de consultas SQL.
+
+    Seguridad y Monitoreo:
+        La autenticación básica o digest se aplica según la ubicación, y la comunicación se protege con SSL/TLS.
+        Todas las actividades se registran en el módulo de logging para auditorías.
+
+Ventajas de Esta Arquitectura
+
+    Modularidad y Mantenimiento:
+        La separación por capas permite un desarrollo y mantenimiento más sencillo.
+
+    Seguridad Mejorada:
+        La combinación de autenticación, filtrado de IP y cifrado SSL/TLS proporciona varias capas de seguridad.
+
+    Optimización del Rendimiento:
+        La validación en el cliente reduce la carga en el servidor y mejora la experiencia del usuario.
+
+    Escalabilidad:
+        La estructura modular permite añadir nuevos módulos o servicios fácilmente sin afectar a los componentes existentes.
+
+Próximos Pasos para la Implementación
+
+    Configurar Validaciones en JavaScript y PHP:
+        Implementar validaciones robustas para garantizar la seguridad de los datos.
+
+    Implementar el Módulo de Logging:
+        Configurar el registro de eventos para facilitar auditorías y depuración.
+
+    Configurar el Acceso a la Base de Datos:
+        Desarrollar el módulo de acceso a datos y el generador de consultas SQL para interactuar con la base de datos.
+
+    Implementar la Seguridad de la Aplicación:
+        Configurar SSL/TLS y los métodos de autenticación para proteger la comunicación.
+
+Si necesitas más detalles sobre la implementación o ajustes en el diagrama, estaré encantado de ayudarte.
+
+
+
