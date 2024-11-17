@@ -3196,9 +3196,16 @@ Diagramas de Internacionalización y Localización: Importantes si el sistema ne
     Descripción: Representa cómo se gestionan múltiples idiomas y adaptaciones culturales en el sistema.
     Componentes Incluidos: Soporte Multilingüe, Traducción de Contenidos, Adaptación a Normas Locales.
 
+git add language/LangManager.php language/TranslationService.php language/RegionalAdapter.php
 
+git commit -m "feat: Implement language management system
 
+- Add LangManager with locale handling
+- Create TranslationService with parameter support
+- Implement RegionalAdapter with content formatting
+- Set up currency and date localization
 
+Relates to: #LANG-111 #I18N-222"
 graph TD
     subgraph "Language Management"
         LangDetect[Language Detection]
@@ -3248,6 +3255,17 @@ Diagramas de Gestión de Usuarios y Roles Avanzada: Facilitan la planificación 
     Componentes Incluidos: Roles (SuperAdministrador, CapDepartament, etc.), Permisos, Asignación de Roles.
 
 
+git add translation/ContentTranslator.php translation/StringManager.php translation/DynamicTextHandler.php
+
+
+git commit -m "feat: Implement content translation system
+
+- Add ContentTranslator with language validation
+- Create StringManager with resource loading
+- Implement DynamicTextHandler with variable support
+- Set up localized string management
+
+Relates to: #TRANS-333 #TEXT-444"
 
 graph TD
     subgraph "Role Hierarchy"
