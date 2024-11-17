@@ -2102,6 +2102,15 @@ sequenceDiagram
     Descripción: Representa el flujo de actividades o procesos dentro del sistema.
     Escenarios Incluidos: Flujo de registro de usuario, validación de formularios, gestión de roles.
 
+git commit -m "feat: Implement core system components
+
+- Add structured logging system
+- Integrate user management with security features
+- Add content management with request tracking
+- Set up database logging infrastructure
+
+Relates to: #USER-123 #CONTENT-456"
+
 
 graph TD
     Start((Start)) --> FormInput[User Fills Registration Form]
