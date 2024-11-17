@@ -4090,6 +4090,15 @@ graph TD
     Descripción: Muestra cómo se monitorean los diferentes componentes del sistema y cómo se gestionan las alertas.
     Componentes Incluidos: Herramientas de Monitoreo, Métricas, Alertas, Paneles de Control.
 
+git add session/ActiveSession.php session/TimeoutHandler.php session/LogoutManager.php
+git commit -m "feat: Implement session flow system
+
+- Add ActiveSession with activity tracking
+- Create TimeoutHandler with inactivity checks
+- Implement LogoutManager with cleanup
+- Set up secure session management
+
+Relates to: #SESSION-333 #TIMEOUT-444"
 
 graph TD
     subgraph "System Metrics"
