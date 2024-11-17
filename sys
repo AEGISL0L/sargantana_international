@@ -2704,6 +2704,14 @@ graph TD
     Componentes Incluidos: Herramientas de CI/CD, Repositorios de Código, Scripts de Despliegue.
 
 
+git commit -m "feat: Implement frontend services
+
+- Add EivissaWeb with access validation
+- Create FormenteraWeb with session tracking
+- Implement StaticContentService with optimization
+- Set up content delivery system
+
+Relates to: #FRONT-555 #CONTENT-666"
 
 
     graph TD
@@ -2739,12 +2747,22 @@ graph TD
     
     Apache & PHP & DB & Security --> BuildServer
 
-    
+
 
 13.2. Diagrama de Pipeline de Despliegue (Deployment Pipeline Diagram)
 
     Descripción: Representa las etapas del pipeline de CI/CD.
     Etapas Incluidas: Commit, Build, Test, Deploy, Monitor.
+
+
+git commit -m "feat: Implement authentication services
+
+- Add AuthenticationService with secure validation
+- Create SessionService with token management 
+- Implement RoleService with permission calculation
+- Set up comprehensive access control
+
+Relates to: #AUTH-777 #PERM-888"
 
 
 graph LR
