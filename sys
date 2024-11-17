@@ -2341,6 +2341,14 @@ Diagramas de Estados y Ciclos de Vida: Importantes para entender cómo cambian l
     Escenarios Incluidos: Estados de una sesión (Inactiva, Activa, Expirada), Ciclo de vida de un usuario (Registrado, Verificado, Activo).
 
 
+git commit -m "feat: Add load balancing and server management
+
+- Implement LoadBalancer with optimal routing
+- Create ApacheServer request handling
+- Add VMManager for resource distribution
+- Set up high availability infrastructure
+
+Relates to: #LOAD-789 #VM-101"
 
 stateDiagram-v2
     %% Session States
@@ -2381,6 +2389,17 @@ Diagramas de Flujo de Proceso: Ayudan a detallar los pasos específicos dentro d
     Descripción: Muestra los pasos específicos en los procesos del sistema.
     Escenarios Incluidos: Proceso de validación de formulario, Proceso de asignación de roles, Proceso de autenticación.
 
+
+git add vm/EivissaVM.php vm/FormenteraVM.php vm/VMOrchestrator.php
+
+git commit -m "feat: Implement virtual machine management
+
+- Add EivissaVM with backup sync
+- Create FormenteraVM with resource allocation
+- Implement VMOrchestrator for pool management
+- Set up automated redundancy checks
+
+Relates to: #VM-202 #BACKUP-303"
 
 graph TD
     %% Form Validation Process
