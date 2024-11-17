@@ -285,14 +285,46 @@ Relates to: #TEST-333 #QA-444"
 
 git add jenkins/JenkinsConfig.php jenkins/PipelineManager.php jenkins/BuildManager.php
 
+git commit -m "feat: Build Jenkins CI/CD system
+
+- Add JenkinsConfig with pipeline setup
+- Create PipelineManager with workflow config
+- Implement BuildManager with artifact handling
+- Set up automated build infrastructure
+
+Relates to: #CI-555 #CD-666"
 
     Capacitación del Equipo:
         Entrenar a los Desarrolladores: Asegurar que todo el equipo de desarrollo esté familiarizado con Git Flow, Jenkins y las mejores prácticas de CI/CD.
         Documentar el Pipeline: Crear documentación detallada sobre el funcionamiento del pipeline, incluyendo cómo añadir nuevas etapas, manejar fallos y realizar despliegues manuales si es necesario.
 
+
+git add git/GitFlowManager.php git/BranchManager.php git/WorkflowEnforcer.php 
+
+git commit -m "feat: Build Git Flow management system
+
+- Add GitFlowManager with workflow definition
+- Create BranchManager with feature handling
+- Implement WorkflowEnforcer with validation
+- Set up standardized git processes
+
+Relates to: #GIT-777 #FLOW-888"
+
+
     Pruebas y Validación del Pipeline:
         Realizar Pruebas Piloto: Implementar el pipeline en un proyecto piloto para identificar y corregir posibles problemas antes de su despliegue completo.
         Iterar y Mejorar: Basado en los resultados de las pruebas piloto, ajustar y optimizar el pipeline para mejorar su eficiencia y fiabilidad.
+
+
+git add monitoring/PrometheusConfig.php monitoring/GrafanaManager.php monitoring/MetricCollector.php   
+git commit -m "feat: Build monitoring integration system
+
+- Add PrometheusConfig with metric definition
+- Create GrafanaManager with dashboard setup
+- Implement MetricCollector with data processing
+- Set up comprehensive monitoring infrastructure
+
+Relates to: #MON-999 #METRICS-000"     
 
     Implementación de Seguridad y Compliance:
         Asegurar Cumplimiento Normativo: Verificar que todas las prácticas de CI/CD cumplan con las normativas de seguridad y protección de datos aplicables.
