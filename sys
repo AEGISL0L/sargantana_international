@@ -3932,7 +3932,15 @@ graph TD
     Descripción: Representa cómo se gestionan los roles y permisos de los usuarios de manera avanzada.
     Componentes Incluidos: Panel de Administración, Asignación Dinámica de Roles, Auditoría de Actividades.
 
+git add entry/Homepage.php entry/LoginPage.php entry/Registration.php
+git commit -m "feat: Implement user entry point system
 
+- Add Homepage with dynamic content loading
+- Create LoginPage with credential validation  
+- Implement Registration with data verification
+- Set up secure user entry infrastructure
+
+Relates to: #ENTRY-555 #LOGIN-666"
 
 graph TD
     subgraph "Admin Panel"
@@ -3973,6 +3981,16 @@ graph TD
 
     Descripción: Muestra las estrategias de indexación implementadas para optimizar las consultas de la base de datos.
     Componentes Incluidos: Índices en Columnas Clave, Optimización de Consultas SQL, Uso de Índices Compuestos.
+
+git add navigation/IntranetNav.php navigation/ClientPortal.php navigation/LibrarySection.php
+git commit -m "feat: Implement main navigation system
+
+- Add IntranetNav with access validation
+- Create ClientPortal with request handling
+- Implement LibrarySection with content management
+- Set up structured navigation infrastructure
+
+Relates to: #NAV-777 #PORTAL-888"
 
 graph TD
     subgraph "Primary Indexes"
