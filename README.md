@@ -40,7 +40,8 @@ Sargantana es un sistema de gestión web modular y escalable, diseñado para man
 1. Clona el repositorio:
 
    ```bash
-   git clone https://github.com/tuusuario/sargantana.git
+   git clone https://github.com/AEGISL0L/sargantana_international.git
+   ```
    cd sargantana
 
 
