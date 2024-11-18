@@ -1,0 +1,234 @@
+3. Diagramas de Flujo de Datos
+3.1. Diagrama de Flujo de Datos (Data Flow Diagram - DFD)
+
+    Descripción: Ilustra cómo los datos se mueven a través del sistema, desde la entrada del usuario hasta el almacenamiento en la base de datos.
+    Componentes Incluidos: Procesos, Almacenes de Datos, Entidades Externas, Flujos de Datos.
+
+
+# Defines a top-down directed graph using Mermaid.js syntax
+# TD indicates the graph flows from top to bottom (Top-Down)
+# This graph will be used to illustrate the data flow between system components
+graph TD
+    subgraph "External Entities"
+        EivissaUser[Eivissa Users]
+        FormenteraUser[Formentera Users]
+        Admin[Administrators]
+    end
+
+    subgraph "Processes"
+        Auth[Authentication Process]
+        UserMgmt[User Management]
+        RoleMgmt[Role Management]
+        SessionHandler[Session Handler]
+        DataValidator[Data Validation]
+    end
+
+    subgraph "Data Stores"
+        UserDB[(User Database)]
+        RoleDB[(Role Database)]
+        SessionDB[(Session Store)]
+        LogDB[(Log Storage)]
+    end
+
+    EivissaUser -->|Login Data| Auth
+    FormenteraUser -->|Login Data| Auth
+    Admin -->|Admin Credentials| Auth
+
+    Auth -->|Validate| UserDB
+    Auth -->|Create| SessionHandler
+    SessionHandler -->|Store| SessionDB
+
+    UserMgmt -->|CRUD Operations| UserDB
+    RoleMgmt -->|Role Assignment| RoleDB
+    
+    DataValidator -->|Validated Data| UserMgmt
+    DataValidator -->|Access Rights| RoleMgmt
+
+    Auth -->|Log Activity| LogDB
+    UserMgmt -->|Log Changes| LogDB
+    RoleMgmt -->|Log Updates| LogDB
+
+
+
++-----------------------------+
+|       External Entities     |
++-----------------------------+
+|  +-------------+            |
+|  | Eivissa     |            |
+|  | Users       |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Formentera  |            |
+|  | Users       |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Admin       |            |
+|  +-------------+            |
++-----------------------------+
+         |           |
+         v           v
++-----------------------------+
+|          Processes          |
++-----------------------------+
+|  +-------------+            |
+|  | Auth       |            |
+|  | Process    |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | User       |            |
+|  | Management |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Role       |            |
+|  | Management |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Session    |            |
+|  | Handler    |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Data       |            |
+|  | Validation |            |
+|  +-------------+            |
++-----------------------------+
+         |           |
+         v           v
++-----------------------------+
+|        Data Stores          |
++-----------------------------+
+|  +-------------+            |
+|  | User       |            |
+|  | Database   |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Role       |            |
+|  | Database   |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Session    |            |
+|  | Store      |            |
+|  +-------------+            |
+|         |                   |
+|  +-------------+            |
+|  | Log        |            |
+|  | Storage    |            |
+|  +-------------+            |
++-----------------------------+
+
+
+Descripción del Diagrama de Procesos y Almacenes de Datos
+1. External Entities (Entidades Externas)
+
+    Eivissa Users (Usuarios de Eivissa):
+        Descripción: Usuarios que acceden desde la sede de Eivissa.
+        Función: Realizan operaciones de inicio de sesión y acceden al portal de clientes o la intranet.
+
+    Formentera Users (Usuarios de Formentera):
+        Descripción: Usuarios que acceden desde la sede de Formentera.
+        Función: Realizan operaciones de inicio de sesión y acceden al portal de clientes o la intranet.
+
+    Admin (Administradores):
+        Descripción: Usuarios con permisos de administración para gestionar usuarios, roles y auditorías.
+        Función: Realizan operaciones avanzadas, como asignación de roles y revisión de logs.
+
+2. Processes (Procesos)
+
+    Authentication Process (Proceso de Autenticación):
+        Descripción: Maneja la validación de credenciales y creación de sesiones.
+        Función: Verifica las credenciales ingresadas por el usuario contra la base de datos y crea una sesión para los usuarios autenticados.
+
+    User Management (Gestión de Usuarios):
+        Descripción: Gestiona las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para usuarios.
+        Función: Permite a los administradores gestionar los datos de los usuarios registrados en el sistema.
+
+    Role Management (Gestión de Roles):
+        Descripción: Gestiona la asignación y verificación de roles para los usuarios.
+        Función: Permite a los administradores definir permisos y asignar roles a los usuarios según sus necesidades.
+
+    Session Handler (Gestor de Sesiones):
+        Descripción: Maneja la creación, verificación y destrucción de sesiones de usuario.
+        Función: Gestiona el estado de la sesión para asegurar que solo los usuarios autenticados tengan acceso a contenido protegido.
+
+    Data Validation (Validación de Datos):
+        Descripción: Valida los datos ingresados por el usuario antes de procesarlos.
+        Función: Asegura que los datos cumplen con los requisitos antes de ser almacenados o utilizados.
+
+3. Data Stores (Almacenes de Datos)
+
+    User Database (Base de Datos de Usuarios):
+        Descripción: Almacena la información de los usuarios, incluyendo datos personales y credenciales.
+        Función: Proporciona acceso a datos de usuarios para las operaciones de autenticación y gestión.
+
+    Role Database (Base de Datos de Roles):
+        Descripción: Almacena información sobre roles y permisos.
+        Función: Permite la asignación de roles y verifica los permisos de los usuarios.
+
+    Session Store (Almacén de Sesiones):
+        Descripción: Almacena los tokens de sesión para mantener el estado del usuario autenticado.
+        Función: Permite validar y destruir sesiones de usuario según sea necesario.
+
+    Log Storage (Almacenamiento de Logs):
+        Descripción: Almacena registros de actividades y cambios en el sistema.
+        Función: Proporciona trazabilidad y permite auditorías de seguridad.
+
+Flujo de Interacción entre Componentes
+
+    Inicio de Sesión:
+        Los usuarios de Eivissa, Formentera o administradores envían datos de inicio de sesión al proceso de autenticación (Auth).
+        El proceso de autenticación valida las credenciales contra la base de datos de usuarios (UserDB) y crea una sesión utilizando el SessionHandler.
+
+    Gestión de Usuarios y Roles:
+        Los administradores utilizan el módulo de gestión de usuarios (UserMgmt) para realizar operaciones CRUD en la base de datos de usuarios (UserDB).
+        El módulo de gestión de roles (RoleMgmt) permite asignar roles a los usuarios y actualizar sus permisos en la base de datos de roles (RoleDB).
+
+    Validación de Datos:
+        El proceso de validación de datos (DataValidator) verifica los datos ingresados por el usuario antes de enviarlos a los módulos de gestión de usuarios y roles.
+
+    Manejo de Sesiones:
+        El SessionHandler almacena y verifica tokens de sesión en el SessionDB, permitiendo el acceso seguro a contenido protegido.
+
+    Registro de Actividades:
+        Todas las actividades importantes, como inicio de sesión, cambios de usuario y actualizaciones de roles, se registran en el almacenamiento de logs (LogDB).
+
+Ventajas de Esta Arquitectura
+
+    Modularidad y Escalabilidad:
+        La separación de procesos y almacenes de datos permite escalar cada componente de forma independiente según la demanda del sistema.
+
+    Seguridad Mejorada:
+        La validación de datos y el manejo de sesiones centralizado reducen el riesgo de accesos no autorizados.
+        Los logs detallados permiten auditorías y monitoreo del sistema para detectar actividades sospechosas.
+
+    Flexibilidad en la Gestión de Usuarios y Roles:
+        Los administradores pueden asignar roles y gestionar usuarios fácilmente, permitiendo una administración eficiente y adaptable.
+
+    Rendimiento Optimizado:
+        El uso de un almacén de sesiones dedicado mejora la eficiencia de la validación de sesiones y reduce la carga en la base de datos principal.
+
+Próximos Pasos para la Implementación
+
+    Configurar el Proceso de Autenticación:
+        Implementar la lógica de autenticación y creación de sesiones en el AuthSystem.
+
+    Desarrollar Módulos de Gestión de Usuarios y Roles:
+        Crear las funcionalidades para las operaciones CRUD y asignación de roles.
+
+    Integrar la Validación de Datos:
+        Implementar validaciones en el lado del cliente y del servidor para asegurar la integridad de los datos.
+
+    Implementar el Almacenamiento de Logs:
+        Configurar la base de datos de logs para registrar actividades y cambios en el sistema.
+
+    Realizar Pruebas de Seguridad:
+        Ejecutar pruebas para validar la seguridad del manejo de sesiones y la gestión de usuarios y roles.
+
+
+
