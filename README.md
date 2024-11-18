@@ -1,5 +1,5 @@
 # Sargantana
-
+![Sargantana](./assets/sargantana.webp)
 Sargantana es un sistema de gestión web modular y escalable, diseñado para manejar diferentes aspectos de una aplicación empresarial. El proyecto incluye módulos para autenticación, administración de contenido, integración con servicios externos, monitoreo del sistema, optimización de rendimiento y mucho más.
 
 ## 📋 Tabla de Contenidos
