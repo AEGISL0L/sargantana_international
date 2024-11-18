@@ -339,4 +339,125 @@ See also
 Literature
 
     Chris Lattner - The Architecture of Open Source Applications - Chapter 11 LLVM, ISBN 978-1257638017, released 2012 under CC BY 3.0 (Open Access).[66]
-    LLVM: A Compilation Framework for Lifelong Program Analysis & Transformation, a published paper by Chris Lattner, Vikram Adve
+    LLVM: A Compilation Framework for Lifelong Program Analysis & Transformation, a published paper by Chris Lattner, Vikram Adv
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HHVM
+
+    Article
+    Talk
+
+    Read
+    Edit
+    View history
+
+Tools
+
+Appearance
+Text
+
+    Small
+    Standard
+    Large
+
+Width
+
+    Standard
+    Wide
+
+Color (beta)
+
+    Automatic
+    Light
+    Dark
+
+From Wikipedia, the free encyclopedia
+HHVMHHVM logo, featuring white uppercase "HHVM" letters on a black background, with stylized triangular geometric shapes on the left
+Developer(s)	Meta Platforms
+Initial release	December 9, 2011; 12 years ago[1]
+Stable release	
+3.15.0[2] Edit this on Wikidata / 28 September 2016; 8 years ago
+Repository	
+
+    github.com/facebook/hhvm Edit this at Wikidata
+
+Written in	PHP, C++,[3] OCaml[4][a] and Rust[5]
+License	PHP License and Zend License[6]
+Website	hhvm.com Edit this at Wikidata
+
+HipHop Virtual Machine (HHVM) is an open-source virtual machine based on just-in-time (JIT) compilation that serves as an execution engine for the Hack programming language. By using the principle of JIT compilation, Hack code is first transformed into intermediate HipHop bytecode (HHBC), which is then dynamically translated into x86-64 machine code, optimized, and natively executed.[7][8] This contrasts with PHP's usual interpreted execution, in which the Zend Engine transforms PHP source code into opcodes that serve as a form of bytecode, and executes the opcodes directly on the Zend Engine's virtual CPU.[9]
+
+HHVM is developed by Meta, with the project's source code hosted on GitHub;[10] it is licensed under the terms of the PHP License and Zend License.[1][6]
+Overview
+
+HHVM was created as the successor to the HipHop for PHP (HPHPc) PHP execution engine, which is a PHP-to-C++ transpiler also created by Facebook.[11][12] Based on the gained experience and aiming to solve issues introduced by HPHPc, Meta decided in early 2010 to create a JIT-based PHP virtual machine. Issues associated with HPHPc included reaching a plateau for further performance improvements, a fundamental inability to support all features of the PHP language, and difficulties arising from specific time- and resource-consuming development and deployment processes.[11] In Q1 2013, the production version of the facebook.com website stopped using HPHPc and switched to HHVM.
+
+Following the JIT compilation principle, HHVM first converts the executed code into an intermediate language, the high-level bytecode HHBC. HHBC is a bytecode format created specifically for HHVM, appropriate for consumption by both interpreters and just-in-time compilers. Next, HHVM dynamically ("just-in-time") translates the HHBC into x86-64 machine code, optimized through dynamic analysis of the translated bytecode. Finally, it executes the x86-64 machine code.[1][11][13] As a result, HHVM has certain similarities to the virtual machines used by other programming languages, including the Common Language Runtime (CLR, for the C# language) and Java virtual machine (JVM, for the Java language).
+
+HHVM brings many benefits in comparison with HPHPc. HHVM uses the same execution engine when deployed in both production and development environments, while supporting integration between the execution engine and the HPHPd debugger in both environment types; as a result, maintaining HPHPi (HipHop interpreter) separately as a development utility is no longer needed as it was the case with HPHPc. HHVM also eliminates the lengthy builds required by HPHPc to run programs, resulting in much simpler development and deployment processes than it was the case with HPHPc.[1] Finally, versions of HHVM before 4.0 have almost complete support for the entire PHP language (as defined by the official implementation of PHP version 5.4), including the support for the create_function() and eval() constructs, which was impossible with HPHPc.[14][15]
+
+Together with HHVM 3.0,[16] Meta also released Hack, a derivative of PHP[17][18] that allows programmers to use both dynamic typing and static typing (a concept also known as gradual typing), and allows types to be specified for function arguments, function return values, and class properties. However, Hack does not provide complete backward compatibility since it removes several PHP features, such as the goto statement and dynamic variable names.[19][20][21][22]
+
+In September 2017, it was announced that version 3.30 would be the last version of HHVM to officially support PHP, and that HHVM will only support Hack going forward.[23] This was due to differences and incompatibilities in PHP 7.[24] HHVM 4.0, released in February 2019, was the first version without support for PHP.[25]
+Performance
+
+As a process virtual machine that provides the execution environment, HHVM has the ability to use live type information to produce more efficient native code, leading to a higher web server throughput and lower latency. In Q4 2012, the execution of facebook.com's source code on HHVM achieved performance parity with HPHPc,[11] and in December 2013 HPHPc was even surpassed by around 15%.[26]
+See also
+
+    iconComputer programming portal
+
+    LLVM
+    Parrot virtual machine
+    Phalanger
+
+Notes
+
+    Only the Hack's type-checking (hh_server and hh_client) and code-formatting (hh_format) command-line utilities and daemons bundled together with the HipHop Virtual Machine are written in OCaml.
+
+References
+
+Jason Evans (December 9, 2011). "The HipHop Virtual Machine". Meta Platforms. Retrieved August 2, 2014.
+"Release 3.15.0". September 28, 2016. Retrieved March 13, 2018.
+"Building and installing HHVM on CentOS 7.x". github.com. Meta Platforms. May 26, 2015. Retrieved June 12, 2015.
+"Building the Hack typechecker". github.com. Meta. September 10, 2014. Retrieved June 12, 2015.
+"Facebook's HHVM Begins Seeing Rust Rewrite - Phoronix". Retrieved August 29, 2019.
+"facebook/hhvm: License". github.com. Facebook, Inc. Retrieved August 2, 2014.
+Ottoni, Guilherme (June 20, 2018). "HHVM JIT: A Profile-Guided, Region-Based Compiler for PHP and Hack". Proceedings of the 39th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI). ACM. pp. 151–165.
+"facebook/hhvm". github.com. Meta Platforms. Retrieved August 2, 2014.
+Kaushik Pal (April 28, 2014). "PHP and Zend Engine Internals". phpbuilder.com. Archived from the original on September 15, 2014. Retrieved September 23, 2014.
+HHVM source code on GitHub
+Drew Paroski (November 29, 2012). "Speeding up PHP-based development with HHVM". Meta Platforms. Retrieved August 2, 2014.
+"Announcement on GitHub removing HPHPc support". github.com. Meta Platforms. February 19, 2013. Retrieved May 24, 2013.
+"HipHop Bytecode v1 revision 18". github.com. Meta Platforms. July 31, 2014. Retrieved May 24, 2013.
+"facebook/hhvm: About upgrade to PHP 5.4 engine". github.com. May 2013. Retrieved August 2, 2014.
+"facebook/hhvm: Home". github.com. Meta Platforms. May 8, 2014. Retrieved August 2, 2014.
+Paul Tarjan (March 28, 2014). "HHVM 3.0.0". Facebook. Retrieved December 26, 2022.
+Cade Metz (March 20, 2014). "Facebook Introduces 'Hack,' the Programming Language of the Future". Wired. Retrieved April 15, 2014.
+Julien Verlaguet; Alok Menghrajani (April 2014). "Hack: a new programming language for HHVM". code.facebook.com. Facebook. Retrieved March 23, 2014.
+Josh Lockhart (April 3, 2014). "Facebook's Hack, HHVM, and the future of PHP". O'Reilly Media. Retrieved August 2, 2014.
+"Hack and HHVM: Type Annotations (Hack Manual)". docs.hhvm.com. Retrieved March 25, 2014.
+"Hack and HHVM: Type Inference (Hack Manual)". docs.hhvm.com. Archived from the original on March 26, 2014. Retrieved March 25, 2014.
+"Hack and HHVM: Unsupported PHP Features in Hack (Hack Manual)". docs.hhvm.com. Archived from the original on November 4, 2015. Retrieved April 2, 2014.
+Fred Emmott (September 12, 2018). "Ending PHP Support, and The Future Of Hack". Retrieved December 26, 2022.
+Krill, Paul (September 20, 2017). "Forget PHP! Facebook's HHVM engine switches to Hack instead". InfoWorld. Retrieved February 6, 2019.
+Fred Emmott (February 11, 2019). "HHVM 4.0.0". Retrieved December 26, 2022.
+"We are the 98.5% (and the 16%)". hhvm.com. December 19, 2013. Retrieved August 2, 2014.
